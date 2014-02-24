@@ -1,0 +1,12 @@
+#!/usr/bin/php
+<?php
+
+define('WEBSERVER_BASEDIR', __DIR__ . '/../');
+
+require WEBSERVER_BASEDIR . '../vendor/autoload.php';
+
+$server = new \TechDivision\WebServer\Server(
+    new \TechDivision\WebServer\JsonConfig(WEBSERVER_BASEDIR . 'etc/webserver.json')
+);
+
+$server->run();

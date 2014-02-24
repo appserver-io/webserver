@@ -1,0 +1,30 @@
+{
+    "name": "techdivision/webserver",
+    "description": "Multithreaded webserver for php in php",
+    "homepage": "https://github.com/techdivision/TechDivision_Webserver",
+    "keywords": ["php", "server", "webserver", "httpd", "http-server"],
+    "license": ["OSL-3.0"],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url" : "/home/zelgerj/Repositories/TechDivision_Socket"
+        },
+        {
+            "type": "vcs",
+            "url" : "/home/zelgerj/Repositories/TechDivision_Http"
+        },
+        {
+            "type": "vcs",
+            "url" : "/home/zelgerj/Repositories/TechDivision_Spdy"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "techdivision/socket": "dev-master",
+        "techdivision/http": "dev-master",
+        "techdivision/spdy": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {"TechDivision": ["src/", "tests/"]}
+    }
+}

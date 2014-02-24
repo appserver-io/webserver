@@ -1,0 +1,13 @@
+{
+    "classes": {
+        "socket": "\\TechDivision\\Socket\\StreamSocket",
+        "parser": "\\TechDivision\\Http\\HttpParser",
+        "connection": "\\TechDivision\\Http\\HttpConnection",
+        "request": "\\TechDivision\\Http\\HttpRequest",
+        "response": "\\TechDivision\\Http\\HttpResponse"
+    },
+    "server": {
+        "port": "8081",
+        "listen": "0.0.0.0"
+    }
+}

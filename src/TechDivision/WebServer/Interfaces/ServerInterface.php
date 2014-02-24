@@ -1,10 +1,8 @@
 <?php
 
-namespace TechDivision\Http;
+namespace TechDivision\WebServer\Interfaces;
 
 interface ServerInterface
 {
-
-
 
 }

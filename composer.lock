@@ -1,0 +1,125 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
+    ],
+    "hash": "38d3b0b6c5fff6525e2b97c6cfa63a42",
+    "packages": [
+        {
+            "name": "techdivision/http",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "/home/zelgerj/Repositories/TechDivision_Http",
+                "reference": "c3eafb66fa50da20d11d86e6ce369ceeb757ae55"
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "TechDivision": [
+                        "src/",
+                        "tests/"
+                    ]
+                }
+            },
+            "license": [
+                "OSL-3.0"
+            ],
+            "description": "HTTP protocol implementation for usage in server context",
+            "homepage": "https://github.com/techdivision/TechDivision_Http",
+            "keywords": [
+                "http",
+                "php",
+                "protocol",
+                "server"
+            ],
+            "time": "2014-02-24 13:23:04"
+        },
+        {
+            "name": "techdivision/socket",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "/home/zelgerj/Repositories/TechDivision_Socket",
+                "reference": "123effd43b3d519376c406728f9f0fd9d5774d59"
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "TechDivision": [
+                        "src/",
+                        "tests/"
+                    ]
+                }
+            },
+            "license": [
+                "OSL-3.0"
+            ],
+            "description": "Socket library witch implements OOP socket handling",
+            "homepage": "https://github.com/techdivision/TechDivision_Socket",
+            "keywords": [
+                "php",
+                "socket",
+                "stream"
+            ],
+            "time": "2014-02-24 13:06:14"
+        },
+        {
+            "name": "techdivision/spdy",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "/home/zelgerj/Repositories/TechDivision_Spdy",
+                "reference": "c014662190bc68b42cc7c0a0aba38433e1488f65"
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "TechDivision": [
+                        "src/",
+                        "tests/"
+                    ]
+                }
+            },
+            "license": [
+                "OSL-3.0"
+            ],
+            "description": "SPDY protocol implementation for usage in server context",
+            "homepage": "https://github.com/techdivision/TechDivision_Spdy",
+            "keywords": [
+                "php",
+                "protocol",
+                "server",
+                "spdy"
+            ],
+            "time": "2014-02-24 13:07:58"
+        }
+    ],
+    "packages-dev": [
+
+    ],
+    "aliases": [
+
+    ],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "techdivision/socket": 20,
+        "techdivision/http": 20,
+        "techdivision/spdy": 20
+    },
+    "platform": {
+        "php": ">=5.4.0"
+    },
+    "platform-dev": [
+
+    ]
+}

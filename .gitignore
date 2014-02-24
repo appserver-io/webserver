@@ -6,3 +6,4 @@
 /.project
 /.settings
 /.build.properties
+/composer.lock

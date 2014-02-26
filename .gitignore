@@ -1,5 +1,6 @@
 .idea
 /target
+/reports
 /instance-src
 /vendor
 /.buildpath

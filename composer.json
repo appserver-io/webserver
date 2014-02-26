@@ -4,18 +4,12 @@
     "homepage": "https://github.com/techdivision/TechDivision_Webserver",
     "keywords": ["php", "server", "webserver", "httpd", "http-server"],
     "license": ["OSL-3.0"],
-    "repositories": [
+    "authors": [
         {
-            "type": "vcs",
-            "url" : "/home/zelgerj/Repositories/TechDivision_Socket"
-        },
-        {
-            "type": "vcs",
-            "url" : "/home/zelgerj/Repositories/TechDivision_Http"
-        },
-        {
-            "type": "vcs",
-            "url" : "/home/zelgerj/Repositories/TechDivision_Spdy"
+            "name": "Johann Zelger",
+            "email": "jz@techdivision.com",
+            "homepage": "http://www.techdivision.com",
+            "role": "Developer"
         }
     ],
     "require": {

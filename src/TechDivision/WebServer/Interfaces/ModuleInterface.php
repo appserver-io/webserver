@@ -1,6 +1,6 @@
 <?php
 /**
- * \TechDivision\WebServer\Interfaces\ConfigInterface
+ * \TechDivision\WebServer\Interfaces\ModuleInterface
  *
  * PHP version 5
  *
@@ -13,9 +13,10 @@
  */
 
 namespace TechDivision\WebServer\Interfaces;
+use TechDivision\WebServer\Exceptions\ModuleException;
 
 /**
- * Interface ConfigInterface
+ * Interface ModuleInterface
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
@@ -24,22 +25,17 @@ namespace TechDivision\WebServer\Interfaces;
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
-interface ConfigInterface
+interface ModuleInterface
 {
 
-    public function getServerListen();
-
-    public function getServerPort();
-
-
-    public function getSocketClassName();
-
-    public function getParserClassName();
-
-    public function getConnectionClassName();
-
-    public function getRequestClassName();
-
-    public function getResponseClassName();
-
+    /**
+     * Implement's module logic
+     *
+     * @param RequestInterface $request
+     * @param ResponseInterface $response
+     *
+     * @return bool
+     * @throws \TechDivision\WebServer\Exceptions\ModuleException
+     */
+    public function process(RequestInterface $request, ResponseInterface $response);
 }

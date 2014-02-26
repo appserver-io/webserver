@@ -1,6 +1,6 @@
 {
     "classes": {
-        "socket": "\\TechDivision\\Socket\\StreamSocket",
+        "socket": "\\TechDivision\\WebServer\\Sockets\\StreamSocket",
         "parser": "\\TechDivision\\Http\\HttpParser",
         "connection": "\\TechDivision\\Http\\HttpConnection",
         "request": "\\TechDivision\\Http\\HttpRequest",

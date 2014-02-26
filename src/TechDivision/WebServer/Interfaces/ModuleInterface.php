@@ -13,7 +13,11 @@
  */
 
 namespace TechDivision\WebServer\Interfaces;
+
 use TechDivision\WebServer\Exceptions\ModuleException;
+use TechDivision\Http\HttpRequestInterface;
+use TechDivision\Http\HttpResponseInterface;
+
 
 /**
  * Interface ModuleInterface
@@ -31,11 +35,35 @@ interface ModuleInterface
     /**
      * Implement's module logic
      *
-     * @param RequestInterface $request
-     * @param ResponseInterface $response
+     * @param \TechDivision\Http\HttpRequestInterface  $request
+     * @param \TechDivision\Http\HttpResponseInterface $response
      *
      * @return bool
      * @throws \TechDivision\WebServer\Exceptions\ModuleException
      */
-    public function process(RequestInterface $request, ResponseInterface $response);
+    public function process(HttpRequestInterface $request, HttpResponseInterface $response);
+
+    /**
+     * Return's an array of module names which should be executed first
+     *
+     * @return array The array of module names
+     */
+    public function getDependencies();
+
+    /**
+     * Returns the module name
+     *
+     * @return string The module name
+     */
+    public function getModuleName();
+
+    /**
+     * Initiates the module
+     *
+     * @return bool
+     * @throws \TechDivision\WebServer\Exceptions\ModuleException
+     */
+    public function init();
+
+
 }

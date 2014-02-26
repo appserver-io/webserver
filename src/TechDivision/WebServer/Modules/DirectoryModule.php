@@ -15,8 +15,8 @@
 namespace TechDivision\WebServer\Modules;
 
 use TechDivision\Http\HttpProtocol;
-use TechDivision\Http\RequestInterface;
-use TechDivision\Http\ResponseInterface;
+use TechDivision\Http\HttpRequestInterface;
+use TechDivision\Http\HttpResponseInterface;
 use TechDivision\WebServer\Interfaces\ModuleInterface;
 use TechDivision\WebServer\Modules\ModuleException;
 
@@ -33,10 +33,12 @@ use TechDivision\WebServer\Modules\ModuleException;
 class DirectoryModule implements ModuleInterface
 {
 
-    public function __construct(RequestInterface $request, ResponseInterface $response)
-    {
-
-    }
+    /**
+     * Defines the module name
+     *
+     * @var string
+     */
+    const MODULE_NAME = 'directory';
 
     public function getRequest()
     {
@@ -49,15 +51,26 @@ class DirectoryModule implements ModuleInterface
     }
 
     /**
-     * Implement's module logic
-     *
-     * @param RequestInterface $request
-     * @param ResponseInterface $response
+     * Initiates the module
      *
      * @return bool
-     * @throws \TechDivision\WebServer\Modules\ModuleException
+     * @throws \TechDivision\WebServer\Exceptions\ModuleException
      */
-    public function process(RequestInterface $request, ResponseInterface $response)
+    public function init()
+    {
+        return true;
+    }
+
+    /**
+     * Implement's module logic
+     *
+     * @param \TechDivision\Http\HttpRequestInterface  $request  The request object
+     * @param \TechDivision\Http\HttpResponseInterface $response The response object
+     *
+     * @return bool
+     * @throws \TechDivision\WebServer\Exceptions\ModuleException
+     */
+    public function process(HttpRequestInterface $request, HttpResponseInterface $response)
     {
         $this->request = $request;
         $this->response = $response;
@@ -85,6 +98,26 @@ class DirectoryModule implements ModuleInterface
             }
         }
         return true;
+    }
+
+    /**
+     * Return's an array of module names which should be executed first
+     *
+     * @return array The array of module names
+     */
+    public function getDependencies()
+    {
+        return array();
+    }
+
+    /**
+     * Returns the module name
+     *
+     * @return string The module name
+     */
+    public function getModuleName()
+    {
+        return self::MODULE_NAME;
     }
 
 }

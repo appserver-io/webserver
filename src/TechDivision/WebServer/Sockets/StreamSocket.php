@@ -50,6 +50,10 @@ class StreamSocket implements SocketInterface
             $flags = STREAM_SERVER_BIND | STREAM_SERVER_LISTEN;
         }
 
+        if (is_null($context)) {
+            $context = stream_context_create();
+        }
+
         $serverResource = stream_socket_server($socket, $errno, $errstr, $flags, $context);
         // set blocking mode
         stream_set_blocking($serverResource, 1);

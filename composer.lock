@@ -3,15 +3,21 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "38d3b0b6c5fff6525e2b97c6cfa63a42",
+    "hash": "909a77f4df943e9935520bef53368912",
     "packages": [
         {
             "name": "techdivision/http",
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "/home/zelgerj/Repositories/TechDivision_Http",
-                "reference": "c3eafb66fa50da20d11d86e6ce369ceeb757ae55"
+                "url": "https://github.com/zelgerj/TechDivision_Http.git",
+                "reference": "207b409ee721e06742a8d7b5676bea4e9d168a72"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zelgerj/TechDivision_Http/zipball/207b409ee721e06742a8d7b5676bea4e9d168a72",
+                "reference": "207b409ee721e06742a8d7b5676bea4e9d168a72",
+                "shasum": ""
             },
             "require": {
                 "php": ">=5.4.0"
@@ -27,6 +33,14 @@
             },
             "license": [
                 "OSL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Johann Zelger",
+                    "email": "jz@techdivision.com",
+                    "homepage": "http://www.techdivision.com",
+                    "role": "Developer"
+                }
             ],
             "description": "HTTP protocol implementation for usage in server context",
             "homepage": "https://github.com/techdivision/TechDivision_Http",
@@ -36,47 +50,25 @@
                 "protocol",
                 "server"
             ],
-            "time": "2014-02-24 13:23:04"
-        },
-        {
-            "name": "techdivision/socket",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "/home/zelgerj/Repositories/TechDivision_Socket",
-                "reference": "123effd43b3d519376c406728f9f0fd9d5774d59"
+            "support": {
+                "source": "https://github.com/zelgerj/TechDivision_Http/tree/master",
+                "issues": "https://github.com/zelgerj/TechDivision_Http/issues"
             },
-            "require": {
-                "php": ">=5.4.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "TechDivision": [
-                        "src/",
-                        "tests/"
-                    ]
-                }
-            },
-            "license": [
-                "OSL-3.0"
-            ],
-            "description": "Socket library witch implements OOP socket handling",
-            "homepage": "https://github.com/techdivision/TechDivision_Socket",
-            "keywords": [
-                "php",
-                "socket",
-                "stream"
-            ],
-            "time": "2014-02-24 13:06:14"
+            "time": "2014-02-26 17:12:04"
         },
         {
             "name": "techdivision/spdy",
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "/home/zelgerj/Repositories/TechDivision_Spdy",
-                "reference": "c014662190bc68b42cc7c0a0aba38433e1488f65"
+                "url": "https://github.com/zelgerj/TechDivision_Spdy.git",
+                "reference": "4e21997bbba5111aa7eff83625242d48441541bc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zelgerj/TechDivision_Spdy/zipball/4e21997bbba5111aa7eff83625242d48441541bc",
+                "reference": "4e21997bbba5111aa7eff83625242d48441541bc",
+                "shasum": ""
             },
             "require": {
                 "php": ">=5.4.0"
@@ -92,6 +84,14 @@
             },
             "license": [
                 "OSL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Johann Zelger",
+                    "email": "jz@techdivision.com",
+                    "homepage": "http://www.techdivision.com",
+                    "role": "Developer"
+                }
             ],
             "description": "SPDY protocol implementation for usage in server context",
             "homepage": "https://github.com/techdivision/TechDivision_Spdy",
@@ -101,7 +101,11 @@
                 "server",
                 "spdy"
             ],
-            "time": "2014-02-24 13:07:58"
+            "support": {
+                "source": "https://github.com/zelgerj/TechDivision_Spdy/tree/master",
+                "issues": "https://github.com/zelgerj/TechDivision_Spdy/issues"
+            },
+            "time": "2014-02-26 17:48:53"
         }
     ],
     "packages-dev": [
@@ -112,7 +116,6 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "techdivision/socket": 20,
         "techdivision/http": 20,
         "techdivision/spdy": 20
     },

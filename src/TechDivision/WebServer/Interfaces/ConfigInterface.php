@@ -31,7 +31,6 @@ interface ConfigInterface
 
     public function getServerPort();
 
-
     public function getSocketClassName();
 
     public function getParserClassName();

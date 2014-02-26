@@ -1,0 +1,48 @@
+<container name="http-server"
+           threadType="TechDivision\ApplicationServer\ContainerThread" type="TechDivision\ServletContainer\Container">
+    <description><![CDATA[This is an example of a servlet container that uses a socket for sending and receiving HTML requests/responses. This solution can be used for running a web server.]]></description>
+
+    <modules>
+        <module type="TechDivision\HttpServer\Modules\RewriteModule"/>
+        <module type="TechDivision\HttpServer\Modules\VhostModule/>
+<module type="TechDivision\ServletContainer\Modules\ServletModule"/>
+    </modules>
+
+    <handlers>
+        <handler name="php" extension=".php" />
+        <handler name="php" extension=".phtml" />
+        <handler name="servlet" extension=".do" />
+    </handlers>
+
+    <server type="TechDivision\WebServer\ForkedServer">
+        <params>
+            <param name="workerNumber" type="integer">128</param>
+            <param name="address" type="string">10.0.106.164</param>
+            <param name="port" type="integer">80</param>
+        </params>
+    </server>
+
+    <server type="TechDivision\WebServer\MultithreadServer">
+        <params>
+            <param name="workerNumber" type="integer">128</param>
+            <param name="address" type="string">10.0.106.165</param>
+            <param name="port" type="integer">443</param>
+            <param name="certPath" type="string">etc/server.pem</param>
+        </params>
+    </server>
+
+    <host name="localhost" appBase="/webapps" serverAdmin="info@appserver.io"
+          serverSoftware="appserver/0.5.9beta (mac) PHP/5.5.8">
+        <vhosts>
+            <vhost name="www.appserver.io" appBase="/site">
+                <aliases>
+                    <alias>appserver.io</alias>
+                    <alias>appserver.local</alias>
+                </aliases>
+            </vhost>
+            <vhost name="neos.local" appBase="/neos" />
+            <vhost name="neos.appserver.io" appBase="/neos" />
+        </vhosts>
+    </host>
+
+</container>

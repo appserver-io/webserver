@@ -12,9 +12,18 @@
             "role": "Developer"
         }
     ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url" : "https://github.com/zelgerj/TechDivision_Http"
+        },
+        {
+            "type": "vcs",
+            "url" : "https://github.com/zelgerj/TechDivision_Spdy"
+        }
+    ],
     "require": {
         "php": ">=5.4.0",
-        "techdivision/socket": "dev-master",
         "techdivision/http": "dev-master",
         "techdivision/spdy": "dev-master"
     },

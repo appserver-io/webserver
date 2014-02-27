@@ -13,6 +13,7 @@
 
 namespace TechDivision\WebServer;
 
+use TechDivision\WebServer\Interfaces\ServerContextInterface;
 use TechDivision\WebServer\Interfaces\ServerInterface;
 use TechDivision\WebServer\Interfaces\ConfigInterface;
 
@@ -28,60 +29,65 @@ use TechDivision\WebServer\Interfaces\ConfigInterface;
 class Server implements ServerInterface
 {
 
+    /**
+     * Hold's the config instance
+     *
+     * @var \TechDivision\WebServer\Interfaces\ConfigInterface The config instance
+     */
     protected $config;
 
+    /**
+     * Constructs the server instance
+     *
+     * @param \TechDivision\WebServer\Interfaces\ConfigInterface $config The config instance
+     */
     public function __construct(ConfigInterface $config)
     {
         $this->config = $config;
     }
 
+    /**
+     * Return's the server context
+     *
+     * @return \TechDivision\WebServer\Interfaces\ServerContextInterface The server's context instance
+     */
+    public function getServerContext()
+    {
+        return $this->serverContext;
+    }
+
+    /**
+     * Return's the config instance
+     *
+     * @return \TechDivision\WebServer\Interfaces\ConfigInterface
+     */
     public function getConfig()
     {
         return $this->config;
     }
 
+    /**
+     * Start's the server's worker as defined in configuration
+     *
+     * @return void
+     */
     public function run()
     {
-
         // init config var for shorter calls
         $config = $this->getConfig();
 
-        $socketClassName = $config->getSocketClassName();
+        // init connection handler
+        $serverContext = new ServerContext($config);
+        $serverContext->init();
 
-        // create server stream connection
-        $socketServer = $socketClassName::getServerInstance(
-            $config->getServerListen() . ':' . $config->getServerPort()
-        );
-
-        /*
-        $connectionClassName = $config->getConnectionClassName();
-        $parserClassName = $config->getParserClassName();
-        $requestClassName= $config->getRequestClassName();
-        $responseClassName= $config->getResponseClassName();
-
-        // setup parser
-        $parser = new $parserClassName(new $requestClassName(), new $responseClassName());
-
-        // accept http connections
-        while($httpConnection = new $connectionClassName($socketServer->accept(), $parser)) {
-            $httpConnection->negotiate();
-        }
-        */
-
-        // open listener threads sharing server connection and config
-        for ($i=0; $i < 128; ++$i) {
-            $listenerThreads[$i] = new ListenerThread(
-                $socketClassName,
-                $socketServer->getConnectionResource(),
-                $config
-            );
-            $listenerThreads[$i]->start();
+        // setup workers
+        for ($i=0; $i < $config->getWorkerNumber(); ++$i) {
+            $workers[$i] = new Worker($serverContext);
         }
 
-        // wait for all listeners to stop
-        foreach ($listenerThreads as $listenerThread) {
-            $listenerThread->join();
+        // wait for all workers to stop
+        foreach ($workers as $worker) {
+            $worker->join();
         }
-
     }
 }

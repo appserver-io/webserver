@@ -9,6 +9,7 @@
     "server": {
         "name": "phpWebserver/0.1.0",
         "port": "8081",
-        "listen": "0.0.0.0"
+        "listen": "0.0.0.0",
+        "workerNumber": 16
     }
 }

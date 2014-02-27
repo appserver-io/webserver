@@ -55,6 +55,7 @@ class StreamSocket implements SocketInterface
         }
 
         $serverResource = stream_socket_server($socket, $errno, $errstr, $flags, $context);
+
         // set blocking mode
         stream_set_blocking($serverResource, 1);
         // create instance and return it.
@@ -157,6 +158,7 @@ class StreamSocket implements SocketInterface
      */
     public function setConnectionResource($connectionResource)
     {
+        $this->connectionResourceId = (int)$connectionResource;
         $this->connectionResource = $connectionResource;
     }
 
@@ -169,5 +171,16 @@ class StreamSocket implements SocketInterface
     {
         return $this->connectionResource;
     }
+
+    /**
+     * Return's connection resource id
+     *
+     * @return int
+     */
+    public function getConnectionResourceId()
+    {
+        return $this->connectionResourceId;
+    }
+
 }
 

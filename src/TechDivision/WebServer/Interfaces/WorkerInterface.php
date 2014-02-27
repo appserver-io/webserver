@@ -1,6 +1,6 @@
 <?php
 /**
- * \TechDivision\WebServer\Interfaces\ConfigInterface
+ * \TechDivision\WebServer\Interfaces\WorkerInterface
  *
  * PHP version 5
  *
@@ -15,7 +15,7 @@
 namespace TechDivision\WebServer\Interfaces;
 
 /**
- * Interface ConfigInterface
+ * Interface WorkerInterface
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
@@ -24,23 +24,27 @@ namespace TechDivision\WebServer\Interfaces;
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
-interface ConfigInterface
+interface WorkerInterface
 {
+    /**
+     * Return's the server context instance
+     *
+     * @return ServerContextInterface The server's context
+     */
+    public function getServerContext();
 
-    public function getServerListen();
+    /**
+     * Start's the worker
+     *
+     * @return void
+     */
+    public function run();
 
-    public function getServerPort();
-
-    public function getSocketClassName();
-
-    public function getParserClassName();
-
-    public function getConnectionClassName();
-
-    public function getRequestClassName();
-
-    public function getResponseClassName();
-
-    public function getWorkerNumber();
+    /**
+     * Implements the workers actual logic
+     *
+     * @return void
+     */
+    public function work();
 
 }

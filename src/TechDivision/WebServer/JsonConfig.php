@@ -68,4 +68,10 @@ class JsonConfig implements ConfigInterface
         return $this->data->classes->response;
     }
 
+    public function getWorkerNumber()
+    {
+        return $this->data->server->workerNumber;
+    }
+
+
 }

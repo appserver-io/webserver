@@ -28,12 +28,17 @@ class StreamSocket implements SocketInterface
 {
 
     /**
-     * Holds the connection resource itselfe.
+     * Holds the connection resource it selfe.
      *
      * @var resource
      */
     protected $connectionResource;
 
+    /**
+     * Holds the actual resource id
+     *
+     * @var int
+     */
     protected $connectionResourceId;
 
     /**
@@ -46,14 +51,17 @@ class StreamSocket implements SocketInterface
      */
     public static function getServerInstance($socket, $flags = null, $context = null)
     {
+        // init flags if none were given
         if (is_null($flags)) {
             $flags = STREAM_SERVER_BIND | STREAM_SERVER_LISTEN;
         }
 
+        // init context if none was given
         if (is_null($context)) {
             $context = stream_context_create();
         }
 
+        // create stream socket server resource
         $serverResource = stream_socket_server($socket, $errno, $errstr, $flags, $context);
 
         // set blocking mode
@@ -146,7 +154,11 @@ class StreamSocket implements SocketInterface
      */
     public function close()
     {
-        fclose($this->getConnectionResource());
+        // check if resource still exists
+        if (is_resource($this->getConnectionResource())) {
+            return fclose($this->getConnectionResource());
+        }
+        return false;
     }
 
     /**

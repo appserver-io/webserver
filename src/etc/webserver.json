@@ -1,15 +1,65 @@
 {
-    "classes": {
-        "socket": "\\TechDivision\\WebServer\\Sockets\\StreamSocket",
-        "parser": "\\TechDivision\\Http\\HttpParser",
-        "connection": "\\TechDivision\\Http\\HttpConnection",
-        "request": "\\TechDivision\\Http\\HttpRequest",
-        "response": "\\TechDivision\\Http\\HttpResponse"
-    },
-    "server": {
-        "name": "phpWebserver/0.1.0",
-        "port": "8081",
-        "listen": "0.0.0.0",
-        "workerNumber": 16
-    }
+    "servers": [
+        {
+            "type": "\\TechDivision\\WebServer\\Servers\\MultiThreadedServer",
+            "worker": "\\TechDivision\\WebServer\\Workers\\ThreadWorker",
+            "socket": "\\TechDivision\\WebServer\\Sockets\\StreamSocket",
+            "serverContext" : "\\TechDivision\\WebServer\\ServerContext",
+
+            "signature": "phpWebServer/0.1.0",
+            "transport": "tcp",
+            "address": "0.0.0.0",
+            "port": "9080",
+            "documentRoot" : "/var/www",
+
+            "workerNumber": 32,
+
+            "connectionHandlers": [
+                "\\TechDivision\\Http\\HttpConnectionHandler"
+            ],
+
+            "modules": [
+                "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
+                "\\TechDivision\\WebServer\\Modules\\CoreModule"
+            ],
+
+            "handlers": [
+                { "name": "php", "extension": ".php" },
+                { "name": "php", "extension": ".phtml" },
+                { "name": "servlet", "extension": ".do" }
+            ]
+        },
+
+        {
+            "type": "\\TechDivision\\WebServer\\Servers\\MultiThreadedServer",
+            "worker": "\\TechDivision\\WebServer\\Workers\\ThreadWorker",
+            "socket": "\\TechDivision\\WebServer\\Sockets\\StreamSocket",
+            "serverContext" : "\\TechDivision\\WebServer\\ServerContext",
+
+            "signature": "phpWebServer/0.1.0",
+            "transport": "ssl",
+            "address": "0.0.0.0",
+            "port": "9443",
+            "certPath": "etc/webserver.pem",
+            "passphrase": "passphrase",
+            "documentRoot" : "/var/www/foundation-5.1.1-custom",
+
+            "workerNumber": 32,
+
+            "connectionHandlers": [
+                "\\TechDivision\\Http\\HttpConnectionHandler"
+            ],
+
+            "modules": [
+                "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
+                "\\TechDivision\\WebServer\\Modules\\CoreModule"
+            ],
+
+            "handlers": [
+                { "name": "php", "extension": ".php" },
+                { "name": "php", "extension": ".phtml" },
+                { "name": "servlet", "extension": ".do" }
+            ]
+        }
+    ]
 }

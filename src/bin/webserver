@@ -2,11 +2,22 @@
 <?php
 
 define('WEBSERVER_BASEDIR', __DIR__ . '/../');
-
 require WEBSERVER_BASEDIR . '../vendor/autoload.php';
 
-$server = new \TechDivision\WebServer\Server(
-    new \TechDivision\WebServer\JsonConfig(WEBSERVER_BASEDIR . 'etc/webserver.json')
-);
+// read in configuration
+// $mainConfiguration = new \TechDivision\WebServer\MainJsonConfiguration(WEBSERVER_BASEDIR . 'etc/webserver.json');
+$mainConfiguration = new \TechDivision\WebServer\MainXmlConfiguration(WEBSERVER_BASEDIR . 'etc/webserver.xml');
 
-$server->run();
+// init server array
+$servers = array();
+
+// start servers
+foreach ($mainConfiguration->getServerConfigs() as $serverConfig) {
+    $serverType = $serverConfig->getType();
+    $servers[] = new $serverType($serverConfig);
+}
+
+// wait for servers
+foreach ($servers as $server) {
+    $server->join();
+}

@@ -14,6 +14,8 @@
 
 namespace TechDivision\WebServer\Interfaces;
 
+use \TechDivision\WebServer\Interfaces\ServerConfigurationInterface;
+
 /**
  * Interface ServerContextInterface
  *
@@ -28,60 +30,41 @@ interface ServerContextInterface
 {
 
     /**
-     * Return's the config instance
-     *
-     * @return \TechDivision\WebServer\Interfaces\ConfigInterface The config instance
-     */
-    public function getConfig();
-
-    /**
-     * Set's the connectionPool to use
-     *
-     * @param \TechDivision\WebServer\Interfaces\PoolInterface $connectionPool
-     *
-     * @return void
-     */
-    public function setConnectionPool($connectionPool);
-
-    /**
-     * Return's the connection pool instance
-     *
-     * @return \TechDivision\WebServer\Interfaces\PoolInterface
-     */
-    public function getConnectionPool();
-
-    /**
      * Initialises the server context
      *
+     * @param \TechDivision\WebServer\Interfaces\ServerConfigurationInterface $serverConfig The servers configuration instance
+     *
      * @return void
      */
-    public function init();
+    public function init(ServerConfigurationInterface $serverConfig);
 
     /**
-     * Set's the server connection id
+     * Return's the server config instance
      *
-     * @param int $id The id of the server connection
+     * @return \TechDivision\WebServer\Interfaces\ServerConfigurationInterface The server config instance
      */
-    public function setServerConnectionId($id);
-    /**
-     * Return's the server connection id
-     *
-     * @return int The id of the server connection
-     */
-    public function getServerConnectionId();
+    public function getServerConfig();
 
     /**
      * Return's the server connection instance
      *
+     * @param resource $connectionResource The socket resource
+     *
      * @return SocketInterface The server connection instance
      */
-    public function getServerConnection();
+    public function getConnectionInstance($connectionResource);
 
     /**
-     * Implement run method due to c-class wrapper abstract specifications
+     * Return's an array of pre init modules instances
      *
-     * @return void
+     * @return array
      */
-    public function run();
+    public function getModules();
 
+    /**
+     * Return's an array of pre init connection handler instances
+     *
+     * @return array
+     */
+    public function getConnectionHandlers();
 }

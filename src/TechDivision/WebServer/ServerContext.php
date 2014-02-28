@@ -14,8 +14,13 @@
 namespace TechDivision\WebServer;
 
 use TechDivision\WebServer\ConnectionPool;
+use TechDivision\WebServer\Exceptions\ConnectionHandlerNotFoundException;
+use TechDivision\WebServer\Exceptions\ModuleNotFoundException;
 use TechDivision\WebServer\Interfaces\ConfigInterface;
+use TechDivision\WebServer\Interfaces\ServerConfigurationInterface;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
+use TechDivision\WebServer\Modules\CoreModule;
+use TechDivision\WebServer\Modules\DirectoryModule;
 use TechDivision\WebServer\Sockets\SocketInterface;
 use TechDivision\WebServer\Interfaces\PoolInterface;
 
@@ -28,130 +33,103 @@ use TechDivision\WebServer\Interfaces\PoolInterface;
  * @copyright 2014 TechDivision GmbH <info@techdivision.com>
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
-class ServerContext extends \Stackable implements ServerContextInterface
+class ServerContext implements ServerContextInterface
 {
 
     /**
      * Hold's the config instance
      *
-     * @var \TechDivision\WebServer\Interfaces\ConfigInterface
+     * @var \TechDivision\WebServer\Interfaces\ServerConfigurationInterface
      */
-    public $config;
+    protected $serverConfig;
 
     /**
-     * Hold's the server connection resource id
+     * Hold's an array of modules defined in config
      *
-     * @var int
+     * @var array
      */
-    public $serverConnectionId;
+    protected $modules = array();
 
     /**
-     * Construct the server context
+     * Hold's an array of connection handlers defined in config
      *
-     * @param \TechDivision\WebServer\Interfaces\ConfigInterface $config The config instance
+     * @var array
      */
-    public function __construct($config)
-    {
-        // init config
-        $this->config = $config;
-    }
-
-    /**
-     * Return's the config instance
-     *
-     * @return \TechDivision\WebServer\Interfaces\ConfigInterface The config instance
-     */
-    public function getConfig()
-    {
-        return $this->config;
-    }
-
-    /**
-     * Set's the connectionPool to use
-     *
-     * @param \TechDivision\WebServer\Interfaces\PoolInterface $connectionPool
-     *
-     * @return void
-     */
-    public function setConnectionPool($connectionPool)
-    {
-        $this->connectionPool = $connectionPool;
-    }
-
-    /**
-     * Return's the connection pool instance
-     *
-     * @return \TechDivision\WebServer\Interfaces\PoolInterface
-     */
-    public function getConnectionPool()
-    {
-        return $this->connectionPool;
-    }
+    protected $connectionHandlers = array();
 
     /**
      * Initialises the server context
      *
+     * @param \TechDivision\WebServer\Interfaces\ServerConfigurationInterface $serverConfig The servers configuration
+     *
      * @return void
      */
-    public function init()
+    public function init(ServerConfigurationInterface $serverConfig)
     {
-        // get connection class name for further instantiations
-        $socketClassName = $this->getConfig()->getSocketClassName();
+        // set configuration
+        $this->serverConfig = $serverConfig;
 
-        // setup up connection Pool
-        $this->setConnectionPool(
-            new ConnectionPool($socketClassName)
-        );
+        // initiate server connection handlers
+        $connectionHandlers = $this->getServerConfig()->getConnectionHandlers();
+        foreach ($connectionHandlers as $connectionHandlerType) {
+            if (!class_exists($connectionHandlerType)) {
+                throw new ConnectionHandlerNotFoundException($connectionHandlerType);
+            }
+            $this->connectionHandlers[$connectionHandlerType] = new $connectionHandlerType();
+            $this->connectionHandlers[$connectionHandlerType]->init($this);
+        }
 
-        // setup and add server connection to connection pool
-        $this->setServerConnectionId(
-            $this->getConnectionPool()->add(
-                $socketClassName::getServerInstance(
-                    $this->getConfig()->getServerListen() . ':' . $this->getConfig()->getServerPort()
-                )
-            )
-        );
+        // initiate server modules
+        $modules = $this->getServerConfig()->getModules();
+        foreach ($modules as $moduleType) {
+            if (!class_exists($moduleType)) {
+                throw new ModuleNotFoundException($moduleType);
+            }
+            $this->modules[$moduleType] = new $moduleType();
+            $this->modules[$moduleType]->init();
+        }
     }
 
     /**
-     * Set's the server connection id
+     * Return's the server config instance
      *
-     * @param int $id The id of the server connection
+     * @return \TechDivision\WebServer\Interfaces\ServerConfigurationInterface The server config instance
      */
-    public function setServerConnectionId($id)
+    public function getServerConfig()
     {
-        $this->serverConnectionId = $id;
-    }
-
-    /**
-     * Return's the server connection id
-     *
-     * @return int The id of the server connection
-     */
-    public function getServerConnectionId()
-    {
-        return $this->serverConnectionId;
+        return $this->serverConfig;
     }
 
     /**
      * Return's the server connection instance
      *
+     * @param resource $connectionResource The socket resource
+     *
      * @return SocketInterface The server connection instance
      */
-    public function getServerConnection()
+    public function getConnectionInstance($connectionResource)
     {
-        return $this->getConnectionPool()->get(
-            $this->getServerConnectionId()
-        );
+        $socketType = $this->getServerConfig()->getSocketType();
+        return $socketType::getInstance($connectionResource);
     }
 
     /**
-     * Implement run method due to c-class wrapper abstract specifications
+     * Return's an array of modules
      *
-     * @return void
+     * @return array
      */
-    public function run()
+    public function getModules()
     {
-        // do nothing
+        return $this->modules;
+    }
+
+    /**
+     * Return's an array of pre init connection handler instances
+     *
+     * @return array
+     */
+    public function getConnectionHandlers()
+    {
+        return $this->connectionHandlers;
     }
 }

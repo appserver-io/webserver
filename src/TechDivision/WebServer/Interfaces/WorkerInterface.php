@@ -29,7 +29,7 @@ interface WorkerInterface
     /**
      * Return's the server context instance
      *
-     * @return ServerContextInterface The server's context
+     * @return \TechDivision\WebServer\Interfaces\ServerContextInterface The server's context
      */
     public function getServerContext();
 

@@ -1,46 +1,30 @@
 <?php
 /**
- * \TechDivision\WebServer\Interfaces\ConfigInterface
+ * \TechDivision\WebServer\Exceptions\ModuleNotFoundException
  *
  * PHP version 5
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
- * @subpackage Interfaces
+ * @subpackage Exceptions
  * @author     Johann Zelger <jz@techdivision.com>
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
-namespace TechDivision\WebServer\Interfaces;
+namespace TechDivision\WebServer\Exceptions;
 
 /**
- * Interface ConfigInterface
+ * Class ModuleNotFoundException
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
- * @subpackage Interfaces
+ * @subpackage Exceptions
  * @author     Johann Zelger <jz@techdivision.com>
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
-interface ConfigInterface
+class ModuleNotFoundException extends \Exception
 {
-
-    public function getServerListen();
-
-    public function getServerPort();
-
-    public function getSocketClassName();
-
-    public function getParserClassName();
-
-    public function getConnectionClassName();
-
-    public function getRequestClassName();
-
-    public function getResponseClassName();
-
-    public function getWorkerNumber();
 
 }

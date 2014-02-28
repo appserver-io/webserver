@@ -61,6 +61,7 @@ class CoreModule implements ModuleInterface
     {
         // set requested filename
         $this->setRequestedFilename($request->getRealPath());
+
         // check if file exists on filesystem
         if (file_exists($this->getRequestedFilename())) {
             // set body stream to file descriptor stream

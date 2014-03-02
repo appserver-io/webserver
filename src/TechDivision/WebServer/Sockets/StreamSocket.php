@@ -10,6 +10,7 @@
  * @author     Johann Zelger <jz@techdivision.com>
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link       https://github.com/techdivision/TechDivision_WebServer
  */
 
 namespace TechDivision\WebServer\Sockets;
@@ -23,6 +24,7 @@ namespace TechDivision\WebServer\Sockets;
  * @author     Johann Zelger <jz@techdivision.com>
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link       https://github.com/techdivision/TechDivision_WebServer
  */
 class StreamSocket implements SocketInterface
 {
@@ -44,8 +46,9 @@ class StreamSocket implements SocketInterface
     /**
      * Creates a stream socket server and returns a instance of Stream implementation with server socket in it.
      *
-     * @param string $socket The address incl. transport the server should be listening to. For example 0.0.0.0:8080
-     * @param string $flags
+     * @param string   $socket  The address incl. transport the server should be listening to. For example 0.0.0.0:8080
+     * @param string   $flags   The flags to be set on server create
+     * @param resource $context The context to be set on stream create
      *
      * @return \TechDivision\WebServer\Sockets\Stream The Stream instance with a server socket created.
      */
@@ -104,9 +107,11 @@ class StreamSocket implements SocketInterface
     /**
      * Return's the line read from connection resource
      *
-     * @param int $readLength The max length to read for a line.
+     * @param int $readLength     The max length to read for a line.
+     * @param int $receiveTimeout The max time to wait for read the next line
      *
      * @return string;
+     * @throws \TechDivision\WebServer\Sockets\SocketReadTimeoutException
      */
     public function readLine($readLength = 256, $receiveTimeout = null)
     {
@@ -164,7 +169,7 @@ class StreamSocket implements SocketInterface
     /**
      * Set's the connection resource
      *
-     * @param resource $connectionResource
+     * @param resource $connectionResource The resource to socket file descriptor
      *
      * @return void
      */
@@ -193,6 +198,4 @@ class StreamSocket implements SocketInterface
     {
         return $this->connectionResourceId;
     }
-
 }
-

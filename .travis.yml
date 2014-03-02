@@ -1,0 +1,17 @@
+language: php
+
+php:
+  - 5.5
+  - 5.4
+  
+before_install:
+  - pecl install pthreads-beta
+  - pyrus install pear/PHP_CodeSniffer
+  - phpenv rehash
+  
+script:
+  - ant build
+
+notifications:
+  email: info@appserver.io
+  hipchat: 95d47a72c5372d4a0fef20048c3200@Appserver

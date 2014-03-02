@@ -10,6 +10,7 @@
  * @author     Johann Zelger <jz@techdivision.com>
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link       https://github.com/techdivision/TechDivision_WebServer
  */
 
 namespace TechDivision\WebServer\Modules;
@@ -29,6 +30,7 @@ use TechDivision\WebServer\Modules\ModuleException;
  * @author     Johann Zelger <jz@techdivision.com>
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link       https://github.com/techdivision/TechDivision_WebServer
  */
 class DirectoryModule implements ModuleInterface
 {
@@ -40,11 +42,21 @@ class DirectoryModule implements ModuleInterface
      */
     const MODULE_NAME = 'directory';
 
+    /**
+     * Return's the request instance
+     *
+     * @return \TechDivision\Http\HttpRequestInterface The request instance
+     */
     public function getRequest()
     {
         return $this->request;
     }
 
+    /**
+     * Returns the response instance
+     *
+     * @return \TechDivision\Http\HttpResponseInterface The response instance;
+     */
     public function getResponse()
     {
         return $this->response;
@@ -85,10 +97,10 @@ class DirectoryModule implements ModuleInterface
         if ($fileInfo->isDir() || $uri === '/') {
             // check if uri has trailing slash
             if (substr($uri, -1) !== '/') {
-               // set enhance uri with trailing slash to response
-               $response->addHeader(HttpProtocol::HEADER_LOCATION, $uri . '/');
-               // send redirect status
-               $response->setStatusCode(301);
+                // set enhance uri with trailing slash to response
+                $response->addHeader(HttpProtocol::HEADER_LOCATION, $uri . '/');
+                // send redirect status
+                $response->setStatusCode(301);
             } else {
                 // check if defined index files are found in directory
                 if (file_exists($realPath . 'index.html')) {
@@ -118,5 +130,4 @@ class DirectoryModule implements ModuleInterface
     {
         return self::MODULE_NAME;
     }
-
 }

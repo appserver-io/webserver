@@ -10,6 +10,7 @@
  * @author     Johann Zelger <jz@techdivision.com>
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link       https://github.com/techdivision/TechDivision_WebServer
  */
 
 namespace TechDivision\WebServer\Workers;
@@ -28,6 +29,7 @@ use TechDivision\WebServer\Interfaces\WorkerInterface;
  * @author     Johann Zelger <jz@techdivision.com>
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link       https://github.com/techdivision/TechDivision_WebServer
  */
 class ThreadWorker extends \Thread implements WorkerInterface
 {
@@ -35,7 +37,8 @@ class ThreadWorker extends \Thread implements WorkerInterface
     /**
      * Constructs the worker by setting the server context
      *
-     * @param ServerContextInterface $serverContext The server's context
+     * @param resource               $serverConnectionResource The server's file descriptor resource
+     * @param ServerContextInterface $serverContext            The server's context
      */
     public function __construct($serverConnectionResource, $serverContext)
     {

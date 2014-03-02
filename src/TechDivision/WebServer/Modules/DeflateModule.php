@@ -10,6 +10,7 @@
  * @author     Johann Zelger <jz@techdivision.com>
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link       https://github.com/techdivision/TechDivision_WebServer
  */
 
 namespace TechDivision\WebServer\Modules;
@@ -29,6 +30,7 @@ use TechDivision\WebServer\Modules\ModuleException;
  * @author     Johann Zelger <jz@techdivision.com>
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link       https://github.com/techdivision/TechDivision_WebServer
  */
 class DeflateModule implements ModuleInterface
 {
@@ -63,7 +65,7 @@ class DeflateModule implements ModuleInterface
     public function process(HttpRequestInterface $request, HttpResponseInterface $response)
     {
         // check if request accepts deflate
-        if (strpos($request->getHeader(HttpProtocol::HEADER_ACCEPT_ENCODING),'deflate') !== false) {
+        if (strpos($request->getHeader(HttpProtocol::HEADER_ACCEPT_ENCODING), 'deflate') !== false) {
             // apply encoding filter to response body stream
             stream_filter_append($response->getBodyStream(), 'zlib.deflate');
             // set encoding header info
@@ -91,5 +93,4 @@ class DeflateModule implements ModuleInterface
     {
         return self::MODULE_NAME;
     }
-
 }

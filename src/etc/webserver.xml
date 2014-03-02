@@ -23,6 +23,7 @@
         <modules>
             <module type="\TechDivision\WebServer\Modules\DirectoryModule" />
             <module type="\TechDivision\WebServer\Modules\CoreModule" />
+            <module type="\TechDivision\WebServer\Modules\DeflateModule" />
         </modules>
         <handlers>
             <handler name="php" extension=".php" />
@@ -54,6 +55,7 @@
         <modules>
             <module type="\TechDivision\WebServer\Modules\DirectoryModule" />
             <module type="\TechDivision\WebServer\Modules\CoreModule" />
+            <module type="\TechDivision\WebServer\Modules\DeflateModule" />
         </modules>
         <handlers>
             <handler name="php" extension=".php" />

@@ -10,6 +10,7 @@
  * @author     Johann Zelger <jz@techdivision.com>
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link       https://github.com/techdivision/TechDivision_WebServer
  */
 
 namespace TechDivision\WebServer\Dictionaries;
@@ -23,8 +24,10 @@ namespace TechDivision\WebServer\Dictionaries;
  * @author     Johann Zelger <jz@techdivision.com>
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link       https://github.com/techdivision/TechDivision_WebServer
  */
-class MimeTypes {
+class MimeTypes
+{
 
     /**
      * Defines mimetype default
@@ -40,7 +43,8 @@ class MimeTypes {
      *
      * @return string
      */
-    public static function getMimeTypeByFilename($filename) {
+    public static function getMimeTypeByFilename($filename)
+    {
         // check if there is an filename extension
         $fileExtension = pathinfo($filename, PATHINFO_EXTENSION);
         if ($fileExtension) {
@@ -60,7 +64,8 @@ class MimeTypes {
      *
      * @return string
      */
-    public static function getMimeTypeByExtension($extension) {
+    public static function getMimeTypeByExtension($extension)
+    {
         // normalize extension by doing lower str
         $extension = strtolower($extension);
         if (isset(self::$types[$extension])) {
@@ -173,5 +178,4 @@ class MimeTypes {
         "wmv" => "video/x-ms-wmv",
         "avi" => "video/x-msvideo"
     );
-
 }

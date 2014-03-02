@@ -10,6 +10,7 @@
  * @author     Johann Zelger <jz@techdivision.com>
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link       https://github.com/techdivision/TechDivision_WebServer
  */
 
 namespace TechDivision\WebServer\Interfaces;
@@ -17,7 +18,6 @@ namespace TechDivision\WebServer\Interfaces;
 use TechDivision\WebServer\Exceptions\ModuleException;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
-
 
 /**
  * Interface ModuleInterface
@@ -28,6 +28,7 @@ use TechDivision\Http\HttpResponseInterface;
  * @author     Johann Zelger <jz@techdivision.com>
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link       https://github.com/techdivision/TechDivision_WebServer
  */
 interface ModuleInterface
 {
@@ -35,8 +36,8 @@ interface ModuleInterface
     /**
      * Implement's module logic
      *
-     * @param \TechDivision\Http\HttpRequestInterface  $request
-     * @param \TechDivision\Http\HttpResponseInterface $response
+     * @param \TechDivision\Http\HttpRequestInterface  $request  The request instance
+     * @param \TechDivision\Http\HttpResponseInterface $response The response instance
      *
      * @return bool
      * @throws \TechDivision\WebServer\Exceptions\ModuleException
@@ -64,6 +65,4 @@ interface ModuleInterface
      * @throws \TechDivision\WebServer\Exceptions\ModuleException
      */
     public function init();
-
-
 }

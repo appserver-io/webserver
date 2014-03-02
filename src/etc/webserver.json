@@ -20,7 +20,8 @@
 
             "modules": [
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
-                "\\TechDivision\\WebServer\\Modules\\CoreModule"
+                "\\TechDivision\\WebServer\\Modules\\CoreModule",
+                "\\TechDivision\\WebServer\\Modules\\DeflateModule"
             ],
 
             "handlers": [
@@ -52,7 +53,8 @@
 
             "modules": [
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
-                "\\TechDivision\\WebServer\\Modules\\CoreModule"
+                "\\TechDivision\\WebServer\\Modules\\CoreModule",
+                "\\TechDivision\\WebServer\\Modules\\DeflateModule"
             ],
 
             "handlers": [

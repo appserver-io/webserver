@@ -1,6 +1,6 @@
 <?php
 /**
- * \TechDivision\WebServer\Modules\DirectoryModule
+ * \TechDivision\WebServer\Modules\DeflateModule
  *
  * PHP version 5
  *
@@ -22,7 +22,7 @@ use TechDivision\WebServer\Interfaces\ModuleInterface;
 use TechDivision\WebServer\Modules\ModuleException;
 
 /**
- * Class DirectoryModule
+ * Class DeflateModule
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
@@ -32,7 +32,7 @@ use TechDivision\WebServer\Modules\ModuleException;
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/techdivision/TechDivision_WebServer
  */
-class DirectoryModule implements ModuleInterface
+class DeflateModule implements ModuleInterface
 {
 
     /**
@@ -40,27 +40,7 @@ class DirectoryModule implements ModuleInterface
      *
      * @var string
      */
-    const MODULE_NAME = 'directory';
-
-    /**
-     * Return's the request instance
-     *
-     * @return \TechDivision\Http\HttpRequestInterface The request instance
-     */
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    /**
-     * Returns the response instance
-     *
-     * @return \TechDivision\Http\HttpResponseInterface The response instance;
-     */
-    public function getResponse()
-    {
-        return $this->response;
-    }
+    const MODULE_NAME = 'deflate';
 
     /**
      * Initiates the module
@@ -84,31 +64,14 @@ class DirectoryModule implements ModuleInterface
      */
     public function process(HttpRequestInterface $request, HttpResponseInterface $response)
     {
-        // set req and res object internally
-        $this->request = $request;
-        $this->response = $response;
-        // get uri
-        $uri = $request->getUri();
-        // get read path to requested uri
-        $realPath = $request->getRealPath();
-        // get info about real path.
-        $fileInfo = new \SplFileInfo($realPath);
-        // check if it's a dir
-        if ($fileInfo->isDir() || $uri === '/') {
-            // check if uri has trailing slash
-            if (substr($uri, -1) !== '/') {
-                // set enhance uri with trailing slash to response
-                $response->addHeader(HttpProtocol::HEADER_LOCATION, $uri . '/');
-                // send redirect status
-                $response->setStatusCode(301);
-            } else {
-                // check if defined index files are found in directory
-                if (file_exists($realPath . 'index.html')) {
-                    $request->setUri($uri . 'index.html');
-                }
-            }
+        // check if request accepts deflate
+        if (strpos($request->getHeader(HttpProtocol::HEADER_ACCEPT_ENCODING), 'deflate') !== false) {
+            // apply encoding filter to response body stream
+            stream_filter_append($response->getBodyStream(), 'zlib.deflate');
+            // set encoding header info
+            $response->addHeader(HttpProtocol::HEADER_CONTENT_ENCODING, 'deflate');
+            return true;
         }
-        return true;
     }
 
     /**

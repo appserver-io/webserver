@@ -10,6 +10,7 @@
  * @author     Johann Zelger <jz@techdivision.com>
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link       https://github.com/techdivision/TechDivision_WebServer
  */
 
 namespace TechDivision\WebServer\Modules;
@@ -30,6 +31,7 @@ use TechDivision\WebServer\Dictionaries\MimeTypes;
  * @author     Johann Zelger <jz@techdivision.com>
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link       https://github.com/techdivision/TechDivision_WebServer
  */
 class CoreModule implements ModuleInterface
 {
@@ -51,8 +53,8 @@ class CoreModule implements ModuleInterface
     /**
      * Implement's module logic
      *
-     * @param \TechDivision\Http\HttpRequestInterface $request
-     * @param \TechDivision\Http\HttpResponseInterface $response
+     * @param \TechDivision\Http\HttpRequestInterface  $request  The request instance
+     * @param \TechDivision\Http\HttpResponseInterface $response The response instance
      *
      * @return bool
      * @throws \TechDivision\WebServer\Exceptions\ModuleException
@@ -107,7 +109,9 @@ class CoreModule implements ModuleInterface
     /**
      * Set's the requested filename
      *
-     * @param string $requestedFilename
+     * @param string $requestedFilename The requested filename
+     *
+     * @return void
      */
     public function setRequestedFilename($requestedFilename)
     {
@@ -124,4 +128,3 @@ class CoreModule implements ModuleInterface
         return $this->requestedFilename;
     }
 }
-

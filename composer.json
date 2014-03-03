@@ -15,17 +15,12 @@
     "repositories": [
         {
             "type": "vcs",
-            "url" : "https://github.com/zelgerj/TechDivision_Http"
-        },
-        {
-            "type": "vcs",
-            "url" : "https://github.com/zelgerj/TechDivision_Spdy"
+            "url" : "https://github.com/techdivision/TechDivision_Http"
         }
     ],
     "require": {
         "php": ">=5.4.0",
-        "techdivision/http": "dev-master",
-        "techdivision/spdy": "dev-master"
+        "techdivision/http": "dev-master"
     },
     "autoload": {
         "psr-0": {"TechDivision": ["src/", "tests/"]}

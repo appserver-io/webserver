@@ -72,7 +72,7 @@ class MultiThreadedServer extends \Thread implements ServerInterface
     public function run()
     {
         // setup autoloader
-        require WEBSERVER_BASEDIR . '../vendor/autoload.php';
+        require WEBSERVER_AUTOLOADER;
 
         // init config var for shorter calls
         $serverConfig = $this->getServerConfig();

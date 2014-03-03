@@ -2,7 +2,10 @@
 <?php
 
 define('WEBSERVER_BASEDIR', __DIR__ . '/../');
-require WEBSERVER_BASEDIR . '../vendor/autoload.php';
+define('WEBSERVER_AUTOLOADER', WEBSERVER_BASEDIR . '../vendor/autoload.php);
+
+require WEBSERVER_AUTOLOADER;;
+
 
 // read in configuration
 // $mainConfiguration = new \TechDivision\WebServer\MainJsonConfiguration(WEBSERVER_BASEDIR . 'etc/webserver.json');

@@ -67,7 +67,7 @@ class ThreadWorker extends \Thread implements WorkerInterface
     public function run()
     {
         // setup environment for worker
-        require WEBSERVER_BASEDIR . '../vendor/autoload.php';
+        require WEBSERVER_AUTOLOADER;
         // do work
         $this->work();
     }

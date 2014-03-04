@@ -12,12 +12,6 @@
             "role": "Developer"
         }
     ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url" : "https://github.com/techdivision/TechDivision_Http"
-        }
-    ],
     "require": {
         "php": ">=5.4.0",
         "techdivision/http": "dev-master"

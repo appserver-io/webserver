@@ -20,9 +20,11 @@
 
 namespace TechDivision\WebServer\Modules;
 
-use TechDivision\WebServer\Exceptions\ModuleException;
+use TechDivision\Http\HttpProtocol;
+use TechDivision\WebServer\Interfaces\ServerContextInterface;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
+use TechDivision\WebServer\Interfaces\ModuleInterface;
 
 /**
  * \TechDivision\WebServer\Modules\RewriteModule
@@ -36,13 +38,14 @@ use TechDivision\Http\HttpResponseInterface;
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/techdivision/TechDivision_WebServer
  */
-class RewriteModule extends AbstractModule
+class RewriteModule implements ModuleInterface
 {
-
     /**
-     * @var  $systemLogger <TODO FIELD COMMENT>
+     * @var array $supportedServerVars <TODO FIELD COMMENT>
      */
-    protected $systemLogger;
+    protected $supportedServerVars = array();
+
+    protected $conditionAdditionMapping = array();
 
     /**
      * This array will hold all values which one would suspect as part of the PHP $_SERVER array.
@@ -64,8 +67,8 @@ class RewriteModule extends AbstractModule
      */
     protected $mockConfig = array(
         'base' => 'http://localhost:8586/magento-1.8.1.0/',
-        'conditions' => array('%{DOCUMENT_ROOT}/$1' => '!-f', '%{HTTP_POST}' => '^(admin.example.com)$'),
-        'rules' => array('/rewritten([0-9]*)([a-z]*)' => '/example/?q=$1&m=$2')
+        'conditions' => array('%{DOCUMENT_ROOT}/$1' => '^.*(www)'),
+        'rules' => array('/rewritten([0-9]*)([a-z]*)' => '/example/?q=$1&m=$2&g=%1')
     );
 
     /**
@@ -98,18 +101,43 @@ class RewriteModule extends AbstractModule
     /**
      * Initiates the module
      *
+     * @param \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext The server's context instance
+     *
      * @return bool
      * @throws \TechDivision\WebServer\Exceptions\ModuleException
      */
-    public function init()
+    public function init(ServerContextInterface $serverContext)
     {
         // Register our dependencies
         $this->dependencies = array(
-            'core',
-            'log'
+            'core'
         );
 
-        $this->systemLogger = $this->getInitialContext()->getSystemLogger();
+        $this->supportedServerVars = array(
+            'headers' => array(
+                'HTTP_USER_AGENT',
+                'HTTP_REFERER',
+                'HTTP_COOKIE',
+                'HTTP_FORWARDED',
+                'HTTP_HOST',
+                'HTTP_PROXY_CONNECTION',
+                'HTTP_ACCEPT'
+            )
+        );
+
+        $this->conditionAdditionMapping = array(
+            '!',
+            '<',
+            '>',
+            '=',
+            '-d',
+            '-f',
+            '-s',
+            '-l',
+            '-x',
+            '-F',
+            '-U'
+        );
     }
 
     /**
@@ -124,22 +152,20 @@ class RewriteModule extends AbstractModule
     public function process(HttpRequestInterface $request, HttpResponseInterface $response)
     {
         $time = microtime(true);
-
-        $conditionBackreferences = array();
-        $ruleBackreferences = array();
-
+        $conditionBackreferences = array(null);
+        $ruleBackreferences = array(null);
+        error_log(var_export($request->getHeaders(), true));
         // We have to fill the request part of our $serverVars array here
-        $this->serverVars = array_merge($this->serverVars, $request->getHeaders());
+        $this->fillHeaderVars($request);
+        $this->serverVars['DOCUMENT_ROOT'] = $request->getDocumentRoot();
+        $this->serverVars['REQUEST_URI'] = $request->getUri();
 
         // Save the request URI to save some method calls
         $requestedUri = $request->getUri();
-
-        $rewrittenUri = '';
         $matches = array();
 
         //////////////////////////////////////////////////// backref rules
 
-        $rulesMatched = array();
         foreach ($this->mockConfig['rules'] as $rule => $target) {
 
             // If we do not match we can continue our quest
@@ -149,7 +175,7 @@ class RewriteModule extends AbstractModule
                 continue;
             }
 
-            // Unset the first find of our backrefernces, so we can use it automatically
+            // Unset the first find of our backreferences, so we can use it automatically
             unset($matches[0]);
 
             $ruleBackreferences = array_merge($ruleBackreferences, $matches);
@@ -166,18 +192,19 @@ class RewriteModule extends AbstractModule
 
         // We have to replace all $serverVar placeholder within the rewrite conditions we got
         $conditions = $this->mockConfig['conditions'];
-        $condFailed = false;
         foreach ($conditions as $testString => $pattern) {
 
             //////////////////////////////////////////////////// resolve cond
 
             $originalTestString = $testString;
             preg_replace_callback(
-                '/%\{.*?\}/',
-                function ($match) {
-                    if (isset($this->serverVars[$match[0]])) {
+                '/%\{(.*?)\}/',
+                function ($match) use (& $testString) {
 
-                        return $this->serverVars[$match[0]];
+                    if (isset($this->serverVars[$match[1]])) {
+
+                        $testString = str_replace($match[0], $this->serverVars[$match[1]], $testString);
+
                     }
                 },
                 $testString
@@ -228,7 +255,7 @@ class RewriteModule extends AbstractModule
         }
         foreach ($conditionBackreferences as $key => $conditionBackreference) {
 
-            $target = str_replace('$' . $key, $conditionBackreference, $target);
+            $target = str_replace('%' . $key, $conditionBackreference, $target);
         }
 
         // We found something, so we need our target anyway
@@ -249,14 +276,45 @@ class RewriteModule extends AbstractModule
             $request->setDocumentRoot(dirname($rewrittenUri));
             $request->setUri(basename($rewrittenUri));
 
+        } elseif (strpos($rewrittenUri, 'http') !== false) {
+
+            // Set the location for our redirect
+            $request->addHeader(HttpProtocol::HEADER_LOCATION, $rewrittenUri);
+
+            // This will stop processing of the module chain
+            return false;
+
         } else {
             // Set the URI as we are relative to the original document root
 
             $request->setUri($rewrittenUri);
         }
+
         error_log(microtime(true) - $time);
-        // Log what we do
-        $this->systemLogger->debug('Rewriting ' . $requestedUri . ' to ' . $rewrittenUri);
+        error_log(var_export($rewrittenUri, true));
+    }
+
+    /**
+     * Will fill the header variables into our pre-collected $serverVars array
+     *
+     * @param \TechDivision\Http\HttpRequestInterface $request The request instance
+     *
+     * @return bool
+     * @throws \TechDivision\WebServer\Exceptions\ModuleException
+     */
+    protected function fillHeaderVars(HttpRequestInterface $request)
+    {
+        $headerArray = $request->getHeaders();
+
+        foreach ($this->supportedServerVars['headers'] as $supportedServerVar) {
+
+            $tmp = strtoupper(str_replace('HTTP', 'HEADER', $supportedServerVar));
+            if (@isset($headerArray[constant("TechDivision\\Http\\HttpProtocol::$tmp")])) {
+                $this->serverVars[$supportedServerVar] = $headerArray[constant(
+                    "TechDivision\\Http\\HttpProtocol::$tmp"
+                )];
+            }
+        }
     }
 
     /**

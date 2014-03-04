@@ -1,7 +1,7 @@
 {
     "name": "techdivision/webserver",
     "description": "Multithreaded webserver for php in php",
-    "homepage": "https://github.com/techdivision/TechDivision_Webserver",
+    "homepage": "https://github.com/techdivision/TechDivision_WebServer",
     "keywords": ["php", "server", "webserver", "httpd", "http-server"],
     "license": ["OSL-3.0"],
     "authors": [

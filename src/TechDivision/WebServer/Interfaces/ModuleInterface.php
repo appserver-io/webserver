@@ -61,8 +61,10 @@ interface ModuleInterface
     /**
      * Initiates the module
      *
+     * @param \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext The server's context instance
+     *
      * @return bool
      * @throws \TechDivision\WebServer\Exceptions\ModuleException
      */
-    public function init();
+    public function init(ServerContextInterface $serverContext);
 }

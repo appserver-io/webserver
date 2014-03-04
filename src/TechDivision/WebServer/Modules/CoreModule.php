@@ -19,6 +19,7 @@ use TechDivision\Http\HttpProtocol;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
 use TechDivision\WebServer\Interfaces\ModuleInterface;
+use TechDivision\WebServer\Interfaces\ServerContextInterface;
 use TechDivision\WebServer\Modules\ModuleException;
 use TechDivision\WebServer\Dictionaries\MimeTypes;
 
@@ -98,10 +99,12 @@ class CoreModule implements ModuleInterface
     /**
      * Initiates the module
      *
+     * @param \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext The server's context instance
+     *
      * @return bool
      * @throws \TechDivision\WebServer\Exceptions\ModuleException
      */
-    public function init()
+    public function init(ServerContextInterface $serverContext)
     {
         return true;
     }

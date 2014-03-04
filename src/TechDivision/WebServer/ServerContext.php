@@ -39,6 +39,14 @@ class ServerContext implements ServerContextInterface
 {
 
     /**
+     * Optionally hold's an container implementation of third party environment.
+     * So every mod depending on his environment can use this as a container to transfer environment specific stuff.
+     *
+     * @var mixed
+     */
+    protected $container;
+
+    /**
      * Hold's the config instance
      *
      * @var \TechDivision\WebServer\Interfaces\ServerConfigurationInterface
@@ -74,21 +82,27 @@ class ServerContext implements ServerContextInterface
         // initiate server connection handlers
         $connectionHandlers = $this->getServerConfig()->getConnectionHandlers();
         foreach ($connectionHandlers as $connectionHandlerType) {
+            // check if conenction handler type exists
             if (!class_exists($connectionHandlerType)) {
                 throw new ConnectionHandlerNotFoundException($connectionHandlerType);
             }
+            // instantiate connection handler type
             $this->connectionHandlers[$connectionHandlerType] = new $connectionHandlerType();
+            // init connection handler with serverContext (this)
             $this->connectionHandlers[$connectionHandlerType]->init($this);
         }
 
         // initiate server modules
         $modules = $this->getServerConfig()->getModules();
         foreach ($modules as $moduleType) {
+            // check if module type exists
             if (!class_exists($moduleType)) {
                 throw new ModuleNotFoundException($moduleType);
             }
+            // instantiate module type
             $this->modules[$moduleType] = new $moduleType();
-            $this->modules[$moduleType]->init();
+            // init module with serverContext (this)
+            $this->modules[$moduleType]->init($this);
         }
     }
 
@@ -133,5 +147,27 @@ class ServerContext implements ServerContextInterface
     public function getConnectionHandlers()
     {
         return $this->connectionHandlers;
+    }
+
+    /**
+     * Injects the container for further use in specific webserver mods etc...
+     *
+     * @param mixed $container An container instance for third party environment
+     *
+     * @return void
+     */
+    public function injectContainer($container)
+    {
+        $this->container = $container;
+    }
+
+    /**
+     * Return's the container instance
+     *
+     * @return mixed The container instance for third party environment
+     */
+    public function getContainer()
+    {
+        return $this->container;
     }
 }

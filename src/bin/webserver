@@ -1,11 +1,9 @@
-#!/usr/bin/php
 <?php
 
 define('WEBSERVER_BASEDIR', __DIR__ . '/../');
-define('WEBSERVER_AUTOLOADER', WEBSERVER_BASEDIR . '../vendor/autoload.php);
+define('WEBSERVER_AUTOLOADER', WEBSERVER_BASEDIR . '../vendor/autoload.php');
 
-require WEBSERVER_AUTOLOADER;;
-
+require WEBSERVER_AUTOLOADER;
 
 // read in configuration
 // $mainConfiguration = new \TechDivision\WebServer\MainJsonConfiguration(WEBSERVER_BASEDIR . 'etc/webserver.json');
@@ -16,8 +14,16 @@ $servers = array();
 
 // start servers
 foreach ($mainConfiguration->getServerConfigs() as $serverConfig) {
+    // get type definitions
     $serverType = $serverConfig->getType();
-    $servers[] = new $serverType($serverConfig);
+    $serverContextType = $serverConfig->getServerContextType();
+
+    // init server context
+    $serverContext = new $serverContextType();
+    $serverContext->init($serverConfig);
+
+    // init and start server
+    $servers[] = new $serverType($serverContext);
 }
 
 // wait for servers

@@ -32,9 +32,9 @@ interface ServerInterface
     /**
      * Return's the server config instance
      *
-     * @return \TechDivision\WebServer\Interfaces\ServerConfigurationInterface
+     * @return \TechDivision\WebServer\Interfaces\ServerContextInterface
      */
-    public function getServerConfig();
+    public function getServerContext();
 
     /**
      * Start's the server's worker as defined in configuration

@@ -35,21 +35,21 @@ class MultiThreadedServer extends \Thread implements ServerInterface
 {
 
     /**
-     * Hold's the config instance
+     * Hold's the server context instance
      *
-     * @var \TechDivision\WebServer\Interfaces\ServerConfigurationInterface The server config instance
+     * @var \TechDivision\WebServer\Interfaces\ServerContextInterface The server context instance
      */
-    protected $serverConfig;
+    protected $serverContext;
 
     /**
      * Constructs the server instance
      *
-     * @param \TechDivision\WebServer\Interfaces\ServerConfigurationInterface $serverConfig The server config instance
+     * @param \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext The server context instance
      */
-    public function __construct(ServerConfigurationInterface $serverConfig)
+    public function __construct(ServerContextInterface $serverContext)
     {
-        // set config
-        $this->serverConfig = $serverConfig;
+        // set context
+        $this->serverContext = $serverContext;
         // start server thread
         $this->start();
     }
@@ -59,9 +59,9 @@ class MultiThreadedServer extends \Thread implements ServerInterface
      *
      * @return \TechDivision\WebServer\Interfaces\ServerConfigurationInterface
      */
-    public function getServerConfig()
+    public function getServerContext()
     {
-        return $this->serverConfig;
+        return $this->serverContext;
     }
 
     /**
@@ -74,24 +74,23 @@ class MultiThreadedServer extends \Thread implements ServerInterface
         // setup autoloader
         require WEBSERVER_AUTOLOADER;
 
+        // init server context
+        $serverContext = $this->getServerContext();
+
         // init config var for shorter calls
-        $serverConfig = $this->getServerConfig();
+        $serverConfig = $serverContext->getServerConfig();
 
         // get class names
         $socketType = $serverConfig->getSocketType();
         $serverContextType = $serverConfig->getServerContextType();
         $workerType = $serverConfig->getWorkerType();
 
-        // init server context
-        $serverContext = new $serverContextType();
-        $serverContext->init($serverConfig);
-
         // init stream context for server connection
         $streamContext = stream_context_create();
         // check if ssl server config
         if ($serverConfig->getTransport() === 'ssl') {
-            stream_context_set_option($streamContext, 'ssl', 'local_cert', WEBSERVER_BASEDIR . $this->getServerConfig()->getCertPath());
-            stream_context_set_option($streamContext, 'ssl', 'passphrase', $this->getServerConfig()->getPassphrase());
+            stream_context_set_option($streamContext, 'ssl', 'local_cert', WEBSERVER_BASEDIR . $serverConfig->getCertPath());
+            stream_context_set_option($streamContext, 'ssl', 'passphrase', $serverConfig->getPassphrase());
             stream_context_set_option($streamContext, 'ssl', 'allow_self_signed', true);
             stream_context_set_option($streamContext, 'ssl', 'verify_peer', false);
         }

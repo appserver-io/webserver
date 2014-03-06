@@ -186,7 +186,7 @@ class ServerContext implements ServerContextInterface
      * Set's a value to specific server var
      *
      * @param string $serverVar The server var to set
-     * @param string $value The value to server var
+     * @param string $value     The value to server var
      *
      * @return void
      */
@@ -259,7 +259,7 @@ class ServerContext implements ServerContextInterface
             ServerVars::HTTPS => ServerVars::VALUE_HTTPS_OFF
         );
         // check if ssl is going on and set server var for it like apache does
-        if ($this->getServerConfig()->getTransport() === 'ssl')  {
+        if ($this->getServerConfig()->getTransport() === 'ssl') {
             $this->setServerVar(ServerVars::HTTPS, ServerVars::VALUE_HTTPS_ON);
         }
         /**

@@ -21,9 +21,9 @@
             <connectionHandler type="\TechDivision\Http\HttpConnectionHandler"/>
         </connectionHandlers>
         <modules>
-            <module type="\TechDivision\WebServer\Modules\RewriteModule" />
             <module type="\TechDivision\WebServer\Modules\DirectoryModule" />
             <module type="\TechDivision\WebServer\Modules\CoreModule" />
+            <module type="\TechDivision\WebServer\Modules\RewriteModule" />
             <module type="\TechDivision\WebServer\Modules\DeflateModule" />
         </modules>
         <handlers>
@@ -56,6 +56,7 @@
         <modules>
             <module type="\TechDivision\WebServer\Modules\DirectoryModule" />
             <module type="\TechDivision\WebServer\Modules\CoreModule" />
+            <module type="\TechDivision\WebServer\Modules\RewriteModule" />
             <module type="\TechDivision\WebServer\Modules\DeflateModule" />
         </modules>
         <handlers>

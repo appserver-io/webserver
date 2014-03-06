@@ -21,10 +21,15 @@
 namespace TechDivision\WebServer\Modules;
 
 use TechDivision\Http\HttpProtocol;
+use TechDivision\WebServer\ConfigParser\HtaccessParser;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
 use TechDivision\WebServer\Interfaces\ModuleInterface;
+use TechDivision\WebServer\ConfigParser\Directives\RewriteBase;
+use TechDivision\WebServer\ConfigParser\Directives\RewriteCondition;
+use TechDivision\WebServer\ConfigParser\Directives\RewriteRule;
+use TechDivision\WebServer\ConfigParser\Config;
 
 /**
  * \TechDivision\WebServer\Modules\RewriteModule
@@ -45,7 +50,26 @@ class RewriteModule implements ModuleInterface
      */
     protected $supportedServerVars = array();
 
+    /**
+     * @var array $conditionAdditionMapping <TODO FIELD COMMENT>
+     */
     protected $conditionAdditionMapping = array();
+
+    /**
+     * This array will hold all locations (e.g. /example/websocket) we ever encountered in our live time.
+     * It will provide a mapping to the $configs array, as several locations can share one config
+     * (e.g. a "global" .htaccess).
+     *
+     * @var array<string> $locations
+     */
+    protected $locations = array();
+
+    /**
+     * Will hold all configs we have encountered to be used via the location mapping
+     *
+     * @var array<\TechDivision\WebServer\Modules\RewriteModule\Config> $configs
+     */
+    protected $configs = array();
 
     /**
      * This array will hold all values which one would suspect as part of the PHP $_SERVER array.
@@ -55,7 +79,7 @@ class RewriteModule implements ModuleInterface
      *
      * @var array $serverVars
      */
-    protected $serverVars = array();
+    protected $serverBackreferences = array();
 
     /**
      * @var array $dependencies The modules we depend on
@@ -63,20 +87,18 @@ class RewriteModule implements ModuleInterface
     protected $dependencies = array();
 
     /**
-     * http://localhost:8586/magento-1.8.1.0/testcategory/testproduct.html => http://localhost:8586/magento-1.8.1.0/index.php/testcategory/testproduct.html
-     */
-    protected $mockConfig = array(
-        'base' => 'http://localhost:8586/magento-1.8.1.0/',
-        'conditions' => array('%{DOCUMENT_ROOT}/$1' => '^.*(www)'),
-        'rules' => array('/rewritten([0-9]*)([a-z]*)' => '/example/?q=$1&m=$2&g=%1')
-    );
-
-    /**
      * Defines the module name
      *
      * @var string
      */
     const MODULE_NAME = 'rewrite';
+
+    /**
+     * Name of local apache like configuration files
+     *
+     * @var string
+     */
+    const APACHE_CONF_LOCAL = '.htaccess';
 
     /**
      * Return's the request instance
@@ -108,9 +130,17 @@ class RewriteModule implements ModuleInterface
      */
     public function init(ServerContextInterface $serverContext)
     {
+        $mockConfig = new Config(__FILE__, array(
+            new RewriteBase('http://localhost:8586/magento-1.8.1.0/'),
+            new RewriteCondition('regex', '%{DOCUMENT_ROOT}/$1', '^.*(www)'),
+            new RewriteRule('relative', '/rewritten([0-9]*)([a-z]*)', '/example/?q=$1&m=$2&g=%1')
+        ));
+        $this->locations['/rewritten123asd'] = $mockConfig;
+
         // Register our dependencies
         $this->dependencies = array(
-            'core'
+            'core',
+            'directory'
         );
 
         $this->supportedServerVars = array(
@@ -123,20 +153,6 @@ class RewriteModule implements ModuleInterface
                 'HTTP_PROXY_CONNECTION',
                 'HTTP_ACCEPT'
             )
-        );
-
-        $this->conditionAdditionMapping = array(
-            '!',
-            '<',
-            '>',
-            '=',
-            '-d',
-            '-f',
-            '-s',
-            '-l',
-            '-x',
-            '-F',
-            '-U'
         );
     }
 
@@ -152,114 +168,69 @@ class RewriteModule implements ModuleInterface
     public function process(HttpRequestInterface $request, HttpResponseInterface $response)
     {
         $time = microtime(true);
-        $conditionBackreferences = array(null);
-        $ruleBackreferences = array(null);
-        error_log(var_export($request->getHeaders(), true));
+
         // We have to fill the request part of our $serverVars array here
-        $this->fillHeaderVars($request);
-        $this->serverVars['DOCUMENT_ROOT'] = $request->getDocumentRoot();
-        $this->serverVars['REQUEST_URI'] = $request->getUri();
+        $this->fillHeaderBackreferences($request);
+        $this->serverBackreferences['%{DOCUMENT_ROOT}'] = $request->getDocumentRoot();
+        $this->serverBackreferences['%{REQUEST_URI}'] = $request->getUri();
 
         // Save the request URI to save some method calls
         $requestedUri = $request->getUri();
-        $matches = array();
 
-        //////////////////////////////////////////////////// backref rules
+        $config = $this->getLocationConfig($requestedUri);
+        $rules = $config->getDirectivesByType('TechDivision\WebServer\ConfigParser\Directives\RewriteRule');
+        $conditions = $config->getDirectivesByType('TechDivision\WebServer\ConfigParser\Directives\RewriteCondition');
 
-        foreach ($this->mockConfig['rules'] as $rule => $target) {
-
-            // If we do not match we can continue our quest
-            if (preg_match('`' . $rule . '`', $requestedUri, $matches) !== 1) {
-
-                unset($this->mockConfig['rules'][$rule]);
-                continue;
-            }
-
-            // Unset the first find of our backreferences, so we can use it automatically
-            unset($matches[0]);
-
-            $ruleBackreferences = array_merge($ruleBackreferences, $matches);
-        }
-
-        // If there was no rule which matched we can stop right here (as rules need no condition backreferences for
-        // patterns)
-        if (empty($this->mockConfig['rules'])) {
-
-            return;
-        }
+        // Get the backreferences for all the directives we need
+        $backreferences = array_merge(
+            $this->serverBackreferences,
+            $config->getBackreferences(
+                'TechDivision\WebServer\ConfigParser\Directives\RewriteRule',
+                array($requestedUri)
+            )
+        );
 
         //////////////////////////////////////////////////// resolve cond & check cond &  backref cond
 
         // We have to replace all $serverVar placeholder within the rewrite conditions we got
-        $conditions = $this->mockConfig['conditions'];
-        foreach ($conditions as $testString => $pattern) {
+        foreach ($conditions as $key => $condition) {
 
             //////////////////////////////////////////////////// resolve cond
 
-            $originalTestString = $testString;
-            preg_replace_callback(
-                '/%\{(.*?)\}/',
-                function ($match) use (& $testString) {
-
-                    if (isset($this->serverVars[$match[1]])) {
-
-                        $testString = str_replace($match[0], $this->serverVars[$match[1]], $testString);
-
-                    }
-                },
-                $testString
-            );
-
-            // Substitute the backreferences like $1, $2, ...
-            foreach ($ruleBackreferences as $key => $ruleBackreference) {
-
-                $testString = str_replace('$' . $key, $ruleBackreference, $testString);
-            }
-
-            // Write our changes back to our condition array
-            unset($this->mockConfig['conditions'][$originalTestString]);
-            $this->mockConfig['conditions'][$testString] = $pattern;
+            $condition->resolve($backreferences);
 
             //////////////////////////////////////////////////// check cond
 
             // If we do not match we will fail right here
-            if (preg_match('`' . $pattern . '`', $testString) !== 1) {
+            if (!$condition->matches()) {
+
+                return;
+            }
+        }
+
+        //////////////////////////////////////////////////// backref cond
+
+        $backreferences = array_merge(
+            $backreferences,
+            $config->getBackreferences(
+                'TechDivision\WebServer\ConfigParser\Directives\RewriteCondition'
+            )
+        );
+        error_log(var_export($backreferences, true));
+        //////////////////////////////////////////////////// resolve rules & check rules $ act
+        $rewrittenUri = $requestedUri;
+        foreach ($rules as $key => $rule) {
+
+            $rule->resolve($backreferences);
+
+            // TODO implement flags
+            if (!$rule->matches($requestedUri)) {
 
                 return;
             }
 
-            //////////////////////////////////////////////////// backref cond
-
-            // If we do not match we can continue our quest
-            if (preg_match('`' . $pattern . '`', $testString, $matches) !== 1) {
-
-                continue;
-            }
-
-            // Unset the first find of our backrefernces, so we can use it automatically
-            unset($matches[0]);
-
-            $conditionBackreferences = array_merge($conditionBackreferences, $matches);
+            $rewrittenUri = $rule->apply();
         }
-
-        //////////////////////////////////////////////////// resolve rules & check rules
-
-        // This is similar to using the L flag and breaks non-L-flag usage!
-        // TODO implement different flags
-        $target = array_pop($this->mockConfig['rules']);
-
-        // Substitute the placeholders like $1, $2, ...
-        foreach ($ruleBackreferences as $key => $ruleBackreference) {
-
-            $target = str_replace('$' . $key, $ruleBackreference, $target);
-        }
-        foreach ($conditionBackreferences as $key => $conditionBackreference) {
-
-            $target = str_replace('%' . $key, $conditionBackreference, $target);
-        }
-
-        // We found something, so we need our target anyway
-        $rewrittenUri = $target;
 
         //////////////////////////////////////////////////// act
 
@@ -295,14 +266,47 @@ class RewriteModule implements ModuleInterface
     }
 
     /**
+     * Will return the configuration
+     *
+     * @param $uri
+     *
+     * @return array
+     */
+    protected function getLocationConfig($uri)
+    {
+        // We have to check if we already got the config
+        if (isset($this->locations[$uri])) {
+
+            // Is the config recent?
+            if ($fileInfo = new \SplFileInfo($this->locations[$uri]->getConfigPath())) {
+
+                if ($fileInfo->getMTime() == $this->locations[$uri]->getMTime()) {
+
+                    return $this->locations[$uri];
+                }
+            }
+        }
+
+        // As we are still here it is safe to assume that we have to reparse the configuration for this location
+        // as there might have been changes
+        $configParser = new HtaccessParser();
+
+        // Save the config for later use
+        $this->locations[$uri] = $configParser->getConfigForFile(
+            $this->serverBackreferences['%{DOCUMENT_ROOT}'] . $uri
+        );
+
+        return $this->locations[$uri];
+    }
+
+    /**
      * Will fill the header variables into our pre-collected $serverVars array
      *
      * @param \TechDivision\Http\HttpRequestInterface $request The request instance
      *
-     * @return bool
-     * @throws \TechDivision\WebServer\Exceptions\ModuleException
+     * @return void
      */
-    protected function fillHeaderVars(HttpRequestInterface $request)
+    protected function fillHeaderBackreferences(HttpRequestInterface $request)
     {
         $headerArray = $request->getHeaders();
 
@@ -310,7 +314,7 @@ class RewriteModule implements ModuleInterface
 
             $tmp = strtoupper(str_replace('HTTP', 'HEADER', $supportedServerVar));
             if (@isset($headerArray[constant("TechDivision\\Http\\HttpProtocol::$tmp")])) {
-                $this->serverVars[$supportedServerVar] = $headerArray[constant(
+                $this->serverBackreferences['%{' . $supportedServerVar . '}'] = $headerArray[constant(
                     "TechDivision\\Http\\HttpProtocol::$tmp"
                 )];
             }

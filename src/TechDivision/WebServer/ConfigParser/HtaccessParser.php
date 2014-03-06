@@ -58,18 +58,25 @@ class HtaccessParser extends AbstractParser
     /**
      * Will return a complete configuration parsed from the provided file
      *
-     * @param string $filePath The path to the configuration file
+     * @param string $documentRoot The servers document root as a fallback
+     * @param string $requestedUri The requested uri
      *
      * @return \TechDivision\WebServer\ConfigParser\Config
      */
-    public function getConfigForFile($filePath)
+    public function getConfigForFile($documentRoot, $requestedUri)
     {
-        $fileInfo = new \SplFileInfo($filePath);
+        $fileInfo = new \SplFileInfo($documentRoot . DIRECTORY_SEPARATOR . $requestedUri);
+error_log(var_export($documentRoot, true));
+        if (!$fileInfo->isReadable()) {
+
+            $fileInfo = new \SplFileInfo($documentRoot . DIRECTORY_SEPARATOR);
+            error_log(var_export($fileInfo, true));
+        }
 
         // We will check each directory from the requested URI's path upwards and if we find a local config file we
         // will take it ;)
         $configPath = '';
-        $depth = count(explode(DIRECTORY_SEPARATOR, $filePath));
+        $depth = count(explode(DIRECTORY_SEPARATOR, $fileInfo->getPath()));
         for ($i = 0; $i <= $depth; $i++) {
 
             $fileInfo = $fileInfo->getPathInfo();

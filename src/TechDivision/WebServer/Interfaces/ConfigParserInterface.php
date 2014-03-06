@@ -46,9 +46,10 @@ interface ConfigParserInterface
     /**
      * Will return a complete configuration parsed from the provided file
      *
-     * @param string $filePath The path to the configuration file
+     * @param string $documentRoot The servers document root as a fallback
+     * @param string $requestedUri The requested uri
      *
-     * @return \TechDivision\WebServer\Modules\RewriteModule\Config
+     * @return \TechDivision\WebServer\ConfigParser\Config
      */
-    public function getConfigForFile($filePath);
+    public function getConfigForFile($documentRoot, $requestedUri);
 }

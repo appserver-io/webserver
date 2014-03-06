@@ -68,17 +68,22 @@ class CoreModule implements ModuleInterface
      */
     public function process(HttpRequestInterface $request, HttpResponseInterface $response)
     {
-        // set requested filename
-        $this->setRequestedFilename($request->getRealPath());
+        // todo: refactor this to be handled by file handlers
+        if (strpos($request->getUri(), '.php') === false) {
 
-        // check if file exists on filesystem
-        if (file_exists($this->getRequestedFilename())) {
-            // set body stream to file descriptor stream
-            $response->setBodyStream(fopen($this->getRequestedFilename(), 'r'));
-            // set correct mimetype
-            $response->setMimeType(
-                MimeTypes::getMimeTypeByFilename($this->getRequestedFilename())
-            );
+            // set requested filename
+            $this->setRequestedFilename($request->getRealPath());
+
+            // check if file exists on filesystem
+            if (file_exists($this->getRequestedFilename())) {
+                // set body stream to file descriptor stream
+                $response->setBodyStream(fopen($this->getRequestedFilename(), 'r'));
+                // set correct mimetype header
+                $response->addHeader(
+                    HttpProtocol::HEADER_CONTENT_TYPE,
+                    MimeTypes::getMimeTypeByFilename($this->getRequestedFilename())
+                );
+            }
         }
     }
 

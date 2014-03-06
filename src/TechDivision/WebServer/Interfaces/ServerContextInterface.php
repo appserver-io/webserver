@@ -75,4 +75,39 @@ interface ServerContextInterface
      * @return array
      */
     public function getConnectionHandlers();
+
+    /**
+     * Set's a value to specific server var
+     *
+     * @param string $serverVar The server var to set
+     * @param string $value     The value to server var
+     *
+     * @return void
+     */
+    public function setServerVar($serverVar, $value);
+
+    /**
+     * Return's a value for specific server var
+     *
+     * @param string $serverVar The server var to get value for
+     *
+     * @return string The value to given server var
+     */
+    public function getServerVar($serverVar);
+
+    /**
+     * Check's if value exists for given server var
+     *
+     * @param string $serverVar The server var to check
+     *
+     * @return bool Weather it has serverVar (true) or not (false)
+     */
+    public function hasServerVar($serverVar);
+
+    /**
+     * Return's all the server vars as array key value pair format
+     *
+     * @return array The server vars as array
+     */
+    public function getServerVars();
 }

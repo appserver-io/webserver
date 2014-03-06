@@ -12,7 +12,6 @@
  * @package    TechDivision_WebServer
  * @subpackage Modules
  * @author     Bernhard Wick <b.wick@techdivision.com>
- * @author     Johann Zelger <jz@techdivision.com>
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/techdivision/TechDivision_WebServer
@@ -38,7 +37,6 @@ use TechDivision\WebServer\ConfigParser\Config;
  * @package    TechDivision_WebServer
  * @subpackage Modules
  * @author     Bernhard Wick <b.wick@techdivision.com>
- * @author     Johann Zelger <jz@techdivision.com>
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/techdivision/TechDivision_WebServer
@@ -49,11 +47,6 @@ class RewriteModule implements ModuleInterface
      * @var array $supportedServerVars <TODO FIELD COMMENT>
      */
     protected $supportedServerVars = array();
-
-    /**
-     * @var array $conditionAdditionMapping <TODO FIELD COMMENT>
-     */
-    protected $conditionAdditionMapping = array();
 
     /**
      * This array will hold all locations (e.g. /example/websocket) we ever encountered in our live time.
@@ -94,33 +87,6 @@ class RewriteModule implements ModuleInterface
     const MODULE_NAME = 'rewrite';
 
     /**
-     * Name of local apache like configuration files
-     *
-     * @var string
-     */
-    const APACHE_CONF_LOCAL = '.htaccess';
-
-    /**
-     * Return's the request instance
-     *
-     * @return \TechDivision\Http\HttpRequestInterface The request instance
-     */
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    /**
-     * Returns the response instance
-     *
-     * @return \TechDivision\Http\HttpResponseInterface The response instance;
-     */
-    public function getResponse()
-    {
-        return $this->response;
-    }
-
-    /**
      * Initiates the module
      *
      * @param \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext The server's context instance
@@ -130,13 +96,6 @@ class RewriteModule implements ModuleInterface
      */
     public function init(ServerContextInterface $serverContext)
     {
-        $mockConfig = new Config(__FILE__, array(
-            new RewriteBase('http://localhost:8586/magento-1.8.1.0/'),
-            new RewriteCondition('regex', '%{DOCUMENT_ROOT}/$1', '^.*(www)'),
-            new RewriteRule('relative', '/rewritten([0-9]*)([a-z]*)', '/example/?q=$1&m=$2&g=%1')
-        ));
-        $this->locations['/rewritten123asd'] = $mockConfig;
-
         // Register our dependencies
         $this->dependencies = array(
             'core',
@@ -216,7 +175,7 @@ class RewriteModule implements ModuleInterface
                 'TechDivision\WebServer\ConfigParser\Directives\RewriteCondition'
             )
         );
-        error_log(var_export($backreferences, true));
+
         //////////////////////////////////////////////////// resolve rules & check rules $ act
         $rewrittenUri = $requestedUri;
         foreach ($rules as $key => $rule) {
@@ -275,14 +234,16 @@ class RewriteModule implements ModuleInterface
     protected function getLocationConfig($uri)
     {
         // We have to check if we already got the config
-        if (isset($this->locations[$uri])) {
+        if (isset($this->locations[$uri]) && isset($this->configs[$this->locations[$uri]])) {
+
+            $config = $this->configs[$this->locations[$uri]];
 
             // Is the config recent?
-            if ($fileInfo = new \SplFileInfo($this->locations[$uri]->getConfigPath())) {
+            if ($fileInfo = new \SplFileInfo($config->getConfigPath())) {
 
-                if ($fileInfo->getMTime() == $this->locations[$uri]->getMTime()) {
+                if ($fileInfo->getMTime() == $config->getMTime()) {
 
-                    return $this->locations[$uri];
+                    return $config;
                 }
             }
         }
@@ -292,11 +253,13 @@ class RewriteModule implements ModuleInterface
         $configParser = new HtaccessParser();
 
         // Save the config for later use
-        $this->locations[$uri] = $configParser->getConfigForFile(
-            $this->serverBackreferences['%{DOCUMENT_ROOT}'] . $uri
+        $config = $configParser->getConfigForFile(
+            $this->serverBackreferences['%{DOCUMENT_ROOT}'], $uri
         );
+        $this->locations[$uri] = $config->getConfigPath();
+        $this->configs[$config->getConfigPath()] = $config;
 
-        return $this->locations[$uri];
+        return $config;
     }
 
     /**

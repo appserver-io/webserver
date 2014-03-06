@@ -44,7 +44,7 @@
             "port": "9443",
             "certPath": "etc/webserver.pem",
             "passphrase": "passphrase",
-            "documentRoot" : "/var/www/foundation-5.1.1-custom",
+            "documentRoot" : "/var/www",
 
             "workerNumber": 32,
 

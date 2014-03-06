@@ -218,7 +218,7 @@ class RewriteCondition
         $this->operand = $parts[0];
         $this->action = $parts[1];
 
-        // Fill the instance
+        // Fill the instance, "regex" is the default type
         $this->type = 'regex';
 
         // Preset the operation with a regex check
@@ -246,7 +246,7 @@ class RewriteCondition
             }
         }
 
-        // Get the modifier, if any
+        // Get the modifier, if there is any
         if (isset($parts[2])) {
 
             $this->modifier = $parts[2];

@@ -27,6 +27,7 @@ use TechDivision\Http\HttpResponseInterface;
 use TechDivision\WebServer\Interfaces\ModuleInterface;
 use TechDivision\WebServer\Modules\ModuleException;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
+use TechDivision\WebServer\Dictionaries\ServerVars;
 
 /**
  * Class DirectoryModule
@@ -48,6 +49,13 @@ class DirectoryModule implements ModuleInterface
      * @var string
      */
     const MODULE_NAME = 'directory';
+
+    /**
+     * Hold's the server context instance
+     *
+     * @var \TechDivision\WebServer\Interfaces\ServerContextInterface
+     */
+    protected $serverContext;
 
     /**
      * Return's the request instance
@@ -79,7 +87,17 @@ class DirectoryModule implements ModuleInterface
      */
     public function init(ServerContextInterface $serverContext)
     {
-        return true;
+        $this->serverContext= $serverContext;
+    }
+
+    /**
+     * Return's the server context instance
+     *
+     * @return \TechDivision\WebServer\Interfaces\ServerContextInterface
+     */
+    public function getServerContext()
+    {
+        return $this->serverContext;
     }
 
     /**
@@ -114,9 +132,19 @@ class DirectoryModule implements ModuleInterface
                 // check if defined index files are found in directory
                 if (file_exists($realPath . 'index.php')) {
                     $request->setUri($uri . 'index.php');
+                    // update server var
+                    $this->getServerContext()->setServerVar(
+                        ServerVars::REQUEST_URI,
+                        $request->getUri()
+                    );
                 }
                 if (file_exists($realPath . 'index.html')) {
                     $request->setUri($uri . 'index.html');
+                    // update server var
+                    $this->getServerContext()->setServerVar(
+                        ServerVars::REQUEST_URI,
+                        $request->getUri()
+                    );
                 }
             }
         }

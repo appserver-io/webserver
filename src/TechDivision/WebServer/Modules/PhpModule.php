@@ -144,10 +144,19 @@ class PhpModule implements ModuleInterface
         // todo: refactore this with fileHandlers check in init function
         if (strpos($request->getUri(), '.php') !== false) {
 
-            error_log('processing: ' . $request->getUri());
+            // init script filename var
+            $scriptFilename = $serverContext->getServerVar(ServerVars::SCRIPT_FILENAME);
 
             /**
-             * todo fill up those server vars in future when mod auth is present
+             * Check if script name exists on filesystem
+             * This is necessary because of seq faults if a non existing file will be required.
+             */
+            if (!file_exists($scriptFilename)) {
+                return;
+            }
+
+            /**
+             * todo: fill up those server vars in future when mod auth is present
              *
              * PHP_AUTH_DIGEST
              * PHP_AUTH_USER
@@ -159,17 +168,14 @@ class PhpModule implements ModuleInterface
 
             // start new php process
             $process = new PhpProcess(
-                $serverContext->getServerVar(ServerVars::SCRIPT_FILENAME),
+                $scriptFilename,
                 $this->globals
-                // $outputBufferStream
             );
 
-            error_log(__METHOD__ .' : ' .'start process');
             // start process
-            $process->start();
+            $process->start(PTHREADS_INHERIT_ALL | PTHREADS_ALLOW_HEADERS);
             // wait for process to finish
             $process->join();
-            error_log(__METHOD__ .' : ' .'end process');
 
             // prepare response
             $this->prepareResponse(
@@ -186,6 +192,8 @@ class PhpModule implements ModuleInterface
     /**
      * Prepares the response instance for delivery
      *
+     * @param array $headers The headers to prepare
+     *
      * @return void
      */
     public function prepareResponse($headers)
@@ -196,10 +204,7 @@ class PhpModule implements ModuleInterface
         $response->addHeader(HttpProtocol::HEADER_EXPIRES, '19 Nov 1981 08:52:00 GMT');
         // set per default text/html mimetype
         $response->addHeader(HttpProtocol::HEADER_CONTENT_TYPE, 'text/html');
-
-        error_log(var_export($headers, true));
-
-        // grap headers and set to response object
+        // grep headers and set to response object
         foreach ($headers as $i => $h) {
             // set headers defined in sapi headers
             $h = explode(':', $h, 2);
@@ -250,8 +255,14 @@ class PhpModule implements ModuleInterface
             // set params given in query string to get
             parse_str($request->getQueryString(), $globals->get);
         }
+        // set cookie globals
+        $globals->cookie = array();
+        // iterate all cookies and set them in globals
+        foreach (explode('; ', $request->getHeader(HttpProtocol::HEADER_COOKIE)) as $cookieLine) {
+            list ($key, $value) = explode('=', $cookieLine);
+            $globals->cookie[$key] = $value;
+        }
 
-        // $_COOKIE = $this->initCookieGlobals($request);
         // $_FILES = $this->initFileGlobals($request);
     }
 

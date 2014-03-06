@@ -73,6 +73,17 @@ interface SocketInterface
     public function readLine($readLength = 256);
 
     /**
+     * Read's the given length from connection resource
+     *
+     * @param int $readLength     The max length to read for a line.
+     * @param int $receiveTimeout The max time to wait for read the next line
+     *
+     * @return string;
+     * @throws \TechDivision\WebServer\Sockets\SocketReadTimeoutException
+     */
+    public function read($readLength = 256, $receiveTimeout = null);
+
+    /**
      * Writes the given message to the connection resource.
      *
      * @param string $message The message to write to the connection resource.

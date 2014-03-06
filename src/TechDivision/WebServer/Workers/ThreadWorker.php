@@ -99,6 +99,8 @@ class ThreadWorker extends \Thread implements WorkerInterface
                     break;
                 }
             }
+            // init server vars afterwards to avoid performance issues
+            $serverContext->initServerVars();
         }
 
     }

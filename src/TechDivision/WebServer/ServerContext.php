@@ -251,7 +251,7 @@ class ServerContext implements ServerContextInterface
         $this->serverVars = array(
             ServerVars::DOCUMENT_ROOT => $this->getServerConfig()->getDocumentRoot(),
             ServerVars::SERVER_ADMIN => 'www@localhost', //todo: implement admin in config
-            ServerVars::SERVER_NAME => '', //todo: implement vhost in config and default name (ip or localhost)
+            ServerVars::SERVER_NAME => '127.0.0.1', //todo: implement vhost in config and default name (ip or localhost)
             ServerVars::SERVER_ADDR => $this->getServerConfig()->getAddress(),
             ServerVars::SERVER_PORT => $this->getServerConfig()->getPort(),
             ServerVars::SERVER_SOFTWARE => $this->getServerConfig()->getSignature(),

@@ -24,6 +24,7 @@ namespace TechDivision\WebServer\Modules;
 use TechDivision\Http\HttpProtocol;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
+use TechDivision\WebServer\Dictionaries\ServerVars;
 use TechDivision\WebServer\Interfaces\ModuleInterface;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
 use TechDivision\WebServer\Modules\ModuleException;
@@ -58,6 +59,13 @@ class CoreModule implements ModuleInterface
     protected $requestedFilename;
 
     /**
+     * Hold's the server context instance
+     *
+     * @var \TechDivision\WebServer\Interfaces\ServerContextInterface
+     */
+    protected $serverContext;
+
+    /**
      * Implement's module logic
      *
      * @param \TechDivision\Http\HttpRequestInterface  $request  The request instance
@@ -68,8 +76,53 @@ class CoreModule implements ModuleInterface
      */
     public function process(HttpRequestInterface $request, HttpResponseInterface $response)
     {
-        // todo: refactor this to be handled by file handlers
-        if (strpos($request->getUri(), '.php') === false) {
+        // set local var
+        $serverContext = $this->getServerContext();
+
+        // todo: read out config for all file handle extensions not just hardcore php
+        $fileHandlerExtension = '.php';
+
+        // check if fileHandler type are present in uri
+        if (strpos($request->getUri(), $fileHandlerExtension) !== false) {
+            // get document root
+            $documentRoot = $serverContext->getServerVar(ServerVars::DOCUMENT_ROOT);
+            // check where the script position ends
+            $scriptStrEndPos = strpos($request->getUri(), $fileHandlerExtension) + strlen($fileHandlerExtension);
+            // parse script name
+            $scriptName = substr($request->getUri(), 0, $scriptStrEndPos);
+            // set script name to request object
+            $request->setScriptName($scriptName);
+
+            $serverContext->setServerVar(
+                ServerVars::SCRIPT_NAME,
+                $request->getScriptName()
+            );
+            $serverContext->setServerVar(
+                ServerVars::SCRIPT_FILENAME,
+                $documentRoot . $request->getScriptName()
+            );
+
+            // parse path info if exists in uri
+            if (($pathInfo = substr(str_replace('?' . $request->getQueryString(), '', $request->getUri()), $scriptStrEndPos)) !== false) {
+                // set path info to request object
+                $request->setPathInfo($pathInfo);
+
+                $serverContext->setServerVar(
+                    ServerVars::PATH_INFO,
+                    $request->getPathInfo()
+                );
+                $serverContext->setServerVar(
+                    ServerVars::PATH_TRANSLATED,
+                    $documentRoot . $request->getPathInfo()
+                );
+            }
+
+            /**
+             * it's intended to not set ScriptFilename and PathTranslated here because the request doesn't
+             * care about document root stuff. so this is set by the connection handler!
+             */
+            // todo: check and implement ORIG_PATH_INFO server var
+        } else {
 
             // set requested filename
             $this->setRequestedFilename($request->getRealPath());
@@ -117,7 +170,7 @@ class CoreModule implements ModuleInterface
      */
     public function init(ServerContextInterface $serverContext)
     {
-        return true;
+        $this->serverContext = $serverContext;
     }
 
     /**
@@ -140,5 +193,15 @@ class CoreModule implements ModuleInterface
     public function getRequestedFilename()
     {
         return $this->requestedFilename;
+    }
+
+    /**
+     * Return's the server context instance
+     *
+     * @return \TechDivision\WebServer\Interfaces\ServerContextInterface
+     */
+    public function getServerContext()
+    {
+        return $this->serverContext;
     }
 }

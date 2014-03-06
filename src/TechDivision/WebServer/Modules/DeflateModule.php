@@ -73,6 +73,10 @@ class DeflateModule implements ModuleInterface
      */
     public function process(HttpRequestInterface $request, HttpResponseInterface $response)
     {
+        // check if no accept encoding headers are sent
+        if (!$request->hasHeader(HttpProtocol::HEADER_ACCEPT_ENCODING)) {
+            return true;
+        }
         // check if request accepts deflate
         if (strpos($request->getHeader(HttpProtocol::HEADER_ACCEPT_ENCODING), 'deflate') !== false) {
             // apply encoding filter to response body stream

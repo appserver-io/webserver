@@ -112,6 +112,9 @@ class DirectoryModule implements ModuleInterface
                 $response->setStatusCode(301);
             } else {
                 // check if defined index files are found in directory
+                if (file_exists($realPath . 'index.php')) {
+                    $request->setUri($uri . 'index.php');
+                }
                 if (file_exists($realPath . 'index.html')) {
                     $request->setUri($uri . 'index.html');
                 }

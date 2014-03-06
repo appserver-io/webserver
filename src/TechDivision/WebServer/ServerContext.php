@@ -23,6 +23,7 @@ namespace TechDivision\WebServer;
 use TechDivision\WebServer\ConnectionPool;
 use TechDivision\WebServer\Exceptions\ConnectionHandlerNotFoundException;
 use TechDivision\WebServer\Exceptions\ModuleNotFoundException;
+use TechDivision\WebServer\Exceptions\ServerException;
 use TechDivision\WebServer\Interfaces\ConfigInterface;
 use TechDivision\WebServer\Interfaces\ServerConfigurationInterface;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
@@ -30,6 +31,7 @@ use TechDivision\WebServer\Modules\CoreModule;
 use TechDivision\WebServer\Modules\DirectoryModule;
 use TechDivision\WebServer\Sockets\SocketInterface;
 use TechDivision\WebServer\Interfaces\PoolInterface;
+use TechDivision\WebServer\Dictionaries\ServerVars;
 
 /**
  * Class ServerContext
@@ -84,6 +86,9 @@ class ServerContext implements ServerContextInterface
     {
         // set configuration
         $this->serverConfig = $serverConfig;
+
+        // init server vars
+        $this->initServerVars();
 
         // initiate server connection handlers
         $connectionHandlers = $this->getServerConfig()->getConnectionHandlers();
@@ -175,5 +180,91 @@ class ServerContext implements ServerContextInterface
     public function getContainer()
     {
         return $this->container;
+    }
+
+    /**
+     * Set's a value to specific server var
+     *
+     * @param string $serverVar The server var to set
+     * @param string $value     The value to server var
+     *
+     * @return void
+     */
+    public function setServerVar($serverVar, $value)
+    {
+        if (!is_null($value)) {
+            $this->serverVars[$serverVar] = $value;
+        }
+    }
+
+    /**
+     * Return's a value for specific server var
+     *
+     * @param string $serverVar The server var to get value for
+     *
+     * @return string The value to given server var
+     */
+    public function getServerVar($serverVar)
+    {
+        // check if server var is set
+        if (isset($this->serverVars[$serverVar])) {
+            // return server vars value
+            return $this->serverVars[$serverVar];
+        }
+        // throw exception
+        throw new ServerException("Server var '$serverVar'' does not exist.");
+    }
+
+    /**
+     * Return's all the server vars as array key value pair format
+     *
+     * @return array The server vars as array
+     */
+    public function getServerVars()
+    {
+        return $this->serverVars;
+    }
+
+    /**
+     * Check's if value exists for given server var
+     *
+     * @param string $serverVar The server var to check
+     *
+     * @return bool Weather it has serverVar (true) or not (false)
+     */
+    public function hasServerVar($serverVar)
+    {
+        // check if server var is set
+        if (!isset($this->serverVars[$serverVar])) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Init basic server vars
+     *
+     * @return void
+     */
+    public function initServerVars()
+    {
+        $this->serverVars = array(
+            ServerVars::DOCUMENT_ROOT => $this->getServerConfig()->getDocumentRoot(),
+            ServerVars::SERVER_ADMIN => 'www@localhost', //todo: implement admin in config
+            ServerVars::SERVER_NAME => '', //todo: implement vhost in config and default name (ip or localhost)
+            ServerVars::SERVER_ADDR => $this->getServerConfig()->getAddress(),
+            ServerVars::SERVER_PORT => $this->getServerConfig()->getPort(),
+            ServerVars::SERVER_SOFTWARE => $this->getServerConfig()->getSignature(),
+            ServerVars::PATH => getenv('PATH'),
+            ServerVars::HTTPS => ServerVars::VALUE_HTTPS_OFF
+        );
+        // check if ssl is going on and set server var for it like apache does
+        if ($this->getServerConfig()->getTransport() === 'ssl') {
+            $this->setServerVar(ServerVars::HTTPS, ServerVars::VALUE_HTTPS_ON);
+        }
+        /**
+         * Todo: set auth server vars by mod_auth later on if it exists
+         * AUTH_TYPE
+         */
     }
 }

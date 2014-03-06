@@ -21,9 +21,10 @@
             <connectionHandler type="\TechDivision\Http\HttpConnectionHandler"/>
         </connectionHandlers>
         <modules>
+            <!-- <module type="\TechDivision\WebServer\Modules\DeflateModule" /> -->
             <module type="\TechDivision\WebServer\Modules\DirectoryModule" />
             <module type="\TechDivision\WebServer\Modules\CoreModule" />
-            <module type="\TechDivision\WebServer\Modules\DeflateModule" />
+            <!-- <module type="\TechDivision\WebServer\Modules\PhpModule" /> -->
         </modules>
         <handlers>
             <handler name="php" extension=".php" />
@@ -53,9 +54,10 @@
             <connectionHandler type="\TechDivision\Http\HttpConnectionHandler"/>
         </connectionHandlers>
         <modules>
+            <!-- <module type="\TechDivision\WebServer\Modules\DeflateModule" /> -->
             <module type="\TechDivision\WebServer\Modules\DirectoryModule" />
             <module type="\TechDivision\WebServer\Modules\CoreModule" />
-            <module type="\TechDivision\WebServer\Modules\DeflateModule" />
+            <!-- <module type="\TechDivision\WebServer\Modules\PhpModule" /> -->
         </modules>
         <handlers>
             <handler name="php" extension=".php" />

@@ -155,7 +155,8 @@ class CoreModule implements ModuleInterface
                 if (isset($handlers['.' . $possibleValidPathExtension])) {
                     // set new handler to use for modules being able to react on this setting
                     $serverContext->setServerVar(
-                        ServerVars::SERVER_HANDLER, $handlers['.' . $possibleValidPathExtension]
+                        ServerVars::SERVER_HANDLER,
+                        $handlers['.' . $possibleValidPathExtension]
                     );
                     // go out and let other modules process this request
                     return;

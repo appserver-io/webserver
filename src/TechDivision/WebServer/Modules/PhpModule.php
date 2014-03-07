@@ -22,6 +22,7 @@
 namespace TechDivision\WebServer\Modules;
 
 use TechDivision\Http\HttpProtocol;
+use TechDivision\Http\HttpResponseStates;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
 use TechDivision\WebServer\Dictionaries\ServerVars;
@@ -196,6 +197,9 @@ class PhpModule implements ModuleInterface
             $response->appendBodyStream(
                 $process->getOutputBuffer()
             );
+
+            // set response state to be dispatched after this without calling other modules process
+            $response->setState(HttpResponseStates::DISPATCH);
         }
     }
 

@@ -126,7 +126,7 @@ class RewriteModule implements ModuleInterface
      */
     public function process(HttpRequestInterface $request, HttpResponseInterface $response)
     {
-        $time = microtime(true);
+        //$time = microtime(true);
 
         // Before everything else we collect the pieces of information we need
         $requestedUri = $request->getUri();
@@ -239,8 +239,8 @@ class RewriteModule implements ModuleInterface
             $request->setUri($rewrittenUri);
         }
 
-        error_log(microtime(true) - $time);
-        error_log(var_export($rewrittenUri, true));
+       // error_log(microtime(true) - $time);
+        //error_log(var_export($rewrittenUri, true));
     }
 
     /**

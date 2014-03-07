@@ -22,6 +22,7 @@
             "modules": [
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",
+                "\\TechDivision\\WebServer\\Modules\\RewriteModule",
                 "\\TechDivision\\WebServer\\Modules\\DeflateModule"
             ],
 
@@ -56,6 +57,7 @@
             "modules": [
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",
+                "\\TechDivision\\WebServer\\Modules\\RewriteModule",
                 "\\TechDivision\\WebServer\\Modules\\DeflateModule"
             ],
 

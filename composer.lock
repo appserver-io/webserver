@@ -3,20 +3,20 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "909a77f4df943e9935520bef53368912",
+    "hash": "bf1deeb21d8d72a96c0b82e0d86c1f68",
     "packages": [
         {
             "name": "techdivision/http",
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/zelgerj/TechDivision_Http.git",
-                "reference": "207b409ee721e06742a8d7b5676bea4e9d168a72"
+                "url": "https://github.com/techdivision/TechDivision_Http.git",
+                "reference": "1ca46ef0aa5407d52fdd29281a6dbcd106bce05c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zelgerj/TechDivision_Http/zipball/207b409ee721e06742a8d7b5676bea4e9d168a72",
-                "reference": "207b409ee721e06742a8d7b5676bea4e9d168a72",
+                "url": "https://api.github.com/repos/techdivision/TechDivision_Http/zipball/1ca46ef0aa5407d52fdd29281a6dbcd106bce05c",
+                "reference": "1ca46ef0aa5407d52fdd29281a6dbcd106bce05c",
                 "shasum": ""
             },
             "require": {
@@ -31,6 +31,7 @@
                     ]
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "OSL-3.0"
             ],
@@ -50,62 +51,7 @@
                 "protocol",
                 "server"
             ],
-            "support": {
-                "source": "https://github.com/zelgerj/TechDivision_Http/tree/master",
-                "issues": "https://github.com/zelgerj/TechDivision_Http/issues"
-            },
-            "time": "2014-02-26 17:12:04"
-        },
-        {
-            "name": "techdivision/spdy",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zelgerj/TechDivision_Spdy.git",
-                "reference": "4e21997bbba5111aa7eff83625242d48441541bc"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zelgerj/TechDivision_Spdy/zipball/4e21997bbba5111aa7eff83625242d48441541bc",
-                "reference": "4e21997bbba5111aa7eff83625242d48441541bc",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "TechDivision": [
-                        "src/",
-                        "tests/"
-                    ]
-                }
-            },
-            "license": [
-                "OSL-3.0"
-            ],
-            "authors": [
-                {
-                    "name": "Johann Zelger",
-                    "email": "jz@techdivision.com",
-                    "homepage": "http://www.techdivision.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "SPDY protocol implementation for usage in server context",
-            "homepage": "https://github.com/techdivision/TechDivision_Spdy",
-            "keywords": [
-                "php",
-                "protocol",
-                "server",
-                "spdy"
-            ],
-            "support": {
-                "source": "https://github.com/zelgerj/TechDivision_Spdy/tree/master",
-                "issues": "https://github.com/zelgerj/TechDivision_Spdy/issues"
-            },
-            "time": "2014-02-26 17:48:53"
+            "time": "2014-03-06 21:22:47"
         }
     ],
     "packages-dev": [
@@ -116,8 +62,7 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "techdivision/http": 20,
-        "techdivision/spdy": 20
+        "techdivision/http": 20
     },
     "platform": {
         "php": ">=5.4.0"

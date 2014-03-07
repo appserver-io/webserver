@@ -35,6 +35,8 @@ use TechDivision\WebServer\Interfaces\DirectiveInterface;
  * @license    http://opensource.org/licenses/osl-3.0.php
  *             Open Software License (OSL 3.0)
  * @link       http://www.techdivision.com/
+ *
+ * TODO implement condition flags
  */
 class RewriteCondition implements DirectiveInterface
 {
@@ -67,14 +69,14 @@ class RewriteCondition implements DirectiveInterface
     protected $type;
 
     /**
-     * To value to check with the given action
+     * The value to check with the given action
      *
      * @var string $operand
      */
     protected $operand;
 
     /**
-     * How the operand had to be checked, this will hold the needed action as a string and cannot be
+     * How the operand has to be checked, this will hold the needed action as a string and cannot be
      * processed automatically.
      *
      * @var string $action
@@ -105,12 +107,12 @@ class RewriteCondition implements DirectiveInterface
     /**
      * Default constructor
      *
-     * @param string $type Type of this condition directive
-     * @param string $operand
-     * @param string $action
-     * @param string|null   $modifier
+     * @param string      $type     Type of this condition directive
+     * @param string      $operand  The value to check with the given action
+     * @param string      $action   How the operand has to be checked, this will hold the needed action
+     * @param string|null $modifier Modifier which should be used to integrate things like apache flags and others
      *
-     * throws \InvalidArgumentExeption
+     * @throws \InvalidArgumentException
      */
     public function __construct($type = 'regex', $operand = '', $action = '', $modifier = null)
     {
@@ -136,14 +138,14 @@ class RewriteCondition implements DirectiveInterface
 
         if (!isset(array_flip($this->allowedTypes)[$type])) {
 
-            throw new \InvalidArgumentExeption($type . ' is not an allowed condition type.');
+            throw new \InvalidArgumentException($type . ' is not an allowed condition type.');
         }
 
         $this->fillFromArray(array(__CLASS__, $operand, $action, $modifier));
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Getter for the $type member
      *
      * @return string
      */
@@ -153,9 +155,9 @@ class RewriteCondition implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Getter for the $operand member
      *
-     * @return mixed
+     * @return string
      */
     public function getOperand()
     {
@@ -163,9 +165,9 @@ class RewriteCondition implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Getter for the $operation member
      *
-     * @return mixed
+     * @return string
      */
     public function getOperation()
     {
@@ -173,9 +175,9 @@ class RewriteCondition implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Getter for the $modifier member
      *
-     * @return mixed
+     * @return string
      */
     public function getModifier()
     {
@@ -183,9 +185,9 @@ class RewriteCondition implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Will resolve the directive's parts by substituting placeholders with the corresponding backreferences
      *
-     * @param array $backreferences
+     * @param array $backreferences The backreferences used for resolving placeholders
      *
      * @return void
      */
@@ -201,7 +203,7 @@ class RewriteCondition implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Will return true if the condition is true, false if not
      *
      * @return boolean
      * @throws \InvalidArgumentException
@@ -219,9 +221,9 @@ class RewriteCondition implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Will collect all backreferences based on regex typed conditions
      *
-     * @param $offset
+     * @param integer $offset The offset to count from, used so no integer based directive will be overwritten
      *
      * @return array
      */
@@ -247,9 +249,10 @@ class RewriteCondition implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Will fill an empty directive object with vital information delivered via an array.
+     * This is mostly useful as an interface for different parsers
      *
-     * @param array $parts
+     * @param array $parts The array to extract information from
      *
      * @return null
      * @throws \InvalidArgumentException

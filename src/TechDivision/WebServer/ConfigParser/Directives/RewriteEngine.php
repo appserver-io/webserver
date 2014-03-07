@@ -25,7 +25,7 @@ use TechDivision\WebServer\Interfaces\DirectiveInterface;
 /**
  * TechDivision\WebServer\ConfigParser\Directives\RewriteEngine
  *
- * <TODO CLASS DESCRIPTION>
+ * The RewriteEngine directive
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
@@ -46,7 +46,9 @@ class RewriteEngine implements DirectiveInterface
     protected $status;
 
     /**
-     * @param string|null $status
+     * Default constructor
+     *
+     * @param string|null $status Status of the rewrite engine, might be "on" or "off"
      */
     public function __construct($status = null)
     {
@@ -54,9 +56,9 @@ class RewriteEngine implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Will return a string representation of $this
      *
-     * @return null|string
+     * @return string
      */
     public function __tostring()
     {
@@ -69,7 +71,7 @@ class RewriteEngine implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Getter for the $status member
      *
      * @return string|null
      */
@@ -79,9 +81,10 @@ class RewriteEngine implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Will fill an empty directive object with vital information delivered via an array.
+     * This is mostly useful as an interface for different parsers.
      *
-     * @param array $parts
+     * @param array $parts The array to extract information from
      *
      * @return null
      * @throws \InvalidArgumentException

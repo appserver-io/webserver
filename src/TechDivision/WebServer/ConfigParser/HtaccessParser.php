@@ -117,10 +117,9 @@ class HtaccessParser extends AbstractParser
     /**
      * This method will extract known directives from a single htaccess line.
      *
-     *
      * @param string $line A line from a htaccess file
      *
-     * @return mixed
+     * @return \TechDivision\WebServer\Interfaces\DirectiveInterface
      * @throws \Exception
      */
     protected function getDirectiveFromLine($line)

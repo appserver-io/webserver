@@ -10,7 +10,7 @@
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
- * @subpackage ConfigParser
+ * @subpackage Modules
  * @author     Bernhard Wick <b.wick@techdivision.com>
  * @copyright  2014 TechDivision GmbH - <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php
@@ -18,18 +18,18 @@
  * @link       http://www.techdivision.com/
  */
 
-namespace TechDivision\WebServer\ConfigParser\Directives;
+namespace TechDivision\WebServer\Modules\Parser\Directives;
 
 use TechDivision\WebServer\Interfaces\DirectiveInterface;
 
 /**
- * TechDivision\WebServer\ConfigParser\Directives\RewriteCondition
+ * TechDivision\WebServer\Modules\Parser\Directives\RewriteCondition
  *
  * This class acts as a generic implementation of a rewrite condition which should be usable by apache and nginx alike
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
- * @subpackage ConfigParser
+ * @subpackage Modules
  * @author     Bernhard Wick <b.wick@techdivision.com>
  * @copyright  2014 TechDivision GmbH - <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php

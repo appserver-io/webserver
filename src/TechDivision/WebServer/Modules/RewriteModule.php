@@ -20,7 +20,8 @@
 namespace TechDivision\WebServer\Modules;
 
 use TechDivision\Http\HttpProtocol;
-use TechDivision\WebServer\ConfigParser\HtaccessParser;
+use TechDivision\WebServer\Exceptions\ModuleException;
+use TechDivision\WebServer\Modules\Parser\HtaccessParser;
 use TechDivision\WebServer\Dictionaries\ServerVars;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
 use TechDivision\Http\HttpRequestInterface;
@@ -41,7 +42,9 @@ use TechDivision\WebServer\Interfaces\ModuleInterface;
 class RewriteModule implements ModuleInterface
 {
     /**
-     * @var array $supportedServerVars <TODO FIELD COMMENT>
+     * Server variables we support and need
+     *
+     * @var array $supportedServerVars
      */
     protected $supportedServerVars = array();
 
@@ -60,6 +63,13 @@ class RewriteModule implements ModuleInterface
      * @var array<\TechDivision\WebServer\Modules\RewriteModule\Config> $configs
      */
     protected $configs = array();
+
+    /**
+     * The server's context instance which we preserve for later use
+     *
+     * @var \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext $serverContext
+     */
+    protected $serverContext;
 
     /**
      * This array will hold all values which one would suspect as part of the PHP $_SERVER array.
@@ -93,26 +103,36 @@ class RewriteModule implements ModuleInterface
      */
     public function init(ServerContextInterface $serverContext)
     {
-        // Prefill the backreferences we got from server context
-        $this->fillContextBackreferences($serverContext);
+        // We have to throw a ModuleException on failure, so surround the body with a try...catch block
+        try {
 
-        // Register our dependencies
-        $this->dependencies = array(
-            'core',
-            'directory'
-        );
+            // Prefill the backreferences we got from server context
+            $this->serverContext = $serverContext;
+            $this->fillContextBackreferences();
 
-        $this->supportedServerVars = array(
-            'headers' => array(
-                ServerVars::HTTP_USER_AGENT,
-                ServerVars::HTTP_REFERER,
-                ServerVars::HTTP_COOKIE,
-                ServerVars::HTTP_FORWARDED,
-                ServerVars::HTTP_HOST,
-                ServerVars::HTTP_PROXY_CONNECTION,
-                ServerVars::HTTP_ACCEPT
-            )
-        );
+            // Register our dependencies
+            $this->dependencies = array(
+                'core',
+                'directory'
+            );
+
+            $this->supportedServerVars = array(
+                'headers' => array(
+                    ServerVars::HTTP_USER_AGENT,
+                    ServerVars::HTTP_REFERER,
+                    ServerVars::HTTP_COOKIE,
+                    ServerVars::HTTP_FORWARDED,
+                    ServerVars::HTTP_HOST,
+                    ServerVars::HTTP_PROXY_CONNECTION,
+                    ServerVars::HTTP_ACCEPT
+                )
+            );
+
+        } catch (\Exception $e) {
+
+            // Re-throw as a ModuleException
+            throw new ModuleException($e);
+        }
     }
 
     /**
@@ -126,115 +146,121 @@ class RewriteModule implements ModuleInterface
      */
     public function process(HttpRequestInterface $request, HttpResponseInterface $response)
     {
-        // Before everything else we collect the pieces of information we need
-        $requestedUri = $request->getUri();
-        $config = $this->getLocationConfig($requestedUri);
-        $engines = $config->getDirectivesByType('TechDivision\WebServer\ConfigParser\Directives\RewriteEngine');
-        // We have to check if the engine is even switched on
-        if (!empty($engines) && array_pop($engines)->isOn() === false) {
+        // We have to throw a ModuleException on failure, so surround the body with a try...catch block
+        try {
 
-            return;
-        }
-
-        // As we are still here it seems the engine is needed, so start collecting the other directives
-        $rules = $config->getDirectivesByType('TechDivision\WebServer\ConfigParser\Directives\RewriteRule');
-        $conditions = $config->getDirectivesByType('TechDivision\WebServer\ConfigParser\Directives\RewriteCondition');
-
-        // Get the RewriteBase directive
-        $bases = $config->getDirectivesByType('TechDivision\WebServer\ConfigParser\Directives\RewriteBase');
-        $rewriteBase = array_pop($bases);
-
-        // We have to fill the request part of our $serverBackreferences array here
-        $this->fillHeaderBackreferences($request);
-
-        // Some vars come separately, we have to get them nethertheless
-        $this->serverBackreferences['%{' . ServerVars::REQUEST_URI . '}'] = $request->getUri();
-        $this->serverBackreferences['%{' . ServerVars::DOCUMENT_ROOT . '}'] = $request->getDocumentRoot();
-        $this->serverBackreferences['%{' . ServerVars::PATH_INFO . '}'] = $request->getPathInfo();
-        $this->serverBackreferences['%{' . ServerVars::REQUEST_METHOD . '}'] = $request->getMethod();
-        $this->serverBackreferences['%{' . ServerVars::QUERY_STRING . '}'] = $request->getQueryString();
-
-        // Get the backreferences for all the directives we need
-        $backreferences = array_merge(
-            $this->serverBackreferences,
-            $config->getBackreferences(
-                'TechDivision\WebServer\ConfigParser\Directives\RewriteRule',
-                array($requestedUri)
-            )
-        );
-
-        // Iterate over all conditions and perform necessary tasks on them. That would be: resolve, match and get
-        // their backreferences
-        foreach ($conditions as $key => $condition) {
-
-            // Resolve the condition with the backreferences we got for now
-            $condition->resolve($backreferences);
-
-            // If we do not match we will fail right here
-            // TODO implement condition flags
-            if (!$condition->matches()) {
+            // Before everything else we collect the pieces of information we need
+            $requestedUri = $request->getUri();
+            $config = $this->getLocationConfig($requestedUri);
+            $engines = $config->getDirectivesByType('TechDivision\WebServer\ConfigParser\Directives\RewriteEngine');
+            // We have to check if the engine is even switched on
+            if (!empty($engines) && array_pop($engines)->isOn() === false) {
 
                 return;
             }
-        }
 
-        // Now that this condition has been resolved we might get some backreferences our of it
-        $backreferences = array_merge(
-            $backreferences,
-            $config->getBackreferences(
+            // As we are still here it seems the engine is needed, so start collecting the other directives
+            $rules = $config->getDirectivesByType('TechDivision\WebServer\ConfigParser\Directives\RewriteRule');
+            $conditions = $config->getDirectivesByType(
                 'TechDivision\WebServer\ConfigParser\Directives\RewriteCondition'
-            )
-        );
+            );
 
-        // Iterate over all rules and perform necessary tasks on them. That would be: resolve, match and if
-        // we match we will apply the rule
-        $rewrittenUri = $requestedUri;
-        foreach ($rules as $key => $rule) {
+            // Get the RewriteBase directive
+            $bases = $config->getDirectivesByType('TechDivision\WebServer\ConfigParser\Directives\RewriteBase');
+            $rewriteBase = array_pop($bases);
 
-            // Resolve the rule with the backreferences we got for now
-            $rule->resolve($backreferences);
+            // We have to fill the request part of our $serverBackreferences array here
+            $this->fillHeaderBackreferences($request);
+            // The server vars seem to change on request too :-(
+            $this->fillContextBackreferences();
 
-            // If we do not match we will fail right here
-            // TODO implement rule flags
-            if (!$rule->matches($requestedUri)) {
+            // Get the backreferences for all the directives we need
+            $backreferences = array_merge(
+                $this->serverBackreferences,
+                $config->getBackreferences(
+                    'TechDivision\WebServer\ConfigParser\Directives\RewriteRule',
+                    array($requestedUri)
+                )
+            );
+
+            // Iterate over all conditions and perform necessary tasks on them. That would be: resolve, match and get
+            // their backreferences
+            foreach ($conditions as $condition) {
+
+                // Resolve the condition with the backreferences we got for now
+                $condition->resolve($backreferences);
+
+                // If we do not match we will fail right here
+                // TODO implement condition flags
+                if (!$condition->matches()) {
+
+                    return;
+                }
+            }
+
+            // Now that this condition has been resolved we might get some backreferences our of it
+            $backreferences = array_merge(
+                $backreferences,
+                $config->getBackreferences(
+                    'TechDivision\WebServer\ConfigParser\Directives\RewriteCondition'
+                )
+            );
+
+            // Iterate over all rules and perform necessary tasks on them. That would be: resolve, match and if
+            // we match we will apply the rule
+            $rewrittenUri = $requestedUri;
+            foreach ($rules as $rule) {
+
+                // Resolve the rule with the backreferences we got for now
+                $rule->resolve($backreferences);
+
+                // If we do not match we will fail right here
+                // TODO implement rule flags
+                if (!$rule->matches($requestedUri)) {
+
+                    return;
+                }
+
+                // As we are still here it is save to assume we have to apply this rule
+                $rewrittenUri = $rule->apply();
+            }
+
+            //////////////////////////////////////////////////// act
+
+            // Did we even get something useful? If not then give the other modules a chance
+            if (empty($rewrittenUri)) {
 
                 return;
             }
 
-            // As we are still here it is save to assume we have to apply this rule
-            $rewrittenUri = $rule->apply();
-        }
+            // If the URI is an absolute file path we have to dispatch the request here
+            if (is_readable($rewrittenUri)) {
 
-        //////////////////////////////////////////////////// act
+                // Set the document root to the directory above the referenced file and the uri to the file itself
+                $request->setDocumentRoot(dirname($rewrittenUri));
+                $request->setUri(basename($rewrittenUri));
 
-        // Did we even get something useful? If not then give the other modules a chance
-        if (empty($rewrittenUri)) {
+                // This will stop processing of the module chain
+                return false;
 
-            return;
-        }
+            } elseif (strpos($rewrittenUri, 'http') !== false) {
 
-        // If the URI is an absolute file path we have to dispatch the request here
-        if (is_readable($rewrittenUri)) {
+                // Set the location for our redirect
+                $request->addHeader(HttpProtocol::HEADER_LOCATION, $rewrittenUri);
 
-            // Set the document root to the directory above the referenced file and the uri to the file itself
-            $request->setDocumentRoot(dirname($rewrittenUri));
-            $request->setUri(basename($rewrittenUri));
+                // This will stop processing of the module chain
+                return false;
 
-            // This will stop processing of the module chain
-            return false;
+            } else {
+                // Set the URI as we are relative to the original document root
+                $rewrittenUri = $rewriteBase . $rewrittenUri;
+                $request->setUri($rewrittenUri);
+            }
 
-        } elseif (strpos($rewrittenUri, 'http') !== false) {
+        } catch (\Exception $e) {
 
-            // Set the location for our redirect
-            $request->addHeader(HttpProtocol::HEADER_LOCATION, $rewrittenUri);
-
-            // This will stop processing of the module chain
-            return false;
-
-        } else {
-            // Set the URI as we are relative to the original document root
-            $rewrittenUri = $rewriteBase . $rewrittenUri;
-            $request->setUri($rewrittenUri);
+            // Re-throw as a ModuleException
+            throw new ModuleException($e);
         }
     }
 
@@ -302,15 +328,13 @@ class RewriteModule implements ModuleInterface
     /**
      * Initiates the module
      *
-     * @param \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext The server's context instance
-     *
      * @throws \TechDivision\WebServer\Exceptions\ModuleException
      *
      * @return void
      */
-    protected function fillContextBackreferences(ServerContextInterface $serverContext)
+    protected function fillContextBackreferences()
     {
-        foreach ($serverContext->getServerVars() as $varName => $serverVar) {
+        foreach ($this->serverContext->getServerVars() as $varName => $serverVar) {
 
             $this->serverBackreferences['%{' . $varName . '}'] = $serverVar;
         }

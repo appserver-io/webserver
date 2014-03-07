@@ -25,7 +25,7 @@ use TechDivision\WebServer\Interfaces\DirectiveInterface;
 /**
  * TechDivision\WebServer\ConfigParser\Directives\RewriteRule
  *
- * <TODO CLASS DESCRIPTION>
+ * The RewriteRule directive
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
@@ -35,50 +35,62 @@ use TechDivision\WebServer\Interfaces\DirectiveInterface;
  * @license    http://opensource.org/licenses/osl-3.0.php
  *             Open Software License (OSL 3.0)
  * @link       http://www.techdivision.com/
+ *
+ * TODO implement rule flags
  */
 class RewriteRule implements DirectiveInterface
 {
     /**
-     * @var array $allowedTypes <TODO FIELD COMMENT>
+     * The allowed values the $type member my assume
+     *
+     * @var array $allowedTypes
      */
     protected $allowedTypes = array();
 
     /**
-     * @var array $flagMapping <TODO FIELD COMMENT>
+     * Mappings for possible flags and their needed reaction as strings
+     *
+     * @var array $flagMapping
      */
     protected $flagMapping = array();
 
     /**
-     * @var  $type <TODO FIELD COMMENT>
+     * The type of rule we have. This might be "relative", "absolute" or "redirect"
+     *
+     * @var string $type
      */
     protected $type;
 
     /**
-     * To check
+     * The pattern to check the requested URI against
      *
-     * @var  $pattern <TODO FIELD COMMENT>
+     * @var string $pattern
      */
     protected $pattern;
 
     /**
-     * Regex, File check etc
+     * The target we have to rewrite to if rules and conditions apply
      *
-     * @var  $target <TODO FIELD COMMENT>
+     * @var string $target
      */
     protected $target;
 
     /**
-     * Flags
+     * Modifier which should be used to integrate things like apache flags and others
      *
-     * @var  $modifier <TODO FIELD COMMENT>
+     * @var string $modifier
      */
     protected $modifier;
 
     /**
-     * @param      $type
-     * @param      $pattern
-     * @param      $target
-     * @param null $modifier
+     * Default constructor
+     *
+     * @param string      $type     The type of rule we have. This might be "relative", "absolute" or "redirect"
+     * @param string      $pattern  The pattern to check the requested URI against
+     * @param string      $target   The target we have to rewrite to if rules and conditions apply
+     * @param string|null $modifier Modifier which should be used to integrate things like apache flags and others
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($type = 'relative', $pattern = '', $target = '', $modifier = null)
     {
@@ -95,7 +107,7 @@ class RewriteRule implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Getter for the $type member
      *
      * @return mixed
      */
@@ -105,7 +117,7 @@ class RewriteRule implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Getter for the $pattern member
      *
      * @return mixed
      */
@@ -115,7 +127,7 @@ class RewriteRule implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Getter for the $target member
      *
      * @return mixed
      */
@@ -125,9 +137,9 @@ class RewriteRule implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Getter for the $modifier member
      *
-     * @return mixed
+     * @return string
      */
     public function getModifier()
     {
@@ -135,9 +147,9 @@ class RewriteRule implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Will resolve the directive's parts by substituting placeholders with the corresponding backreferences
      *
-     * @param array $backreferences
+     * @param array $backreferences The backreferences used for resolving placeholders
      *
      * @return void
      */
@@ -152,9 +164,9 @@ class RewriteRule implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Will return true if the rule applies, false if not
      *
-     * @param $requestedUri
+     * @param string $requestedUri The requested URI as implicit part of the rule
      *
      * @return bool
      */
@@ -171,10 +183,10 @@ class RewriteRule implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Will collect all backreferences based on regex typed conditions
      *
-     * @param $offset
-     * @param $requestedUri
+     * @param integer $offset       The offset to count from, used so no integer based directive will be overwritten
+     * @param string  $requestedUri The requested URI as implicit part of the rule
      *
      * @return array
      */
@@ -200,7 +212,7 @@ class RewriteRule implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Will return the necessary result after applying the rule
      *
      * @return mixed
      */
@@ -210,9 +222,10 @@ class RewriteRule implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Will fill an empty directive object with vital information delivered via an array.
+     * This is mostly useful as an interface for different parsers
      *
-     * @param array $parts
+     * @param array $parts The array to extract information from
      *
      * @return null
      * @throws \InvalidArgumentException

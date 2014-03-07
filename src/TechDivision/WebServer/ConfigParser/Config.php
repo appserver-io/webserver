@@ -23,7 +23,7 @@ namespace TechDivision\WebServer\ConfigParser;
 /**
  * TechDivision\WebServer\ConfigParser\Config
  *
- * <TODO CLASS DESCRIPTION>
+ * Base class which will hold all configuration directives
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
@@ -36,12 +36,35 @@ namespace TechDivision\WebServer\ConfigParser;
  */
 class Config
 {
+    /**
+     * The path to the file which this configuration is based on
+     *
+     * @var string $configPath
+     */
     protected $configPath;
 
+    /**
+     * The timestamp of the config file at the time we parsed it
+     *
+     * @var integer $mTime
+     */
     protected $mTime;
 
+    /**
+     * The directives contained in the config file
+     *
+     * @var array $directives
+     */
     protected $directives;
 
+    /**
+     * Default constructor
+     *
+     * @param string $configPath The path to the file which this configuration is based on
+     * @param array  $directives The directives contained in the config file
+     *
+     * @throws \InvalidArgumentException
+     */
     public function __construct($configPath, $directives)
     {
         if (!is_readable($configPath)) {
@@ -54,21 +77,43 @@ class Config
         $this->directives = $directives;
     }
 
+    /**
+     * Getter for the config file's path
+     *
+     * @return string
+     */
     public function getConfigPath()
     {
         return $this->configPath;
     }
 
+    /**
+     * Getter for the config file's change time
+     *
+     * @return string
+     */
     public function getMTime()
     {
         return $this->mTime;
     }
 
+    /**
+     * Getter for the directives array
+     *
+     * @return array
+     */
     public function getDirectives()
     {
         return $this->directives;
     }
 
+    /**
+     * Will return all directives of a certain type. This "type" is the qualified class name of a directive
+     *
+     * @param string $type Directive type as a directive class's qualified name
+     *
+     * @return array
+     */
     public function getDirectivesByType($type)
     {
         $directives = array();
@@ -84,10 +129,11 @@ class Config
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Will return all backreferences for all directives within this config. As some backreferences need resolved
+     * directives to be built, we can get them only for certain types/directives.
      *
-     * @param null $type
-     * @param array $args
+     * @param string|null $type Directive type as a directive class's qualified name
+     * @param array       $args Arguments which will be passed to the directive's getBackreferences method
      *
      * @return array
      */

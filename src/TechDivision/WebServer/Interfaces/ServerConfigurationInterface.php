@@ -70,11 +70,11 @@ interface ServerConfigurationInterface
     public function getWorkerNumber();
 
     /**
-     * Return's signature
+     * Return's software
      *
      * @return string
      */
-    public function getSignature();
+    public function getSoftware();
 
     /**
      * Return's server context type

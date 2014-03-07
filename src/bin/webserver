@@ -1,5 +1,8 @@
 <?php
 
+// set globals to be set before using them
+ini_set('auto_globals_jit', 0);
+
 define('WEBSERVER_BASEDIR', __DIR__ . '/../');
 define('WEBSERVER_AUTOLOADER', WEBSERVER_BASEDIR . '../vendor/autoload.php');
 

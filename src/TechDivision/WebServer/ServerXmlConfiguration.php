@@ -50,7 +50,7 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         $this->transport = (string)array_shift($node->xpath(".//param[@name='transport']"));
         $this->address = (string)array_shift($node->xpath(".//param[@name='address']"));
         $this->port = (int)array_shift($node->xpath(".//param[@name='port']"));
-        $this->signature = (string)array_shift($node->xpath(".//param[@name='signature']"));
+        $this->software = (string)array_shift($node->xpath(".//param[@name='software']"));
         $this->workerNumber = (int)array_shift($node->xpath(".//param[@name='workerNumber']"));
         $this->certPath = (string)array_shift($node->xpath(".//param[@name='certPath']"));
         $this->passphrase = (string)array_shift($node->xpath(".//param[@name='passphrase']"));
@@ -114,13 +114,13 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
     }
 
     /**
-     * Return's signature
+     * Return's software
      *
      * @return string
      */
-    public function getSignature()
+    public function getSoftware()
     {
-        return $this->signature;
+        return $this->software;
     }
 
     /**

@@ -51,6 +51,13 @@ class PhpModule implements ModuleInterface
     const MODULE_NAME = 'php';
 
     /**
+     * Defines the php specific server var PHP_SELF
+     *
+     * @var string
+     */
+    const SERVER_VAR_PHP_SELF = 'PHP_SELF';
+
+    /**
      * Hold's the server's context
      *
      * @var \TechDivision\WebServer\Interfaces\ServerContextInterface
@@ -163,6 +170,9 @@ class PhpModule implements ModuleInterface
              * PHP_AUTH_PW
              */
 
+            // prepare modules specific server vars
+            $this->prepareServerVars();
+
             // initialize the globals $_SERVER, $_REQUEST, $_POST, $_GET, $_COOKIE, $_FILES and set the headers
             $this->initGlobals();
 
@@ -224,6 +234,20 @@ class PhpModule implements ModuleInterface
                 }
             }
         }
+    }
+
+    /**
+     * Prepare's the server vars for php usage
+     *
+     * @return void
+     */
+    protected function prepareServerVars()
+    {
+        $serverContext = $this->getServerContext();
+        $serverContext->setServerVar(
+            self::SERVER_VAR_PHP_SELF,
+            $serverContext->getServerVar(ServerVars::SCRIPT_NAME) . $serverContext->getServerVar(ServerVars::PATH_INFO)
+        );
     }
 
     /**

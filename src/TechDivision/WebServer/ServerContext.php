@@ -254,7 +254,7 @@ class ServerContext implements ServerContextInterface
             ServerVars::SERVER_NAME => '127.0.0.1', //todo: implement vhost in config and default name (ip or localhost)
             ServerVars::SERVER_ADDR => $this->getServerConfig()->getAddress(),
             ServerVars::SERVER_PORT => $this->getServerConfig()->getPort(),
-            ServerVars::SERVER_SOFTWARE => $this->getServerConfig()->getSignature(),
+            ServerVars::SERVER_SOFTWARE => $this->getServerConfig()->getSoftware(),
             ServerVars::PATH => getenv('PATH'),
             ServerVars::HTTPS => ServerVars::VALUE_HTTPS_OFF
         );

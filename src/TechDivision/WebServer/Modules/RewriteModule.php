@@ -21,14 +21,11 @@ namespace TechDivision\WebServer\Modules;
 
 use TechDivision\Http\HttpProtocol;
 use TechDivision\WebServer\ConfigParser\HtaccessParser;
+use TechDivision\WebServer\Dictionaries\ServerVars;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
 use TechDivision\WebServer\Interfaces\ModuleInterface;
-use TechDivision\WebServer\ConfigParser\Directives\RewriteBase;
-use TechDivision\WebServer\ConfigParser\Directives\RewriteCondition;
-use TechDivision\WebServer\ConfigParser\Directives\RewriteRule;
-use TechDivision\WebServer\ConfigParser\Config;
 
 /**
  * \TechDivision\WebServer\Modules\RewriteModule
@@ -51,7 +48,7 @@ class RewriteModule implements ModuleInterface
     /**
      * This array will hold all locations (e.g. /example/websocket) we ever encountered in our live time.
      * It will provide a mapping to the $configs array, as several locations can share one config
-     * (e.g. a "global" .htaccess).
+     * (e.g. a "global" .htaccess or nginx config).
      *
      * @var array<string> $locations
      */
@@ -96,6 +93,9 @@ class RewriteModule implements ModuleInterface
      */
     public function init(ServerContextInterface $serverContext)
     {
+        // Prefill the backreferences we got from server context
+        $this->fillContextBackreferences($serverContext);
+
         // Register our dependencies
         $this->dependencies = array(
             'core',
@@ -104,13 +104,13 @@ class RewriteModule implements ModuleInterface
 
         $this->supportedServerVars = array(
             'headers' => array(
-                'HTTP_USER_AGENT',
-                'HTTP_REFERER',
-                'HTTP_COOKIE',
-                'HTTP_FORWARDED',
-                'HTTP_HOST',
-                'HTTP_PROXY_CONNECTION',
-                'HTTP_ACCEPT'
+                ServerVars::HTTP_USER_AGENT,
+                ServerVars::HTTP_REFERER,
+                ServerVars::HTTP_COOKIE,
+                ServerVars::HTTP_FORWARDED,
+                ServerVars::HTTP_HOST,
+                ServerVars::HTTP_PROXY_CONNECTION,
+                ServerVars::HTTP_ACCEPT
             )
         );
     }
@@ -128,17 +128,33 @@ class RewriteModule implements ModuleInterface
     {
         $time = microtime(true);
 
-        // We have to fill the request part of our $serverVars array here
-        $this->fillHeaderBackreferences($request);
-        $this->serverBackreferences['%{DOCUMENT_ROOT}'] = $request->getDocumentRoot();
-        $this->serverBackreferences['%{REQUEST_URI}'] = $request->getUri();
-
-        // Save the request URI to save some method calls
+        // Before everything else we collect the pieces of information we need
         $requestedUri = $request->getUri();
-
         $config = $this->getLocationConfig($requestedUri);
+        $engines = $config->getDirectivesByType('TechDivision\WebServer\ConfigParser\Directives\RewriteEngine');
+        // We have to check if the engine is even switched on
+        if (!empty($engines) && array_pop($engines)->isOn() === false) {
+
+            return;
+        }
+
+        // As we are still here it seems the engine is needed, so start collecting the other directives
         $rules = $config->getDirectivesByType('TechDivision\WebServer\ConfigParser\Directives\RewriteRule');
         $conditions = $config->getDirectivesByType('TechDivision\WebServer\ConfigParser\Directives\RewriteCondition');
+
+        // Get the RewriteBase directive
+        $bases = $config->getDirectivesByType('TechDivision\WebServer\ConfigParser\Directives\RewriteBase');
+        $rewriteBase = array_pop($bases);
+
+        // We have to fill the request part of our $serverBackreferences array here
+        $this->fillHeaderBackreferences($request);
+
+        // Some vars come separately, we have to get them nethertheless
+        $this->serverBackreferences['%{' . ServerVars::REQUEST_URI . '}'] = $request->getUri();
+        $this->serverBackreferences['%{' . ServerVars::DOCUMENT_ROOT . '}'] = $request->getDocumentRoot();
+        $this->serverBackreferences['%{' . ServerVars::PATH_INFO . '}'] = $request->getPathInfo();
+        $this->serverBackreferences['%{' . ServerVars::REQUEST_METHOD . '}'] = $request->getMethod();
+        $this->serverBackreferences['%{' . ServerVars::QUERY_STRING . '}'] = $request->getQueryString();
 
         // Get the backreferences for all the directives we need
         $backreferences = array_merge(
@@ -206,6 +222,9 @@ class RewriteModule implements ModuleInterface
             $request->setDocumentRoot(dirname($rewrittenUri));
             $request->setUri(basename($rewrittenUri));
 
+            // This will stop processing of the module chain
+            return false;
+
         } elseif (strpos($rewrittenUri, 'http') !== false) {
 
             // Set the location for our redirect
@@ -216,7 +235,7 @@ class RewriteModule implements ModuleInterface
 
         } else {
             // Set the URI as we are relative to the original document root
-
+            $rewrittenUri = $rewriteBase . $rewrittenUri;
             $request->setUri($rewrittenUri);
         }
 
@@ -254,7 +273,8 @@ class RewriteModule implements ModuleInterface
 
         // Save the config for later use
         $config = $configParser->getConfigForFile(
-            $this->serverBackreferences['%{DOCUMENT_ROOT}'], $uri
+            $this->serverBackreferences['%{DOCUMENT_ROOT}'],
+            $uri
         );
         $this->locations[$uri] = $config->getConfigPath();
         $this->configs[$config->getConfigPath()] = $config;
@@ -281,6 +301,23 @@ class RewriteModule implements ModuleInterface
                     "TechDivision\\Http\\HttpProtocol::$tmp"
                 )];
             }
+        }
+    }
+
+    /**
+     * Initiates the module
+     *
+     * @param \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext The server's context instance
+     *
+     * @throws \TechDivision\WebServer\Exceptions\ModuleException
+     *
+     * @return void
+     */
+    protected function fillContextBackreferences(ServerContextInterface $serverContext)
+    {
+        foreach ($serverContext->getServerVars() as $varName => $serverVar) {
+
+            $this->serverBackreferences['%{' . $varName . '}'] = $serverVar;
         }
     }
 

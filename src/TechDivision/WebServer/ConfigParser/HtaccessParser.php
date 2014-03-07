@@ -8,7 +8,7 @@
  *
  * PHP version 5
  *
- * @category   Php-by-contract
+ * @category   Webserver
  * @package    TechDivision_WebServer
  * @subpackage ConfigParser
  * @author     Bernhard Wick <b.wick@techdivision.com>
@@ -20,14 +20,13 @@
 
 namespace TechDivision\WebServer\ConfigParser;
 
-use TechDivision\WebServer\ConfigParser\Directives;
-
 /**
  * TechDivision\WebServer\ConfigParser\HtaccessParser
  *
- * <TODO CLASS DESCRIPTION>
+ * This class provides a very basic htaccess parser which is able to extract several htaccess specific
+ * directives.
  *
- * @category   Php-by-contract
+ * @category   Webserver
  * @package    TechDivision_WebServer
  * @subpackage ConfigParser
  * @author     Bernhard Wick <b.wick@techdivision.com>
@@ -44,6 +43,13 @@ class HtaccessParser extends AbstractParser
      * @const string CONFIG_TYPE
      */
     const CONFIG_TYPE = '.htaccess';
+
+    /**
+     * A prefix which indicates a comment in a config file
+     *
+     * @const string COMMENT_PREFIX
+     */
+    const COMMENT_PREFIX = '#';
 
     /**
      * Will return the type of the configuration as the parser might encounter different configuration types
@@ -65,30 +71,27 @@ class HtaccessParser extends AbstractParser
      */
     public function getConfigForFile($documentRoot, $requestedUri)
     {
+        // Get the path to the requested uri
         $fileInfo = new \SplFileInfo($documentRoot . DIRECTORY_SEPARATOR . $requestedUri);
-error_log(var_export($documentRoot, true));
-        if (!$fileInfo->isReadable()) {
-
-            $fileInfo = new \SplFileInfo($documentRoot . DIRECTORY_SEPARATOR);
-            error_log(var_export($fileInfo, true));
-        }
 
         // We will check each directory from the requested URI's path upwards and if we find a local config file we
         // will take it ;)
         $configPath = '';
-        $depth = count(explode(DIRECTORY_SEPARATOR, $fileInfo->getPath()));
+        $depth = count(explode(DIRECTORY_SEPARATOR, $fileInfo));
         for ($i = 0; $i <= $depth; $i++) {
 
-            $fileInfo = $fileInfo->getPathInfo();
             if ($fileInfo->isDir()) {
 
-                $directoryContent = array_flip(scandir($fileInfo->getPath()));
+                $directoryContent = array_flip(scandir($fileInfo));
                 if (isset($directoryContent[self::CONFIG_TYPE])) {
 
-                    $configPath = $fileInfo->getPath() . DIRECTORY_SEPARATOR . self::CONFIG_TYPE;
+                    $configPath = $fileInfo . DIRECTORY_SEPARATOR . self::CONFIG_TYPE;
                     break;
                 }
             }
+
+            // Set move one directory up the in the file hierarchy
+            $fileInfo = $fileInfo->getPathInfo();
         }
 
         // We have to read the file line per line, filter the directives and group them into modules
@@ -98,6 +101,13 @@ error_log(var_export($documentRoot, true));
         $directives = array();
         foreach ($lines as $line) {
 
+            // Check if we got a comment
+            if (strpos($line, self::COMMENT_PREFIX) === 0) {
+
+                continue;
+            }
+
+            // Get the directive for this line
             $directives[] = $this->getDirectiveFromLine($line);
         }
 
@@ -105,20 +115,21 @@ error_log(var_export($documentRoot, true));
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * This method will extract known directives from a single htaccess line.
      *
-     * @param $line
+     *
+     * @param string $line A line from a htaccess file
      *
      * @return mixed
      * @throws \Exception
      */
-    protected function getDirectivesFromLine($line)
+    protected function getDirectiveFromLine($line)
     {
         // Split the line into pieces and check which directive we got
         $lineParts = explode(' ', $line);
 
         // What would be the directive class name?
-        $className = 'Directives\\' . $lineParts[0];
+        $className = __NAMESPACE__ . '\Directives\\' . $lineParts[0];
 
         if (!class_exists($className)) {
 
@@ -127,7 +138,6 @@ error_log(var_export($documentRoot, true));
 
         // Create the directive and let it be filled
         $directive = new $className();
-        unset($lineParts[0]);
         $directive->fillFromArray($lineParts);
 
         return $directive;

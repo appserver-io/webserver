@@ -8,7 +8,7 @@
  *
  * PHP version 5
  *
- * @category   Php-by-contract
+ * @category   Webserver
  * @package    TechDivision_WebServer
  * @subpackage ConfigParser
  * @author     Bernhard Wick <b.wick@techdivision.com>
@@ -20,12 +20,14 @@
 
 namespace TechDivision\WebServer\ConfigParser\Directives;
 
+use TechDivision\WebServer\Interfaces\DirectiveInterface;
+
 /**
  * TechDivision\WebServer\ConfigParser\Directives\RewriteRule
  *
  * <TODO CLASS DESCRIPTION>
  *
- * @category   Php-by-contract
+ * @category   Webserver
  * @package    TechDivision_WebServer
  * @subpackage ConfigParser
  * @author     Bernhard Wick <b.wick@techdivision.com>
@@ -34,12 +36,17 @@ namespace TechDivision\WebServer\ConfigParser\Directives;
  *             Open Software License (OSL 3.0)
  * @link       http://www.techdivision.com/
  */
-class RewriteRule
+class RewriteRule implements DirectiveInterface
 {
     /**
      * @var array $allowedTypes <TODO FIELD COMMENT>
      */
-    protected $allowedTypes = array('relative', 'absolute', 'redirect');
+    protected $allowedTypes = array();
+
+    /**
+     * @var array $flagMapping <TODO FIELD COMMENT>
+     */
+    protected $flagMapping = array();
 
     /**
      * @var  $type <TODO FIELD COMMENT>
@@ -73,34 +80,55 @@ class RewriteRule
      * @param      $target
      * @param null $modifier
      */
-    public function __construct($type, $pattern, $target, $modifier = null)
+    public function __construct($type = 'relative', $pattern = '', $target = '', $modifier = null)
     {
+        // Fill the default values for our members here
+        $this->allowedTypes = array('relative', 'absolute', 'redirect');
+        $this->flagMapping = array();
+
         if (!isset(array_flip($this->allowedTypes)[$type])) {
 
             throw new \InvalidArgumentException($type . ' is not an allowed rule type.');
         }
 
-        $this->type = $type;
-        $this->pattern = $pattern;
-        $this->target = $target;
-        $this->modifier = $modifier;
+        $this->fillFromArray(array(__CLASS__, $pattern, $target, $modifier));
     }
 
+    /**
+     * <TODO FUNCTION DESCRIPTION>
+     *
+     * @return mixed
+     */
     public function getType()
     {
         return $this->type;
     }
 
+    /**
+     * <TODO FUNCTION DESCRIPTION>
+     *
+     * @return mixed
+     */
     public function getPattern()
     {
         return $this->pattern;
     }
 
+    /**
+     * <TODO FUNCTION DESCRIPTION>
+     *
+     * @return mixed
+     */
     public function getTarget()
     {
         return $this->target;
     }
 
+    /**
+     * <TODO FUNCTION DESCRIPTION>
+     *
+     * @return mixed
+     */
     public function getModifier()
     {
         return $this->modifier;
@@ -179,5 +207,50 @@ class RewriteRule
     public function apply()
     {
         return $this->target;
+    }
+
+    /**
+     * <TODO FUNCTION DESCRIPTION>
+     *
+     * @param array $parts
+     *
+     * @return null
+     * @throws \InvalidArgumentException
+     */
+    public function fillFromArray(array $parts)
+    {
+        // Array should be 3 or 4 pieces long
+        if (count($parts) < 3 || count($parts) > 4) {
+
+            throw new \InvalidArgumentException('Could not process line ' . implode($parts, ' '));
+        }
+
+        // Fill pattern and target as they are pretty straight forward
+        $this->pattern = $parts[1];
+        $this->target = $parts[2];
+
+        // Fill the instance, "relative" is the default type
+        $this->type = 'relative';
+        if (filter_var($parts[2], FILTER_VALIDATE_URL)) {
+
+            // Do we have a valid url? If so we have a redirect at hand
+            $this->type = 'redirect';
+
+        } else {
+
+            // If we can find the file with all we got then we are absolute
+            $fileInfo = new \SplFileInfo($parts[2]);
+            if ($fileInfo->isReadable()) {
+
+                $this->type = 'absolute';
+            }
+
+        }
+
+        // Get the modifier, if there is any
+        if (isset($parts[3])) {
+
+            $this->modifier = $parts[3];
+        }
     }
 }

@@ -110,4 +110,11 @@ interface ServerContextInterface
      * @return array The server vars as array
      */
     public function getServerVars();
+
+    /**
+     * Init basic server vars
+     *
+     * @return void
+     */
+    public function initServerVars();
 }

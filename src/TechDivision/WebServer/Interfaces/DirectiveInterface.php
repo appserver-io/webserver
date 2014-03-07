@@ -21,9 +21,9 @@
 namespace TechDivision\WebServer\Interfaces;
 
 /**
- * TechDivision\WebServer\Interfaces\ConfigParserInterface
+ * TechDivision\WebServer\Interfaces\DirectiveInterface
  *
- * <TODO CLASS DESCRIPTION>
+ * This interface acts as a very basic interface for directives of config files
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
@@ -34,22 +34,16 @@ namespace TechDivision\WebServer\Interfaces;
  *             Open Software License (OSL 3.0)
  * @link       http://www.techdivision.com/
  */
-interface ConfigParserInterface
+interface DirectiveInterface
 {
     /**
-     * Will return the type of the configuration as the parser might encounter different configuration types
+     * Will fill an empty directive object with vital information delivered via an array.
+     * This is mostly useful as an interface for different parsers
      *
-     * @return string
+     * @param array $parts The array to extract information from
+     *
+     * @return null
+     * @throws \InvalidArgumentException
      */
-    public function getConfigType();
-
-    /**
-     * Will return a complete configuration parsed from the provided file
-     *
-     * @param string $documentRoot The servers document root as a fallback
-     * @param string $requestedUri The requested uri
-     *
-     * @return \TechDivision\WebServer\ConfigParser\Config
-     */
-    public function getConfigForFile($documentRoot, $requestedUri);
+    public function fillFromArray(array $parts);
 }

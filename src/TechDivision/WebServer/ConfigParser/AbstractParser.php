@@ -8,7 +8,7 @@
  *
  * PHP version 5
  *
- * @category   Php-by-contract
+ * @category   Webserver
  * @package    TechDivision_WebServer
  * @subpackage ConfigParser
  * @author     Bernhard Wick <b.wick@techdivision.com>
@@ -27,7 +27,7 @@ use TechDivision\WebServer\Interfaces\ConfigParserInterface;
  *
  * <TODO CLASS DESCRIPTION>
  *
- * @category   Php-by-contract
+ * @category   Webserver
  * @package    TechDivision_WebServer
  * @subpackage ConfigParser
  * @author     Bernhard Wick <b.wick@techdivision.com>

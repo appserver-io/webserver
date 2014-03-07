@@ -8,7 +8,7 @@
  *
  * PHP version 5
  *
- * @category   Php-by-contract
+ * @category   Webserver
  * @package    TechDivision_WebServer
  * @subpackage ConfigParser
  * @author     Bernhard Wick <b.wick@techdivision.com>
@@ -20,12 +20,14 @@
 
 namespace TechDivision\WebServer\ConfigParser\Directives;
 
+use TechDivision\WebServer\Interfaces\DirectiveInterface;
+
 /**
  * TechDivision\WebServer\ConfigParser\Directives\RewriteCondition
  *
- * <TODO CLASS DESCRIPTION>
+ * This class acts as a generic implementation of a rewrite condition which should be usable by apache and nginx alike
  *
- * @category   Php-by-contract
+ * @category   Webserver
  * @package    TechDivision_WebServer
  * @subpackage ConfigParser
  * @author     Bernhard Wick <b.wick@techdivision.com>
@@ -34,100 +36,147 @@ namespace TechDivision\WebServer\ConfigParser\Directives;
  *             Open Software License (OSL 3.0)
  * @link       http://www.techdivision.com/
  */
-class RewriteCondition
+class RewriteCondition implements DirectiveInterface
 {
     /**
-     * @var array $allowedTypes <TODO FIELD COMMENT>
+     * The allowed values for the $types member
+     *
+     * @var array<string> $allowedTypes
      */
-    protected $allowedTypes = array('regex', 'check');
+    protected $allowedTypes = array();
 
     /**
-     * @var array $htaccessAdditions <TODO FIELD COMMENT>
+     * A mapping of possible flags and the resulting modifier
+     *
+     * @var array<string> $flagMapping
      */
-    protected $htaccessAdditions = array(
-        '!',
-        '<' => 'strcmp(#1, #2) < 0',
-        '>' => 'strcmp(#1, #2) > 0',
-        '=' => 'strcmp(#1, #2) == 0',
-        '-d' => 'is_dir(#1)',
-        '-f' => 'is_file(#1)',
-        '-s' => 'is_file(#1) && filesize(#1) > 0',
-        '-l' => 'is_link(#1)',
-        '-x' => 'is_executable(#1)',
-        '-F',
-        '-U'
-    );
+    protected $flagMapping = array();
 
     /**
-     * @var string $type <TODO FIELD COMMENT>
+     * Possible additions to the known PCRE regex. These additions get used by htaccess notation only.
+     *
+     * @var array<string> $htaccessAdditions
+     */
+    protected $htaccessAdditions = array();
+
+    /**
+     * The type of this condition
+     *
+     * @var string $type
      */
     protected $type;
 
     /**
-     * To check
+     * To value to check with the given action
      *
-     * @var  $operand <TODO FIELD COMMENT>
+     * @var string $operand
      */
     protected $operand;
 
     /**
-     * @var  $action <TODO FIELD COMMENT>
+     * How the operand had to be checked, this will hold the needed action as a string and cannot be
+     * processed automatically.
+     *
+     * @var string $action
      */
     protected $action;
 
     /**
-     * Regex, File check etc
+     * This is a combination of the operand and the action to perform, wrapped in an eval-able string
      *
-     * @var  $operation <TODO FIELD COMMENT>
+     * @var string $operation
      */
     protected $operation;
 
     /**
-     * Flags
+     * Modifier which should be used to integrate things like apache flags and others
      *
-     * @var  $modifier <TODO FIELD COMMENT>
+     * @var string $modifier
      */
     protected $modifier;
 
     /**
-     * @var  $isNegated <TODO FIELD COMMENT>
+     * At least in the apache universe we can negate the logical meaning with a "!"
+     *
+     * @var boolean $isNegated
      */
     protected $isNegated;
 
     /**
-     * @param string $type
+     * Default constructor
+     *
+     * @param string $type Type of this condition directive
      * @param string $operand
-     * @param string $operation
-     * @param null   $modifier
+     * @param string $action
+     * @param string|null   $modifier
+     *
+     * throws \InvalidArgumentExeption
      */
     public function __construct($type = 'regex', $operand = '', $action = '', $modifier = null)
     {
+        // Fill the default values for our members here
+        $this->allowedTypes = array('regex', 'check');
+        $this->htaccessAdditions = array(
+            '!' => '!',
+            '<' => 'strcmp(\'#1\', \'#2\') < 0',
+            '>' => 'strcmp(\'#1\', \'#2\') > 0',
+            '=' => 'strcmp(\'#1\', \'#2\') == 0',
+            '-d' => 'is_dir(\'#1\')',
+            '-f' => 'is_file(\'#1\')',
+            '-s' => 'is_file(\'#1\') && filesize(\'#1\') > 0',
+            '-l' => 'is_link(\'#1\')',
+            '-x' => 'is_executable(\'#1\')',
+            '-F',
+            '-U'
+        );
+        $this->flagMapping = array('[NC]', '[OR]', '[NV]');
+
+        // We do not negate by default
+        $this->isNegated = false;
+
         if (!isset(array_flip($this->allowedTypes)[$type])) {
 
             throw new \InvalidArgumentExeption($type . ' is not an allowed condition type.');
         }
 
-        // We do not negate by default
-        $this->isNegated = false;
-
-        $this->fillFromArray(array($operand, $action, $modifier));
+        $this->fillFromArray(array(__CLASS__, $operand, $action, $modifier));
     }
 
+    /**
+     * <TODO FUNCTION DESCRIPTION>
+     *
+     * @return string
+     */
     public function getType()
     {
         return $this->type;
     }
 
+    /**
+     * <TODO FUNCTION DESCRIPTION>
+     *
+     * @return mixed
+     */
     public function getOperand()
     {
         return $this->operand;
     }
 
+    /**
+     * <TODO FUNCTION DESCRIPTION>
+     *
+     * @return mixed
+     */
     public function getOperation()
     {
         return $this->operation;
     }
 
+    /**
+     * <TODO FUNCTION DESCRIPTION>
+     *
+     * @return mixed
+     */
     public function getModifier()
     {
         return $this->modifier;
@@ -159,15 +208,14 @@ class RewriteCondition
      */
     public function matches()
     {
-        switch ($this->type) {
+        if ($this->isNegated) {
 
-            default:
+            return eval('if (!' . $this->operation . '){return true;}');
 
-                return eval('if (' . $this->operation . '){return true;}');
+        } else {
+
+            return eval('if (' . $this->operation . '){return true;}');
         }
-
-        // Still here? That does not sound good
-        return false;
     }
 
     /**
@@ -208,29 +256,26 @@ class RewriteCondition
      */
     public function fillFromArray(array $parts)
     {
-        // Array should be 2 or 3 pieces long
-        if (count($parts) < 2 || count($parts) > 3) {
+        // Array should be 3 or 4 pieces long
+        if (count($parts) < 3 || count($parts) > 4) {
 
             throw new \InvalidArgumentException('Could not process line ' . implode($parts, ' '));
         }
 
         // Fill operand and action to preserve it
-        $this->operand = $parts[0];
-        $this->action = $parts[1];
+        $this->operand = $parts[1];
+        $this->action = $parts[2];
 
         // Fill the instance, "regex" is the default type
         $this->type = 'regex';
 
         // Preset the operation with a regex check
-        $this->operation = 'preg_match(\'`' . $parts[1] . '`\', \'' . $parts[0] . '\') === 1';
+        $this->operation = 'preg_match(\'`' . $parts[2] . '`\', \'' . $parts[1] . '\') === 1';
 
         // Are we able to find any of the additions htaccess syntax offers?
         foreach ($this->htaccessAdditions as $addition => $realAction) {
 
-            if (strpos($parts[1], $addition) !== false) {
-
-                // We have a "check" type
-                $this->type = 'check';
+            if (strpos($parts[2], $addition) !== false) {
 
                 // Check if we have to negate
                 if ($addition === '!') {
@@ -239,17 +284,20 @@ class RewriteCondition
                     continue;
                 }
 
+                // We have a "check" type
+                $this->type = 'check';
+
                 // We have to extract the needed parts of our operation and refill it into our operation string
-                $additionPart = substr($parts[1], 1);
-                $this->$operation = str_replace(array('#1', '#2'), array($parts[0], $additionPart), $realAction);
+                $additionPart = substr($parts[2], 1);
+                $this->operation = str_replace(array('#1', '#2'), array($parts[1], $additionPart), $realAction);
                 break;
             }
         }
 
         // Get the modifier, if there is any
-        if (isset($parts[2])) {
+        if (isset($parts[3])) {
 
-            $this->modifier = $parts[2];
+            $this->modifier = $parts[3];
         }
     }
 }

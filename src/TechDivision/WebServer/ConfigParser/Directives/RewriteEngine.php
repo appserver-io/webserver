@@ -23,7 +23,7 @@ namespace TechDivision\WebServer\ConfigParser\Directives;
 use TechDivision\WebServer\Interfaces\DirectiveInterface;
 
 /**
- * TechDivision\WebServer\ConfigParser\Directives\RewriteBase
+ * TechDivision\WebServer\ConfigParser\Directives\RewriteEngine
  *
  * <TODO CLASS DESCRIPTION>
  *
@@ -36,19 +36,21 @@ use TechDivision\WebServer\Interfaces\DirectiveInterface;
  *             Open Software License (OSL 3.0)
  * @link       http://www.techdivision.com/
  */
-class RewriteBase implements DirectiveInterface
+class RewriteEngine implements DirectiveInterface
 {
     /**
-     * @var string $urlPath The url which builds up the rewrite base
+     * Status to set the rewrite engine to. Can be either "on" or "off".
+     *
+     * @var string $status
      */
-    protected $urlPath;
+    protected $status;
 
     /**
-     * @param null $urlPath
+     * @param string|null $status
      */
-    public function __construct($urlPath = null)
+    public function __construct($status = null)
     {
-        $this->urlPath = $urlPath;
+        $this->status = $status;
     }
 
     /**
@@ -58,22 +60,22 @@ class RewriteBase implements DirectiveInterface
      */
     public function __tostring()
     {
-        if (is_null($this->getUrlPath())) {
+        if (is_null($this->getStatus())) {
 
             return '';
         }
 
-        return $this->getUrlPath();
+        return $this->getStatus();
     }
 
     /**
      * <TODO FUNCTION DESCRIPTION>
      *
-     * @return null
+     * @return string|null
      */
-    public function getUrlPath()
+    public function getStatus()
     {
-        return $this->urlPath;
+        return $this->status;
     }
 
     /**
@@ -92,7 +94,24 @@ class RewriteBase implements DirectiveInterface
             throw new \InvalidArgumentException('Could not process line ' . implode($parts, ' '));
         }
 
-        // Fill the url
-        $this->urlPath = $parts[1];
+        // Fill the status
+        $this->status = $parts[1];
+    }
+
+    /**
+     * Will return true if the rewrite engine is set to on and false if not.
+     *
+     * @return boolean
+     */
+    public function isOn()
+    {
+        if ($this->status === 'on') {
+
+            return true;
+
+        } else {
+
+            return false;
+        }
     }
 }

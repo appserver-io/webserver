@@ -24,9 +24,13 @@
             <!-- <module type="\TechDivision\WebServer\Modules\DeflateModule" /> -->
             <module type="\TechDivision\WebServer\Modules\DirectoryModule" />
             <module type="\TechDivision\WebServer\Modules\CoreModule" />
+<<<<<<< HEAD
             <module type="\TechDivision\WebServer\Modules\RewriteModule" />
             <module type="\TechDivision\WebServer\Modules\DeflateModule" />
             <!-- <module type="\TechDivision\WebServer\Modules\PhpModule" /> -->
+=======
+            <module type="\TechDivision\WebServer\Modules\PhpModule" />
+>>>>>>> 79e3bf909f13d863dbe529c868c625fe32507b53
         </modules>
         <handlers>
             <handler name="php" extension=".php" />
@@ -61,7 +65,7 @@
             <module type="\TechDivision\WebServer\Modules\CoreModule" />
             <module type="\TechDivision\WebServer\Modules\RewriteModule" />
             <module type="\TechDivision\WebServer\Modules\DeflateModule" />
-            <!-- <module type="\TechDivision\WebServer\Modules\PhpModule" /> -->
+            <module type="\TechDivision\WebServer\Modules\PhpModule" />
         </modules>
         <handlers>
             <handler name="php" extension=".php" />

@@ -46,15 +46,16 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         $this->workerType = (string)$node->attributes()->worker;
         $this->socketType = (string)$node->attributes()->socket;
         $this->serverContextType = (string)$node->attributes()->serverContext;
-
         $this->transport = (string)array_shift($node->xpath(".//param[@name='transport']"));
         $this->address = (string)array_shift($node->xpath(".//param[@name='address']"));
         $this->port = (int)array_shift($node->xpath(".//param[@name='port']"));
-        $this->signature = (string)array_shift($node->xpath(".//param[@name='signature']"));
+        $this->software = (string)array_shift($node->xpath(".//param[@name='software']"));
         $this->workerNumber = (int)array_shift($node->xpath(".//param[@name='workerNumber']"));
         $this->certPath = (string)array_shift($node->xpath(".//param[@name='certPath']"));
         $this->passphrase = (string)array_shift($node->xpath(".//param[@name='passphrase']"));
         $this->documentRoot = (string)array_shift($node->xpath(".//param[@name='documentRoot']"));
+        $this->admin = (string)array_shift($node->xpath(".//param[@name='admin']"));
+
         // init modules
         foreach ($node->modules->module as $moduleNode) {
             $this->modules[] = (string)$moduleNode->attributes()->type;
@@ -114,13 +115,23 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
     }
 
     /**
-     * Return's signature
+     * Return's software
      *
      * @return string
      */
-    public function getSignature()
+    public function getSoftware()
     {
-        return $this->signature;
+        return $this->software;
+    }
+
+    /**
+     * Return's admin
+     *
+     * @return string
+     */
+    public function getAdmin()
+    {
+        return $this->admin;
     }
 
     /**

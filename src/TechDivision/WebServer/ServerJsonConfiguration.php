@@ -93,13 +93,23 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     }
 
     /**
-     * Return's signature
+     * Return's software
      *
      * @return string
      */
-    public function getSignature()
+    public function getSoftware()
     {
-        return $this->data->signature;
+        return $this->data->software;
+    }
+
+    /**
+     * Return's admin
+     *
+     * @return string
+     */
+    public function getAdmin()
+    {
+        return $this->data->admin;
     }
 
     /**

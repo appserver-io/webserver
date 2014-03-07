@@ -248,13 +248,20 @@ class ServerContext implements ServerContextInterface
      */
     public function initServerVars()
     {
+        // set server vars to local var to shorter usage
+        $serverSoftware = $this->getServerConfig()->getSoftware() . ' (PHP ' . PHP_VERSION . ')';
+        $serverAddress = $this->getServerConfig()->getAddress();
+        $serverPort = $this->getServerConfig()->getPort();
+        // set server vars array
         $this->serverVars = array(
             ServerVars::DOCUMENT_ROOT => $this->getServerConfig()->getDocumentRoot(),
-            ServerVars::SERVER_ADMIN => 'www@localhost', //todo: implement admin in config
-            ServerVars::SERVER_NAME => '127.0.0.1', //todo: implement vhost in config and default name (ip or localhost)
-            ServerVars::SERVER_ADDR => $this->getServerConfig()->getAddress(),
-            ServerVars::SERVER_PORT => $this->getServerConfig()->getPort(),
-            ServerVars::SERVER_SOFTWARE => $this->getServerConfig()->getSignature(),
+            ServerVars::SERVER_ADMIN => $this->getServerConfig()->getAdmin(),
+            ServerVars::SERVER_NAME => $serverAddress, //todo: implement vhost in config and default name (ip or localhost)
+            ServerVars::SERVER_ADDR => $serverAddress,
+            ServerVars::SERVER_PORT => $serverPort,
+            ServerVars::GATEWAY_INTERFACE => 'CGI/1.1',
+            ServerVars::SERVER_SOFTWARE => $serverSoftware,
+            ServerVars::SERVER_SIGNATURE => "<address>$serverSoftware Server at $serverAddress Port $serverPort</address>\r\n",
             ServerVars::PATH => getenv('PATH'),
             ServerVars::HTTPS => ServerVars::VALUE_HTTPS_OFF
         );

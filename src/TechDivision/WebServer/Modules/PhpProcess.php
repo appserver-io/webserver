@@ -75,6 +75,9 @@ class PhpProcess extends \Thread
         ob_start();
         // set globals
         $_SERVER = $globals->server;
+
+        error_log(var_export($_SERVER, true));
+
         $_REQUEST = $globals->request;
         $_POST = $globals->post;
         $_GET = $globals->get;

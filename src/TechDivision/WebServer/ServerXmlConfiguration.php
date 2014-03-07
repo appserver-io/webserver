@@ -66,10 +66,7 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         }
         // init handlers
         foreach ($node->handlers->handler as $handlerNode) {
-            $handler = new \stdClass();
-            $handler->name = (string)$handlerNode->attributes()->extension;
-            $handler->extension = (string)$handlerNode->attributes()->name;
-            $this->handlers[] = $handler;
+            $this->handlers[(string)$handlerNode->attributes()->extension] = (string)$handlerNode->attributes()->name;
         }
     }
 

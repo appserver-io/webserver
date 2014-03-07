@@ -65,6 +65,7 @@ class ServerVars
     const SERVER_PROTOCOL = 'SERVER_PROTOCOL';
     const SERVER_SOFTWARE = 'SERVER_SOFTWARE';
     const SERVER_SIGNATURE = 'SERVER_SIGNATURE';
+    const SERVER_HANDLER = 'SERVER_HANDLER';
     const PATH = 'PATH';
 
     /**

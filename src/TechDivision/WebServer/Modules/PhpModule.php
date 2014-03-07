@@ -27,7 +27,7 @@ use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
 use TechDivision\WebServer\Dictionaries\ServerVars;
 use TechDivision\WebServer\Interfaces\ModuleInterface;
-use TechDivision\WebServer\Modules\ModuleException;
+use TechDivision\WebServer\Exceptions\ModuleException;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
 
 /**
@@ -144,13 +144,18 @@ class PhpModule implements ModuleInterface
         // set req and res internally
         $this->request = $request;
         $this->response = $response;
-
-        $outputBufferStream = null;
+        // get server context to local var
         $serverContext = $this->getServerContext();
 
-        // check if file extension is php to react on it in this case
-        // todo: refactore this with fileHandlers check in init function
-        if (strpos($request->getUri(), '.php') !== false) {
+        // check if server handler sais php modules should react on this request as file handler
+        if ($serverContext->getServerVar(ServerVars::SERVER_HANDLER) === self::MODULE_NAME) {
+
+            // check if file does not exist
+            if (!$serverContext->hasServerVar(ServerVars::SCRIPT_FILENAME)) {
+                // send 404
+                $response->setStatusCode(404);
+                throw new ModuleException(null, 404);
+            }
 
             // init script filename var
             $scriptFilename = $serverContext->getServerVar(ServerVars::SCRIPT_FILENAME);
@@ -248,10 +253,12 @@ class PhpModule implements ModuleInterface
     protected function prepareServerVars()
     {
         $serverContext = $this->getServerContext();
-        $serverContext->setServerVar(
-            self::SERVER_VAR_PHP_SELF,
-            $serverContext->getServerVar(ServerVars::SCRIPT_NAME) . $serverContext->getServerVar(ServerVars::PATH_INFO)
-        );
+        // init php self server var
+        $phpSelf = $serverContext->getServerVar(ServerVars::SCRIPT_NAME);
+        if ($serverContext->hasServerVar(ServerVars::PATH_INFO)) {
+            $phpSelf .= $serverContext->getServerVar(ServerVars::PATH_INFO);
+        }
+        $serverContext->setServerVar(self::SERVER_VAR_PHP_SELF, $phpSelf);
     }
 
     /**

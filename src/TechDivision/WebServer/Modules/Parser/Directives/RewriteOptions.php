@@ -20,12 +20,14 @@
 
 namespace TechDivision\WebServer\Modules\Parser\Directives;
 
+use TechDivision\Http\HttpRequestInterface;
 use TechDivision\WebServer\Interfaces\DirectiveInterface;
+use TechDivision\WebServer\Modules\Parser\Config;
 
 /**
- * TechDivision\WebServer\Modules\Parser\Directives\RewriteEngine
+ * TechDivision\WebServer\Modules\Parser\Directives\RewriteOptions
  *
- * The RewriteEngine directive
+ * The RewriteOptions directive
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
@@ -36,23 +38,40 @@ use TechDivision\WebServer\Interfaces\DirectiveInterface;
  *             Open Software License (OSL 3.0)
  * @link       http://www.techdivision.com/
  */
-class RewriteEngine implements DirectiveInterface
+class RewriteOptions implements DirectiveInterface
 {
     /**
-     * Status to set the rewrite engine to. Can be either "on" or "off".
+     * The allowed values the $type member my assume
      *
-     * @var string $status
+     * @var array $allowedValues
      */
-    protected $status;
+    protected $allowedValues = array();
+
+    /**
+     * The option value. This might be "inherit", "AllowAnyURI" or "MergeBase"
+     *
+     * @var string $value
+     */
+    protected $value;
 
     /**
      * Default constructor
      *
-     * @param string|null $status Status of the rewrite engine, might be "on" or "off"
+     * @param string $value The option value. This might be "inherit", "AllowAnyURI" or "MergeBase"
+     *
+     * @throws \InvalidArgumentException
      */
-    public function __construct($status = null)
+    public function __construct($value = 'inherit')
     {
-        $this->status = $status;
+        // Fill the default values for our members here
+        $this->allowedValues = array("inherit", "AllowAnyURI", "MergeBase");
+
+        if (!isset(array_flip($this->allowedValues)[$value])) {
+
+            throw new \InvalidArgumentException($value . ' is not an allowed RewriteOptions value.');
+        }
+
+        $this->fillFromArray(array(__CLASS__, $value));
     }
 
     /**
@@ -62,22 +81,50 @@ class RewriteEngine implements DirectiveInterface
      */
     public function __tostring()
     {
-        if (is_null($this->getStatus())) {
-
-            return '';
-        }
-
-        return $this->getStatus();
+        return $this->getValue();
     }
 
     /**
-     * Getter for the $status member
+     * Getter for the $value member
      *
      * @return string|null
      */
-    public function getStatus()
+    public function getValue()
     {
-        return $this->status;
+        return $this->value;
+    }
+
+    /**
+     * Will have to extend or security-check the current config according to $this->value
+     *
+     * @param \TechDivision\WebServer\Modules\Parser\Config $config  The current module configuration
+     * @param \TechDivision\Http\HttpRequestInterface       $request The current request object
+     *
+     * @return null
+     */
+    public function apply(Config $config, HttpRequestInterface $request)
+    {
+        switch ($this->value) {
+
+            case "inherit":
+
+
+                break;
+
+            case "AllowAnyURI":
+
+                break;
+
+            case "MergeBase":
+
+
+                break;
+
+            default:
+
+
+                break;
+        }
     }
 
     /**
@@ -98,23 +145,6 @@ class RewriteEngine implements DirectiveInterface
         }
 
         // Fill the status
-        $this->status = $parts[1];
-    }
-
-    /**
-     * Will return true if the rewrite engine is set to on and false if not.
-     *
-     * @return boolean
-     */
-    public function isOn()
-    {
-        if ($this->status === 'on') {
-
-            return true;
-
-        } else {
-
-            return false;
-        }
+        $this->value = $parts[1];
     }
 }

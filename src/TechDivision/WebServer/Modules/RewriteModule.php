@@ -152,21 +152,23 @@ class RewriteModule implements ModuleInterface
             // Before everything else we collect the pieces of information we need
             $requestedUri = $request->getUri();
             $config = $this->getLocationConfig($requestedUri);
-            $engines = $config->getDirectivesByType('TechDivision\WebServer\ConfigParser\Directives\RewriteEngine');
-            // We have to check if the engine is even switched on
-            if (!empty($engines) && array_pop($engines)->isOn() === false) {
+            $options = $config->getDirectivesByType('TechDivision\WebServer\Modules\Parser\Directives\RewriteOptions');
 
-                return;
+            // We got the options, check if there are some and react accordingly
+            if (count($options) > 0) {
+
+                $option = array_pop($options);
+                $option->apply($config, $request);
             }
 
             // As we are still here it seems the engine is needed, so start collecting the other directives
-            $rules = $config->getDirectivesByType('TechDivision\WebServer\ConfigParser\Directives\RewriteRule');
+            $rules = $config->getDirectivesByType('TechDivision\WebServer\Modules\Parser\Directives\RewriteRule');
             $conditions = $config->getDirectivesByType(
-                'TechDivision\WebServer\ConfigParser\Directives\RewriteCondition'
+                'TechDivision\WebServer\Modules\Parser\Directives\RewriteCondition'
             );
 
             // Get the RewriteBase directive
-            $bases = $config->getDirectivesByType('TechDivision\WebServer\ConfigParser\Directives\RewriteBase');
+            $bases = $config->getDirectivesByType('TechDivision\WebServer\Modules\Parser\Directives\RewriteBase');
             $rewriteBase = array_pop($bases);
 
             // We have to fill the request part of our $serverBackreferences array here
@@ -178,7 +180,7 @@ class RewriteModule implements ModuleInterface
             $backreferences = array_merge(
                 $this->serverBackreferences,
                 $config->getBackreferences(
-                    'TechDivision\WebServer\ConfigParser\Directives\RewriteRule',
+                    'TechDivision\WebServer\Modules\Parser\Directives\RewriteRule',
                     array($requestedUri)
                 )
             );
@@ -202,7 +204,7 @@ class RewriteModule implements ModuleInterface
             $backreferences = array_merge(
                 $backreferences,
                 $config->getBackreferences(
-                    'TechDivision\WebServer\ConfigParser\Directives\RewriteCondition'
+                    'TechDivision\WebServer\Modules\Parser\Directives\RewriteCondition'
                 )
             );
 
@@ -224,8 +226,6 @@ class RewriteModule implements ModuleInterface
                 // As we are still here it is save to assume we have to apply this rule
                 $rewrittenUri = $rule->apply();
             }
-
-            //////////////////////////////////////////////////// act
 
             // Did we even get something useful? If not then give the other modules a chance
             if (empty($rewrittenUri)) {

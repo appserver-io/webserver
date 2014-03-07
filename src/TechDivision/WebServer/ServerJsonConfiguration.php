@@ -103,6 +103,16 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     }
 
     /**
+     * Return's admin
+     *
+     * @return string
+     */
+    public function getAdmin()
+    {
+        return $this->data->admin;
+    }
+
+    /**
      * Return's worker number
      *
      * @return int

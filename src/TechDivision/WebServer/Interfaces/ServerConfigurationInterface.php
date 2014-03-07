@@ -77,6 +77,13 @@ interface ServerConfigurationInterface
     public function getSoftware();
 
     /**
+     * Return's admin
+     *
+     * @return string
+     */
+    public function getAdmin();
+
+    /**
      * Return's server context type
      *
      * @return string

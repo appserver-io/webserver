@@ -25,7 +25,7 @@
             <!-- <module type="\TechDivision\WebServer\Modules\DeflateModule" /> -->
             <module type="\TechDivision\WebServer\Modules\DirectoryModule" />
             <module type="\TechDivision\WebServer\Modules\CoreModule" />
-            <module type="\TechDivision\WebServer\Modules\RewriteModule" />
+            <!-- <module type="\TechDivision\WebServer\Modules\RewriteModule" /> -->
             <module type="\TechDivision\WebServer\Modules\PhpModule" />
 
         </modules>
@@ -61,7 +61,7 @@
             <!-- <module type="\TechDivision\WebServer\Modules\DeflateModule" /> -->
             <module type="\TechDivision\WebServer\Modules\DirectoryModule" />
             <module type="\TechDivision\WebServer\Modules\CoreModule" />
-            <module type="\TechDivision\WebServer\Modules\RewriteModule" />
+            <!-- <module type="\TechDivision\WebServer\Modules\RewriteModule" /> -->
             <module type="\TechDivision\WebServer\Modules\PhpModule" />
         </modules>
         <handlers>

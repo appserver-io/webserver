@@ -25,7 +25,7 @@ use TechDivision\WebServer\Interfaces\DirectiveInterface;
 /**
  * TechDivision\WebServer\ConfigParser\Directives\RewriteBase
  *
- * <TODO CLASS DESCRIPTION>
+ * Class which contains the RewriteBase directive used in directory based rewrite rules
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
@@ -39,12 +39,16 @@ use TechDivision\WebServer\Interfaces\DirectiveInterface;
 class RewriteBase implements DirectiveInterface
 {
     /**
-     * @var string $urlPath The url which builds up the rewrite base
+     * The url which builds up the rewrite base
+     *
+     * @var string $urlPath
      */
     protected $urlPath;
 
     /**
-     * @param null $urlPath
+     * Default constructor
+     *
+     * @param string|null $urlPath The url which builds up the rewrite base
      */
     public function __construct($urlPath = null)
     {
@@ -52,9 +56,9 @@ class RewriteBase implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Will return a string representation of $this
      *
-     * @return null|string
+     * @return string
      */
     public function __tostring()
     {
@@ -67,9 +71,9 @@ class RewriteBase implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Getter for the url path of our rewrite base
      *
-     * @return null
+     * @return null|string
      */
     public function getUrlPath()
     {
@@ -77,9 +81,10 @@ class RewriteBase implements DirectiveInterface
     }
 
     /**
-     * <TODO FUNCTION DESCRIPTION>
+     * Will fill an empty directive object with vital information delivered via an array.
+     * This is mostly useful as an interface for different parsers
      *
-     * @param array $parts
+     * @param array $parts The array to extract information from
      *
      * @return null
      * @throws \InvalidArgumentException

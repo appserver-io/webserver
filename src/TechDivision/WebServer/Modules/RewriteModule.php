@@ -126,8 +126,6 @@ class RewriteModule implements ModuleInterface
      */
     public function process(HttpRequestInterface $request, HttpResponseInterface $response)
     {
-        //$time = microtime(true);
-
         // Before everything else we collect the pieces of information we need
         $requestedUri = $request->getUri();
         $config = $this->getLocationConfig($requestedUri);
@@ -165,26 +163,22 @@ class RewriteModule implements ModuleInterface
             )
         );
 
-        //////////////////////////////////////////////////// resolve cond & check cond &  backref cond
-
-        // We have to replace all $serverVar placeholder within the rewrite conditions we got
+        // Iterate over all conditions and perform necessary tasks on them. That would be: resolve, match and get
+        // their backreferences
         foreach ($conditions as $key => $condition) {
 
-            //////////////////////////////////////////////////// resolve cond
-
+            // Resolve the condition with the backreferences we got for now
             $condition->resolve($backreferences);
 
-            //////////////////////////////////////////////////// check cond
-
             // If we do not match we will fail right here
+            // TODO implement condition flags
             if (!$condition->matches()) {
 
                 return;
             }
         }
 
-        //////////////////////////////////////////////////// backref cond
-
+        // Now that this condition has been resolved we might get some backreferences our of it
         $backreferences = array_merge(
             $backreferences,
             $config->getBackreferences(
@@ -192,18 +186,22 @@ class RewriteModule implements ModuleInterface
             )
         );
 
-        //////////////////////////////////////////////////// resolve rules & check rules $ act
+        // Iterate over all rules and perform necessary tasks on them. That would be: resolve, match and if
+        // we match we will apply the rule
         $rewrittenUri = $requestedUri;
         foreach ($rules as $key => $rule) {
 
+            // Resolve the rule with the backreferences we got for now
             $rule->resolve($backreferences);
 
-            // TODO implement flags
+            // If we do not match we will fail right here
+            // TODO implement rule flags
             if (!$rule->matches($requestedUri)) {
 
                 return;
             }
 
+            // As we are still here it is save to assume we have to apply this rule
             $rewrittenUri = $rule->apply();
         }
 
@@ -238,15 +236,12 @@ class RewriteModule implements ModuleInterface
             $rewrittenUri = $rewriteBase . $rewrittenUri;
             $request->setUri($rewrittenUri);
         }
-
-       // error_log(microtime(true) - $time);
-        //error_log(var_export($rewrittenUri, true));
     }
 
     /**
      * Will return the configuration
      *
-     * @param $uri
+     * @param string $uri The requested uri we need the configuration for
      *
      * @return array
      */

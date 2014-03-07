@@ -6,9 +6,10 @@
             "socket": "\\TechDivision\\WebServer\\Sockets\\StreamSocket",
             "serverContext" : "\\TechDivision\\WebServer\\ServerContext",
 
-            "signature": "phpWebServer/0.1.0",
+            "admin": "www@localhost.localdomain",
+            "software": "phpWebServer/0.1.0",
             "transport": "tcp",
-            "address": "0.0.0.0",
+            "address": "127.0.0.1",
             "port": "9080",
             "documentRoot" : "/var/www",
 
@@ -37,13 +38,14 @@
             "socket": "\\TechDivision\\WebServer\\Sockets\\StreamSocket",
             "serverContext" : "\\TechDivision\\WebServer\\ServerContext",
 
-            "signature": "phpWebServer/0.1.0",
+            "admin": "www@localhost.localdomain",
+            "software": "phpWebServer/0.1.0",
             "transport": "ssl",
-            "address": "0.0.0.0",
+            "address": "127.0.0.1",
             "port": "9443",
             "certPath": "etc/webserver.pem",
             "passphrase": "passphrase",
-            "documentRoot" : "/var/www/foundation-5.1.1-custom",
+            "documentRoot" : "/var/www",
 
             "workerNumber": 32,
 

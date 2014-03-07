@@ -114,14 +114,16 @@ class DirectoryModule implements ModuleInterface
         // set req and res object internally
         $this->request = $request;
         $this->response = $response;
+        // get server context ref to local func
+        $serverContext = $this->getServerContext();
+        // get document root
+        $documentRoot = $serverContext->getServerVar(ServerVars::DOCUMENT_ROOT);
         // get uri
         $uri = $request->getUri();
         // get read path to requested uri
-        $realPath = $request->getRealPath();
-        // get info about real path.
-        $fileInfo = new \SplFileInfo($realPath);
+        $realPath = $documentRoot . $uri;
         // check if it's a dir
-        if ($fileInfo->isDir() || $uri === '/') {
+        if (is_dir($realPath)|| $uri === '/') {
             // check if uri has trailing slash
             if (substr($uri, -1) !== '/') {
                 // set enhance uri with trailing slash to response
@@ -131,6 +133,7 @@ class DirectoryModule implements ModuleInterface
             } else {
                 // check if defined index files are found in directory
                 if (file_exists($realPath . 'index.php')) {
+                    // reset uri with indexed filename
                     $request->setUri($uri . 'index.php');
                     // update server var
                     $this->getServerContext()->setServerVar(
@@ -139,6 +142,7 @@ class DirectoryModule implements ModuleInterface
                     );
                 }
                 if (file_exists($realPath . 'index.html')) {
+                    // reset uri with indexed filename
                     $request->setUri($uri . 'index.html');
                     // update server var
                     $this->getServerContext()->setServerVar(

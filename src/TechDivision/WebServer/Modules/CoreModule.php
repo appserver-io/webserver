@@ -22,6 +22,7 @@
 namespace TechDivision\WebServer\Modules;
 
 use TechDivision\Http\HttpProtocol;
+use TechDivision\Http\HttpResponseStates;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
 use TechDivision\WebServer\Dictionaries\ServerVars;
@@ -136,6 +137,8 @@ class CoreModule implements ModuleInterface
                     HttpProtocol::HEADER_CONTENT_TYPE,
                     MimeTypes::getMimeTypeByFilename($this->getRequestedFilename())
                 );
+                // set response state to be dispatched after this without calling other modules process
+                $response->setState(HttpResponseStates::DISPATCH);
             }
         }
     }

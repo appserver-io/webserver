@@ -259,9 +259,10 @@ class ServerContext implements ServerContextInterface
             ServerVars::SERVER_NAME => $serverAddress, //todo: implement vhost in config and default name (ip or localhost)
             ServerVars::SERVER_ADDR => $serverAddress,
             ServerVars::SERVER_PORT => $serverPort,
-            ServerVars::GATEWAY_INTERFACE => 'CGI/1.1',
+            ServerVars::GATEWAY_INTERFACE => "PHP/" . PHP_VERSION,
             ServerVars::SERVER_SOFTWARE => $serverSoftware,
             ServerVars::SERVER_SIGNATURE => "<address>$serverSoftware Server at $serverAddress Port $serverPort</address>\r\n",
+            ServerVars::SERVER_HANDLER => CoreModule::MODULE_NAME,
             ServerVars::PATH => getenv('PATH'),
             ServerVars::HTTPS => ServerVars::VALUE_HTTPS_OFF
         );

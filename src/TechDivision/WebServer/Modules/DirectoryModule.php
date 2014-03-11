@@ -24,6 +24,7 @@ namespace TechDivision\WebServer\Modules;
 use TechDivision\Http\HttpProtocol;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
+use TechDivision\Http\HttpResponseStates;
 use TechDivision\WebServer\Interfaces\ModuleInterface;
 use TechDivision\WebServer\Modules\ModuleException;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
@@ -122,6 +123,7 @@ class DirectoryModule implements ModuleInterface
         $uri = $request->getUri();
         // get read path to requested uri
         $realPath = $documentRoot . $uri;
+
         // check if it's a dir
         if (is_dir($realPath)|| $uri === '/') {
             // check if uri has trailing slash
@@ -130,6 +132,8 @@ class DirectoryModule implements ModuleInterface
                 $response->addHeader(HttpProtocol::HEADER_LOCATION, $uri . '/');
                 // send redirect status
                 $response->setStatusCode(301);
+                // set response state to be dispatched after this without calling other modules process
+                $response->setState(HttpResponseStates::DISPATCH);
             } else {
                 // check if defined index files are found in directory
                 if (file_exists($realPath . 'index.php')) {

@@ -105,6 +105,20 @@ class RewriteModule implements ModuleInterface
     const MODULE_NAME = 'rewrite';
 
     /**
+     * Defines the SCRIPT_URL constant's name we keep track of
+     *
+     * @var string
+     */
+    const SCRIPT_URL = 'SCRIPT_URL';
+
+    /**
+     * Defines the SCRIPT_URI constant's name we keep track of
+     *
+     * @var string
+     */
+    const SCRIPT_URI = 'SCRIPT_URI';
+
+    /**
      * Initiates the module
      *
      * @param \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext The server's context instance
@@ -198,6 +212,9 @@ class RewriteModule implements ModuleInterface
     {
         // We have to throw a ModuleException on failure, so surround the body with a try...catch block
         try {
+
+            // First of all we have to set the server vars we take care of: SCRIPT_URL and SCRIPT_URI
+            $this->setModuleVars($request);
 
             // Before everything else we collect the pieces of information we need
             $requestedUri = $request->getUri();
@@ -312,6 +329,27 @@ class RewriteModule implements ModuleInterface
             // Re-throw as a ModuleException
             throw new ModuleException($e);
         }
+    }
+
+    /**
+     * Will set the additional server vars for the requested URI and URL so it will get preserved
+     * over any rewrite.
+     *
+     * @param \TechDivision\Http\HttpRequestInterface $request The request instance
+     *
+     * @return void
+     */
+    protected function setModuleVars(HttpRequestInterface $request)
+    {
+        // Preserve the requested URI as a backup
+        $this->serverContext->setServerVar(self::SCRIPT_URI, $request->getUri());
+
+        // Preserve the complete URL as it was requested
+        $this->serverContext->setServerVar(
+            self::SCRIPT_URI,
+            $this->serverContext->getServerVar(ServerVars::SERVER_ADDR),
+            $request->getUri()
+        );
     }
 
     /**

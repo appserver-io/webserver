@@ -23,6 +23,7 @@ use TechDivision\Http\HttpProtocol;
 use TechDivision\WebServer\Exceptions\ModuleException;
 use TechDivision\WebServer\Modules\Parser\HtaccessParser;
 use TechDivision\WebServer\Dictionaries\ServerVars;
+use TechDivision\WebServer\Dictionaries\SslEnvironmentVars;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
@@ -38,6 +39,9 @@ use TechDivision\WebServer\Interfaces\ModuleInterface;
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/techdivision/TechDivision_WebServer
+ *
+ * TODO there currently is no possibility for internal subrequests
+ * TODO A RewriteMap directive would come handy
  */
 class RewriteModule implements ModuleInterface
 {
@@ -47,6 +51,13 @@ class RewriteModule implements ModuleInterface
      * @var array $supportedServerVars
      */
     protected $supportedServerVars = array();
+
+    /**
+     * SSL environment variables we support and need
+     *
+     * @var array $supportedSslEnvironmentVars
+     */
+    protected $supportedSslEnvironmentVars = array();
 
     /**
      * This array will hold all locations (e.g. /example/websocket) we ever encountered in our live time.
@@ -126,6 +137,45 @@ class RewriteModule implements ModuleInterface
                     ServerVars::HTTP_PROXY_CONNECTION,
                     ServerVars::HTTP_ACCEPT
                 )
+            );
+
+            $this->supportedSslEnvironmentVars = array(
+                SslEnvironmentVars::HTTPS,
+                SslEnvironmentVars::SSL_PROTOCOL,
+                SslEnvironmentVars::SSL_SESSION_ID,
+                SslEnvironmentVars::SSL_CIPHER,
+                SslEnvironmentVars::SSL_CIPHER_EXPORT,
+                SslEnvironmentVars::SSL_CIPHER_USEKEYSIZE,
+                SslEnvironmentVars::SSL_CIPHER_ALGKEYSIZE,
+                SslEnvironmentVars::SSL_COMPRESS_METHOD,
+                SslEnvironmentVars::SSL_VERSION_INTERFACE,
+                SslEnvironmentVars::SSL_VERSION_LIBRARY,
+                SslEnvironmentVars::SSL_CLIENT_M_VERSION,
+                SslEnvironmentVars::SSL_CLIENT_M_SERIAL,
+                SslEnvironmentVars::SSL_CLIENT_S_DN,
+                SslEnvironmentVars::SSL_CLIENT_S_DN_X509,
+                SslEnvironmentVars::SSL_CLIENT_I_DN,
+                SslEnvironmentVars::SSL_CLIENT_I_DN_X509,
+                SslEnvironmentVars::SSL_CLIENT_V_START,
+                SslEnvironmentVars::SSL_CLIENT_V_END,
+                SslEnvironmentVars::SSL_CLIENT_V_REMAIN,
+                SslEnvironmentVars::SSL_CLIENT_A_SIG,
+                SslEnvironmentVars::SSL_CLIENT_A_KEY,
+                SslEnvironmentVars::SSL_CLIENT_CERT,
+                SslEnvironmentVars::SSL_CLIENT_CERT_CHAIN_N,
+                SslEnvironmentVars::SSL_CLIENT_VERIFY,
+                SslEnvironmentVars::SSL_SERVER_M_VERSION,
+                SslEnvironmentVars::SSL_SERVER_M_SERIAL,
+                SslEnvironmentVars::SSL_SERVER_S_DN,
+                SslEnvironmentVars::SSL_SERVER_S_DN_X509,
+                SslEnvironmentVars::SSL_SERVER_I_DN,
+                SslEnvironmentVars::SSL_SERVER_I_DN_X509,
+                SslEnvironmentVars::SSL_SERVER_V_START,
+                SslEnvironmentVars::SSL_SERVER_V_END,
+                SslEnvironmentVars::SSL_SERVER_A_SIG,
+                SslEnvironmentVars::SSL_SERVER_A_KEY,
+                SslEnvironmentVars::SSL_SERVER_CERT,
+                SslEnvironmentVars::SSL_TLS_SNI
             );
 
         } catch (\Exception $e) {
@@ -314,14 +364,42 @@ class RewriteModule implements ModuleInterface
     {
         $headerArray = $request->getHeaders();
 
+        // Iterate over all header vars we know and add them to our serverBackreferences array
         foreach ($this->supportedServerVars['headers'] as $supportedServerVar) {
 
+            // As we got them with another name, we have to rename them, so we will not have to do this on the fly
             $tmp = strtoupper(str_replace('HTTP', 'HEADER', $supportedServerVar));
             if (@isset($headerArray[constant("TechDivision\\Http\\HttpProtocol::$tmp")])) {
                 $this->serverBackreferences['%{' . $supportedServerVar . '}'] = $headerArray[constant(
                     "TechDivision\\Http\\HttpProtocol::$tmp"
                 )];
+
+                // Also create for the "dynamic" substitution syntax
+                $this->serverBackreferences['%{HTTP:' . constant(
+                    "TechDivision\\Http\\HttpProtocol::$tmp"
+                ) . '}'] = $headerArray[constant(
+                    "TechDivision\\Http\\HttpProtocol::$tmp"
+                )];
             }
+        }
+    }
+
+    /**
+     * Will fill the SSL environment variables into the backreferences.
+     * These are empty as long as the SSL module is not loaded.
+     *
+     * @param \TechDivision\Http\HttpRequestInterface $request The request instance
+     *
+     * @return void
+     *
+     * TODO Get this vars from the SSL module as soon as it exists
+     */
+    protected function fillSslEnvironmentBackreferences(HttpRequestInterface $request)
+    {
+        // Iterate over all SSL environment variables and fill them into our backreferences
+        foreach ($this->supportedSslEnvironmentVars as $supportedSslEnvironmentVar) {
+
+            $this->serverBackreferences['${SSL:' . $supportedSslEnvironmentVar . '}'] = '';
         }
     }
 
@@ -336,7 +414,11 @@ class RewriteModule implements ModuleInterface
     {
         foreach ($this->serverContext->getServerVars() as $varName => $serverVar) {
 
+            // Prefill the value
             $this->serverBackreferences['%{' . $varName . '}'] = $serverVar;
+
+            // Also create for the "dynamic" substitution syntax
+            $this->serverBackreferences['%{ENV:' . $varName . '}'] = $serverVar;
         }
     }
 

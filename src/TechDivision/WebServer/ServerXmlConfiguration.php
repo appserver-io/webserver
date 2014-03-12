@@ -68,6 +68,19 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         foreach ($node->handlers->handler as $handlerNode) {
             $this->handlers[(string)$handlerNode->attributes()->extension] = (string)$handlerNode->attributes()->name;
         }
+        // init virutalHosts
+        foreach ($node->virtualHosts->virtualHost as $virtualHostNode) {
+            $virtualHostNames = explode(' ' , (string)$virtualHostNode->attributes()->name);
+            $params = array();
+            foreach ($virtualHostNode->params->param as $paramNode) {
+                $paramName = (string)$paramNode->attributes()->name;
+                $params[$paramName] = (string)array_shift($virtualHostNode->xpath(".//param[@name='$paramName']"));
+            }
+            foreach ($virtualHostNames as $virtualHostName) {
+                // set all virtual hosts params per key for faster matching later on
+                $this->virtualHosts[trim($virtualHostName)] = $params;
+            }
+        }
     }
 
     /**
@@ -189,6 +202,16 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
     public function getConnectionHandlers()
     {
         return $this->connectionHandlers;
+    }
+
+    /**
+     * Return's the virtual hosts
+     *
+     * @return array
+     */
+    public function getVirtualHosts()
+    {
+        return $this->virtualHosts;
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 /**
- * \TechDivision\WebServer\Modules\DirectoryModule
+ * \TechDivision\WebServer\Modules\VirtualHostModule
  *
  * NOTICE OF LICENSE
  *
@@ -22,16 +22,15 @@
 namespace TechDivision\WebServer\Modules;
 
 use TechDivision\Http\HttpProtocol;
+use TechDivision\WebServer\Dictionaries\ServerVars;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
-use TechDivision\Http\HttpResponseStates;
 use TechDivision\WebServer\Interfaces\ModuleInterface;
 use TechDivision\WebServer\Modules\ModuleException;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
-use TechDivision\WebServer\Dictionaries\ServerVars;
 
 /**
- * Class DirectoryModule
+ * Class VirtualHostModule
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
@@ -41,7 +40,7 @@ use TechDivision\WebServer\Dictionaries\ServerVars;
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/techdivision/TechDivision_WebServer
  */
-class DirectoryModule implements ModuleInterface
+class VirtualHostModule implements ModuleInterface
 {
 
     /**
@@ -49,7 +48,18 @@ class DirectoryModule implements ModuleInterface
      *
      * @var string
      */
-    const MODULE_NAME = 'directory';
+    const MODULE_NAME = 'virtualHost';
+
+    /**
+     * Defines the map from params to server vars
+     *
+     * @var array
+     */
+    protected $paramServerVarsMap = array(
+        'admin' => ServerVars::SERVER_ADMIN,
+        'documentRoot' => ServerVars::DOCUMENT_ROOT,
+        'software' => ServerVars::SERVER_SOFTWARE
+    );
 
     /**
      * Hold's the server context instance
@@ -115,48 +125,27 @@ class DirectoryModule implements ModuleInterface
         // set req and res object internally
         $this->request = $request;
         $this->response = $response;
-        // get server context ref to local func
-        $serverContext = $this->getServerContext();
-        // get document root
-        $documentRoot = $serverContext->getServerVar(ServerVars::DOCUMENT_ROOT);
-        // get uri
-        $uri = $request->getUri();
-        // get read path to requested uri
-        $realPath = $documentRoot . $uri;
 
-        // check if it's a dir
-        if (is_dir($realPath)|| $uri === '/') {
-            // check if uri has trailing slash
-            if (substr($uri, -1) !== '/') {
-                // set enhance uri with trailing slash to response
-                $response->addHeader(HttpProtocol::HEADER_LOCATION, $uri . '/');
-                // send redirect status
-                $response->setStatusCode(301);
-                // set response state to be dispatched after this without calling other modules process
-                $response->setState(HttpResponseStates::DISPATCH);
-            } else {
-                // check if defined index files are found in directory
-                if (file_exists($realPath . 'index.php')) {
-                    // reset uri with indexed filename
-                    $request->setUri($uri . 'index.php');
-                    // update server var
+        $virtualHosts = $this->getServerContext()->getServerConfig()->getVirtualHosts();
+        $serverName = $this->getServerContext()->getServerVar(ServerVars::SERVER_NAME);
+
+        // check if current host matches any virtual host configuration
+        if (isset($virtualHosts[$serverName])) {
+            // read out params
+            $params = $virtualHosts[$serverName];
+            // iterate over all params and try to set as server var via mapping
+            foreach ($params as $paramName => $paramValue) {
+                // check if server var mapping exists
+                if (isset($this->paramServerVarsMap[$paramName])) {
+                    // set server var
                     $this->getServerContext()->setServerVar(
-                        ServerVars::REQUEST_URI,
-                        $request->getUri()
-                    );
-                }
-                if (file_exists($realPath . 'index.html')) {
-                    // reset uri with indexed filename
-                    $request->setUri($uri . 'index.html');
-                    // update server var
-                    $this->getServerContext()->setServerVar(
-                        ServerVars::REQUEST_URI,
-                        $request->getUri()
+                        $this->paramServerVarsMap[$paramName],
+                        $paramValue
                     );
                 }
             }
         }
-        return true;
+
     }
 
     /**

@@ -209,15 +209,15 @@ class RewriteModule implements ModuleInterface
      * @throws \TechDivision\WebServer\Exceptions\ModuleException
      */
     public function process(HttpRequestInterface $request, HttpResponseInterface $response)
-    {
+    {/*
         // We have to throw a ModuleException on failure, so surround the body with a try...catch block
         try {
-
+/*
             // First of all we have to set the server vars we take care of: SCRIPT_URL and SCRIPT_URI
             $this->setModuleVars($request);
 
             // Before everything else we collect the pieces of information we need
-            $requestedUri = $request->getUri();
+            $requestedUri = $request->getUri();error_log($requestedUri);
             $config = $this->getLocationConfig($requestedUri);
             $options = $config->getDirectivesByType('TechDivision\WebServer\Modules\Parser\Directives\RewriteOptions');
 
@@ -263,7 +263,16 @@ class RewriteModule implements ModuleInterface
                 // TODO implement condition flags
                 if (!$condition->matches()) {
 
-                    return;
+                    //return;
+
+                }
+
+                // If we do not have the "no vary" header we
+
+                if($condition->isOrCombined()) {
+                    // We did succeed but we are or-combined so we do not need work with other conditions
+
+                    break;
                 }
             }
 
@@ -287,13 +296,13 @@ class RewriteModule implements ModuleInterface
                 // TODO implement rule flags
                 if (!$rule->matches($requestedUri)) {
 
-                    return;
+                   // return;
                 }
 
                 // As we are still here it is save to assume we have to apply this rule
                 $rewrittenUri = $rule->apply();
             }
-
+error_log($rewrittenUri);
             // Did we even get something useful? If not then give the other modules a chance
             if (empty($rewrittenUri)) {
 
@@ -304,8 +313,8 @@ class RewriteModule implements ModuleInterface
             if (is_readable($rewrittenUri)) {
 
                 // Set the document root to the directory above the referenced file and the uri to the file itself
-                $request->setDocumentRoot(dirname($rewrittenUri));
-                $request->setUri(basename($rewrittenUri));
+                $this->serverContext->setServerVar(ServerVars::DOCUMENT_ROOT, dirname($rewrittenUri));
+                $this->serverContext->setServerVar(ServerVars::REQUEST_URI, basename($rewrittenUri));
 
                 // This will stop processing of the module chain
                 return false;
@@ -328,7 +337,7 @@ class RewriteModule implements ModuleInterface
 
             // Re-throw as a ModuleException
             throw new ModuleException($e);
-        }
+        }*/
     }
 
     /**

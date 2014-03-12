@@ -70,7 +70,7 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         }
         // init virutalHosts
         foreach ($node->virtualHosts->virtualHost as $virtualHostNode) {
-            $virtualHostNames = explode(' ' , (string)$virtualHostNode->attributes()->name);
+            $virtualHostNames = explode(' ', (string)$virtualHostNode->attributes()->name);
             $params = array();
             foreach ($virtualHostNode->params->param as $paramNode) {
                 $paramName = (string)$paramNode->attributes()->name;

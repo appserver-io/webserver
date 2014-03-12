@@ -18,11 +18,21 @@
             <param name="documentRoot" type="string">/var/www</param>
         </params>
 
+        <virtualHosts>
+            <virtualHost name="neos.dev neos.local neos.test">
+                <params>
+                    <param name="admin" type="string">www@neos.dev</param>
+                    <param name="documentRoot" type="string">/var/www/neos/Web</param>
+                </params>
+            </virtualHost>
+        </virtualHosts>
+
         <connectionHandlers>
             <connectionHandler type="\TechDivision\Http\HttpConnectionHandler"/>
         </connectionHandlers>
         <modules>
             <!-- <module type="\TechDivision\WebServer\Modules\DeflateModule" /> -->
+            <module type="\TechDivision\WebServer\Modules\VirtualHostModule" />
             <module type="\TechDivision\WebServer\Modules\DirectoryModule" />
             <module type="\TechDivision\WebServer\Modules\CoreModule" />
             <module type="\TechDivision\WebServer\Modules\RewriteModule" />
@@ -53,6 +63,8 @@
             <param name="passphrase" type="string">passphrase</param>
             <param name="documentRoot" type="string">/var/www</param>
         </params>
+
+        <virtualHosts/>
 
         <connectionHandlers>
             <connectionHandler type="\TechDivision\Http\HttpConnectionHandler"/>

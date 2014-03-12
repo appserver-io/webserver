@@ -173,6 +173,16 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     }
 
     /**
+     * Return's the virtual hosts
+     *
+     * @return array
+     */
+    public function getVirtualHosts()
+    {
+        return $this->data->virtualHosts;
+    }
+
+    /**
      * Return's modules
      *
      * @return array

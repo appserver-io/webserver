@@ -126,6 +126,13 @@ interface ServerConfigurationInterface
     public function getConnectionHandlers();
 
     /**
+     * Return's the virtual hosts
+     *
+     * @return array
+     */
+    public function getVirtualHosts();
+
+    /**
      * Return's handlers
      *
      * @return array

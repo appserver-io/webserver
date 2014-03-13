@@ -36,6 +36,13 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
 {
 
     /**
+     * The configured rewrite rules
+     *
+     * @var array $rewrites
+     */
+    protected $rewrites;
+
+    /**
      * Constructs config
      *
      * @param \SimpleXMLElement $node The simple xml element used to build config
@@ -69,16 +76,28 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
             $this->handlers[(string)$handlerNode->attributes()->extension] = (string)$handlerNode->attributes()->name;
         }
         // init virutalHosts
-        foreach ($node->virtualHosts->virtualHost as $virtualHostNode) {
-            $virtualHostNames = explode(' ', (string)$virtualHostNode->attributes()->name);
-            $params = array();
-            foreach ($virtualHostNode->params->param as $paramNode) {
-                $paramName = (string)$paramNode->attributes()->name;
-                $params[$paramName] = (string)array_shift($virtualHostNode->xpath(".//param[@name='$paramName']"));
+        if (isset($node->virtualHosts->virtualHost)) {
+            foreach ($node->virtualHosts->virtualHost as $virtualHostNode) {
+                $virtualHostNames = explode(' ', (string)$virtualHostNode->attributes()->name);
+                $params = array();
+                foreach ($virtualHostNode->params->param as $paramNode) {
+                    $paramName = (string)$paramNode->attributes()->name;
+                    $params[$paramName] = (string)array_shift($virtualHostNode->xpath(".//param[@name='$paramName']"));
+                }
+
+                foreach ($virtualHostNames as $virtualHostName) {
+                    // set all virtual hosts params per key for faster matching later on
+                    $this->virtualHosts[trim($virtualHostName)] = $params;
+                }
             }
-            foreach ($virtualHostNames as $virtualHostName) {
-                // set all virtual hosts params per key for faster matching later on
-                $this->virtualHosts[trim($virtualHostName)] = $params;
+        }
+        // Init rewrites
+        if (isset($node->rewrites->rewrite)) {
+            foreach ($node->rewrites->rewrite as $rewriteNode) {
+
+                // Cut of the SimpleXML attributes wrapper and attach it to our rewrites
+                $rewrite = (array)$rewriteNode;
+                $this->rewrites[] = array_shift($rewrite);
             }
         }
     }
@@ -100,8 +119,17 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
      */
     public function getTransport()
     {
-        $t = $this->transport;
         return $this->transport;
+    }
+
+    /**
+     * Returns rewrites
+     *
+     * @return array
+     */
+    public function getRewrites()
+    {
+        return $this->rewrites;
     }
 
     /**

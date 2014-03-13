@@ -11,12 +11,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/techdivision/TechDivision_Http.git",
-                "reference": "dda2883224a2ad3e993290139e3356161662a7a4"
+                "reference": "bb3193ad47f9f576ebf6fb62ad04de29f0aaedce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/techdivision/TechDivision_Http/zipball/dda2883224a2ad3e993290139e3356161662a7a4",
-                "reference": "dda2883224a2ad3e993290139e3356161662a7a4",
+                "url": "https://api.github.com/repos/techdivision/TechDivision_Http/zipball/bb3193ad47f9f576ebf6fb62ad04de29f0aaedce",
+                "reference": "bb3193ad47f9f576ebf6fb62ad04de29f0aaedce",
                 "shasum": ""
             },
             "require": {
@@ -51,7 +51,7 @@
                 "protocol",
                 "server"
             ],
-            "time": "2014-03-07 21:00:13"
+            "time": "2014-03-12 14:31:23"
         }
     ],
     "packages-dev": [

@@ -57,18 +57,23 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         $this->admin = (string)array_shift($node->xpath(".//param[@name='admin']"));
 
         // init modules
+        $this->modules = array();
         foreach ($node->modules->module as $moduleNode) {
             $this->modules[] = (string)$moduleNode->attributes()->type;
         }
         // init connection handlers
+        $this->connectionHandlers = array();
         foreach ($node->connectionHandlers->connectionHandler as $connectionHandlerNode) {
             $this->connectionHandlers[] = (string)$connectionHandlerNode->attributes()->type;
         }
         // init handlers
+        $this->handlers = array();
         foreach ($node->handlers->handler as $handlerNode) {
             $this->handlers[(string)$handlerNode->attributes()->extension] = (string)$handlerNode->attributes()->name;
         }
+
         // init virutalHosts
+        $this->virtualHosts = array();
         foreach ($node->virtualHosts->virtualHost as $virtualHostNode) {
             $virtualHostNames = explode(' ', (string)$virtualHostNode->attributes()->name);
             $params = array();
@@ -80,6 +85,16 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
                 // set all virtual hosts params per key for faster matching later on
                 $this->virtualHosts[trim($virtualHostName)] = $params;
             }
+        }
+        // init authentications
+        $this->authentications = array();
+        foreach ($node->authentications->authentication as $authenticationNode) {
+            $params = array();
+            foreach ($authenticationNode->params->param as $paramNode) {
+                $paramName = (string)$paramNode->attributes()->name;
+                $params[$paramName] = (string)array_shift($authenticationNode->xpath(".//param[@name='$paramName']"));
+            }
+            $this->authentications[(string)$authenticationNode->attributes()->type] = $params;
         }
     }
 
@@ -212,6 +227,16 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
     public function getVirtualHosts()
     {
         return $this->virtualHosts;
+    }
+
+    /**
+     * Return's the authentication information's
+     *
+     * @return array
+     */
+    public function getAuthentications()
+    {
+        return $this->authentications;
     }
 
     /**

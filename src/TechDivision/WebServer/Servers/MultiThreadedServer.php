@@ -25,6 +25,9 @@ use TechDivision\WebServer\Interfaces\ServerConfigurationInterface;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
 use TechDivision\WebServer\Interfaces\ServerInterface;
 use TechDivision\WebServer\Interfaces\ConfigInterface;
+use TechDivision\WebServer\Exceptions\ModuleNotFoundException;
+use TechDivision\WebServer\Exceptions\ConnectionHandlerNotFoundException;
+
 
 /**
  * Class MultiThreadedServer
@@ -39,6 +42,20 @@ use TechDivision\WebServer\Interfaces\ConfigInterface;
  */
 class MultiThreadedServer extends \Thread implements ServerInterface
 {
+
+    /**
+     * Hold's the modules pre initiated
+     *
+     * @var array
+     */
+    protected $modules;
+
+    /**
+     * Hold's the connection Handlers pre initiated
+     *
+     * @var array
+     */
+    protected $connectionHandlers;
 
     /**
      * Hold's the server context instance
@@ -63,7 +80,7 @@ class MultiThreadedServer extends \Thread implements ServerInterface
     /**
      * Return's the config instance
      *
-     * @return \TechDivision\WebServer\Interfaces\ServerConfigurationInterface
+     * @return \TechDivision\WebServer\Interfaces\ServerContextInterface
      */
     public function getServerContext()
     {
@@ -71,9 +88,32 @@ class MultiThreadedServer extends \Thread implements ServerInterface
     }
 
     /**
+     * Return's the modules as array
+     *
+     * @return array
+     */
+    protected function getModules()
+    {
+        return $this->modules;
+    }
+
+    /**
+     * Return's connection handlers as array
+     *
+     * @return array
+     */
+    protected function getConnectionHandlers()
+    {
+        return $this->connectionHandlers;
+    }
+
+    /**
      * Start's the server's worker as defined in configuration
      *
      * @return void
+     *
+     * @throws \TechDivision\WebServer\Exceptions\ModuleNotFoundException
+     * @throws \TechDivision\WebServer\Exceptions\ConnectionHandlerNotFoundException
      */
     public function run()
     {
@@ -88,7 +128,6 @@ class MultiThreadedServer extends \Thread implements ServerInterface
 
         // get class names
         $socketType = $serverConfig->getSocketType();
-        $serverContextType = $serverConfig->getServerContextType();
         $workerType = $serverConfig->getWorkerType();
 
         // init stream context for server connection
@@ -109,8 +148,11 @@ class MultiThreadedServer extends \Thread implements ServerInterface
         );
 
         // setup and start workers
-        for ($i=0; $i < $serverConfig->getWorkerNumber(); ++$i) {
-            $workers[$i] = new $workerType($serverConnection->getConnectionResource(), $serverContext);
+        for ($i=1; $i <= $serverConfig->getWorkerNumber(); ++$i) {
+            $workers[$i] = new $workerType(
+                $serverConnection->getConnectionResource(),
+                $serverContext
+            );
         }
 
         // wait until all workers finished

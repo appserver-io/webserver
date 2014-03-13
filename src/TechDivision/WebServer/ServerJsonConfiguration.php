@@ -183,6 +183,16 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     }
 
     /**
+     * Return's the authentications
+     *
+     * @return array
+     */
+    public function getAuthentications()
+    {
+        return $this->data->authentications;
+    }
+
+    /**
      * Return's modules
      *
      * @return array

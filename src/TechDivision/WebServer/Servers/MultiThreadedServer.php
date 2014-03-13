@@ -28,7 +28,6 @@ use TechDivision\WebServer\Interfaces\ConfigInterface;
 use TechDivision\WebServer\Exceptions\ModuleNotFoundException;
 use TechDivision\WebServer\Exceptions\ConnectionHandlerNotFoundException;
 
-
 /**
  * Class MultiThreadedServer
  *

@@ -288,7 +288,8 @@ class PhpModule implements ModuleInterface
             // set params to post
             $globals->post = $request->getParams();
             // set params given in query string to get
-            parse_str($request->getQueryString(), $globals->get);
+            parse_str($request->getQueryString(), $getArray);
+            $globals->get = $getArray;
         }
         // set cookie globals
         $globals->cookie = array();

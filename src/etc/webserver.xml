@@ -18,6 +18,17 @@
             <param name="documentRoot" type="string">/var/www</param>
         </params>
 
+        <authentications>
+            <authentication type="\TechDivision\WebServer\Authentication\BasicAuthentication">
+                <params>
+                    <param name="pattern" type="string">^\/xyz.*</param>
+                    <!-- <param name="file" type="string"></param> -->
+                    <param name="username" type="string">appserver</param>
+                    <param name="password" type="string">wURpZpgIT.w1I</param>
+                </params>
+            </authentication>
+        </authentications>
+
         <virtualHosts>
             <virtualHost name="neos.dev neos.local neos.test">
                 <params>
@@ -32,6 +43,7 @@
         </connectionHandlers>
         <modules>
             <!-- <module type="\TechDivision\WebServer\Modules\DeflateModule" /> -->
+            <module type="\TechDivision\WebServer\Modules\AuthenticationModule" />
             <module type="\TechDivision\WebServer\Modules\VirtualHostModule" />
             <module type="\TechDivision\WebServer\Modules\DirectoryModule" />
             <module type="\TechDivision\WebServer\Modules\CoreModule" />
@@ -66,11 +78,15 @@
 
         <virtualHosts/>
 
+        <authentications/>
+
         <connectionHandlers>
             <connectionHandler type="\TechDivision\Http\HttpConnectionHandler"/>
         </connectionHandlers>
         <modules>
             <!-- <module type="\TechDivision\WebServer\Modules\DeflateModule" /> -->
+            <module type="\TechDivision\WebServer\Modules\AuthenticationModule" />
+            <module type="\TechDivision\WebServer\Modules\VirtualHostModule" />
             <module type="\TechDivision\WebServer\Modules\DirectoryModule" />
             <module type="\TechDivision\WebServer\Modules\CoreModule" />
             <!-- <module type="\TechDivision\WebServer\Modules\RewriteModule" /> -->

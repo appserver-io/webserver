@@ -173,7 +173,7 @@ class AuthenticationModule implements ModuleInterface
                         $response->addHeader(HttpProtocol::HEADER_WWW_AUTHENTICATE, 'Basic realm="Test Authentication System"');
                     }
 
-                    $response->addHeader(HttpProtocol::HEADER_CONTENT_TYPE,'text/plain');
+                    $response->addHeader(HttpProtocol::HEADER_CONTENT_TYPE, 'text/plain');
                     $response->setState(HttpResponseStates::DISPATCH);
 
                 } else {

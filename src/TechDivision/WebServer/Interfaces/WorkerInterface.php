@@ -54,4 +54,14 @@ interface WorkerInterface
      * @return void
      */
     public function work();
+
+    /**
+     * Does shutdown logic for worker if something breaks in process.
+     *
+     * This shutdown function will be called from specific connection handler if an error occurs, so the connection
+     * handler can send an response in the correct protocol specifications and a new worker can be started
+     *
+     * @return void
+     */
+    public function shutdown();
 }

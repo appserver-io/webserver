@@ -116,6 +116,9 @@ class MultiThreadedServer extends \Thread implements ServerInterface
      */
     public function run()
     {
+        // set current dir to base dir for relative dirs
+        chdir(WEBSERVER_BASEDIR);
+
         // setup autoloader
         require WEBSERVER_AUTOLOADER;
 

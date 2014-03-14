@@ -1,6 +1,6 @@
 <?php
 /**
- * \TechDivision\WebServer\Modules\PhpProcess
+ * \TechDivision\WebServer\Modules\PhpProcessThread
  *
  * NOTICE OF LICENSE
  *
@@ -22,7 +22,7 @@
 namespace TechDivision\WebServer\Modules;
 
 /**
- * Class PhpProcess
+ * Class PhpProcessThread
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
@@ -32,7 +32,7 @@ namespace TechDivision\WebServer\Modules;
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/techdivision/TechDivision_WebServer
  */
-class PhpProcess
+class PhpProcessThread extends \Thread
 {
     /**
      * Hold's the headers as array
@@ -63,14 +63,14 @@ class PhpProcess
     /**
      * Run's the process
      *
-     * @param int $flags Flags how to start the process
-     *
      * @return void
      */
-    public function start($flags)
+    public function run()
     {
         // init globals to local var
         $globals = $this->globals;
+        // register shutdown handler
+        register_shutdown_function(array(&$this, "shutdown"));
         // start output buffering
         ob_start();
         // set globals
@@ -81,24 +81,20 @@ class PhpProcess
         $_COOKIE = $globals->cookie;
         //$_FILES = $globals->files;
 
-        // get current working dir for reset after processing
-        $oldCwd = getcwd();
         // change dir to be in real php process context
         chdir(dirname($this->scriptFilename));
         // reset headers sent
         appserver_set_headers_sent(false);
         // require script filename
         require $this->scriptFilename;
-        // change dir to old cwd
-        chdir($oldCwd);
     }
 
     /**
-     * Waits for the process to be finished and provides properties to be set when finished.
+     * Implements shutdown logic
      *
-     * @return bool
+     * @return void
      */
-    public function join()
+    public function shutdown()
     {
         // set headers set by script inclusion
         $this->headers = appserver_get_headers(true);

@@ -5,8 +5,12 @@ define('WEBSERVER_AUTOLOADER', WEBSERVER_BASEDIR . '../vendor/autoload.php');
 
 require WEBSERVER_AUTOLOADER;
 
-// read in configuration
-// $mainConfiguration = new \TechDivision\WebServer\MainJsonConfiguration(WEBSERVER_BASEDIR . 'etc/webserver.json');
+// set current dir to base dir for relative dirs
+chdir(WEBSERVER_BASEDIR);
+
+// read in json configuration
+//$mainConfiguration = new \TechDivision\WebServer\MainJsonConfiguration(WEBSERVER_BASEDIR . 'etc/webserver.json');
+// read in xml configuration <- just comment this in to use xml configuration
 $mainConfiguration = new \TechDivision\WebServer\MainXmlConfiguration(WEBSERVER_BASEDIR . 'etc/webserver.xml');
 
 // init server array

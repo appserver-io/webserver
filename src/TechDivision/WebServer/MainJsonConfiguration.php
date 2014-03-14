@@ -58,7 +58,7 @@ class MainJsonConfiguration
     {
         $serverConfigurations = array();
         foreach ($this->data->servers as $serverConfig) {
-            $serverConfigurations[] = new ServerConfiguration($serverConfig);
+            $serverConfigurations[] = new ServerJsonConfiguration($serverConfig);
         }
         return $serverConfigurations;
     }

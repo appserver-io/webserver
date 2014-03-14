@@ -1,10 +1,12 @@
 {
+    "description": "This is an example of a php WebServer configuration in json",
     "servers": [
         {
             "type": "\\TechDivision\\WebServer\\Servers\\MultiThreadedServer",
             "worker": "\\TechDivision\\WebServer\\Workers\\ThreadWorker",
             "socket": "\\TechDivision\\WebServer\\Sockets\\StreamSocket",
             "serverContext" : "\\TechDivision\\WebServer\\ServerContext",
+            "workerNumber": 32,
 
             "admin": "www@localhost.localdomain",
             "software": "phpWebServer/0.1.0",
@@ -13,17 +15,34 @@
             "port": "9080",
             "documentRoot" : "/var/www",
 
-            "workerNumber": 32,
+            "authentications" : [
+                {
+                    "type": "\\TechDivision\\WebServer\\Authentication\\BasicAuthentication",
+                    "pattern": "^\\/xyz.*",
+                    "file": "var/www/passwd",
+                    "username": "webserver",
+                    "password": "wURpZpgIT.w1I"
+                }
+            ],
+
+            "virtualHosts" : [
+                {
+                    "name": "phpwebserver.dev phpwebserver.local phpwebserver.test",
+                    "admin": "admin@phpwebserver.dev",
+                    "documentRoot": "var/www"
+                }
+            ],
 
             "connectionHandlers": [
                 "\\TechDivision\\Http\\HttpConnectionHandler"
             ],
 
             "modules": [
+                "\\TechDivision\\WebServer\\Modules\\AuthenticationModule",
+                "\\TechDivision\\WebServer\\Modules\\VirtualHostModule",
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",
-                "\\TechDivision\\WebServer\\Modules\\RewriteModule",
-                "\\TechDivision\\WebServer\\Modules\\DeflateModule"
+                "\\TechDivision\\WebServer\\Modules\\PhpModule"
             ],
 
             "handlers": [
@@ -38,6 +57,7 @@
             "worker": "\\TechDivision\\WebServer\\Workers\\ThreadWorker",
             "socket": "\\TechDivision\\WebServer\\Sockets\\StreamSocket",
             "serverContext" : "\\TechDivision\\WebServer\\ServerContext",
+            "workerNumber": 32,
 
             "admin": "www@localhost.localdomain",
             "software": "phpWebServer/0.1.0",
@@ -48,17 +68,33 @@
             "passphrase": "passphrase",
             "documentRoot" : "/var/www",
 
-            "workerNumber": 32,
+            "authentications" : [
+                {
+                    "type": "\\TechDivision\\WebServer\\Authentication\\BasicAuthentication",
+                    "file": "var/www/passwd",
+                    "username": "webserver",
+                    "password": "wURpZpgIT.w1I"
+                }
+            ],
+
+            "virtualHosts" : [
+                {
+                    "name": "phpwebserver.dev phpwebserver.local phpwebserver.test",
+                    "admin": "admin@phpwebserver.dev",
+                    "documentRoot": "var/www"
+                }
+            ],
 
             "connectionHandlers": [
                 "\\TechDivision\\Http\\HttpConnectionHandler"
             ],
 
             "modules": [
+                "\\TechDivision\\WebServer\\Modules\\AuthenticationModule",
+                "\\TechDivision\\WebServer\\Modules\\VirtualHostModule",
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",
-                "\\TechDivision\\WebServer\\Modules\\RewriteModule",
-                "\\TechDivision\\WebServer\\Modules\\DeflateModule"
+                "\\TechDivision\\WebServer\\Modules\\PhpModule"
             ],
 
             "handlers": [

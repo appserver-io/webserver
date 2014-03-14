@@ -97,7 +97,7 @@ class AuthenticationModule implements ModuleInterface
      */
     public function init(ServerContextInterface $serverContext)
     {
-        $this->serverContext= $serverContext;
+        $this->serverContext = $serverContext;
         $this->authentications = $serverContext->getServerConfig()->getAuthentications();
 
         // check if authentication are given
@@ -134,6 +134,7 @@ class AuthenticationModule implements ModuleInterface
         if (isset($this->authenticationTypes[$authType])) {
             // init auth type by given auth data
             $this->authenticationTypes[$authType]->init($authData);
+
             return $this->authenticationTypes[$authType];
         }
         throw new ModuleException("No auth type found for given request '$authType'", 500);
@@ -157,7 +158,11 @@ class AuthenticationModule implements ModuleInterface
         // check authentication informations if something matches
         foreach ($this->authentications as $authentication) {
             // check if pattern matches uri
-            if (preg_match('/'.$authentication["pattern"].'/', $request->getUri())) {
+            if (preg_match(
+                '/' . $authentication["pattern"] . '/',
+                $this->getServerContext()->getServerVar(ServerVars::REQUEST_URI)
+            )
+            ) {
                 // check if client sends an authentication header
                 if ($authHeader = $request->getHeader(HttpProtocol::HEADER_AUTHORIZATION)) {
                     // get auth type and content out of header
@@ -170,7 +175,10 @@ class AuthenticationModule implements ModuleInterface
                     } else {
                         $response->setStatusCode(401);
                         $response->appendBodyStream('NOK');
-                        $response->addHeader(HttpProtocol::HEADER_WWW_AUTHENTICATE, 'Basic realm="Test Authentication System"');
+                        $response->addHeader(
+                            HttpProtocol::HEADER_WWW_AUTHENTICATE,
+                            'Basic realm="Test Authentication System"'
+                        );
                     }
 
                     $response->addHeader(HttpProtocol::HEADER_CONTENT_TYPE, 'text/plain');
@@ -178,14 +186,16 @@ class AuthenticationModule implements ModuleInterface
 
                 } else {
 
-                    $response->addHeader(HttpProtocol::HEADER_WWW_AUTHENTICATE, 'Basic realm="Test Authentication System"');
+                    $response->addHeader(
+                        HttpProtocol::HEADER_WWW_AUTHENTICATE,
+                        'Basic realm="Test Authentication System"'
+                    );
                     $response->setStatusCode(401);
                     $response->setState(HttpResponseStates::DISPATCH);
                 }
 
             }
         }
-
     }
 
     /**

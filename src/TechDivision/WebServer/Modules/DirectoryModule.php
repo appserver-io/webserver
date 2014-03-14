@@ -120,7 +120,7 @@ class DirectoryModule implements ModuleInterface
         // get document root
         $documentRoot = $serverContext->getServerVar(ServerVars::DOCUMENT_ROOT);
         // get uri
-        $uri = $request->getUri();
+        $uri = $serverContext->getServerVar(ServerVars::REQUEST_URI);
         // get read path to requested uri
         $realPath = $documentRoot . $uri;
 
@@ -138,20 +138,16 @@ class DirectoryModule implements ModuleInterface
                 // check if defined index files are found in directory
                 if (file_exists($realPath . 'index.php')) {
                     // reset uri with indexed filename
-                    $request->setUri($uri . 'index.php');
-                    // update server var
                     $this->getServerContext()->setServerVar(
                         ServerVars::REQUEST_URI,
-                        $request->getUri()
+                        $uri . 'index.php'
                     );
                 }
                 if (file_exists($realPath . 'index.html')) {
                     // reset uri with indexed filename
-                    $request->setUri($uri . 'index.html');
-                    // update server var
                     $this->getServerContext()->setServerVar(
                         ServerVars::REQUEST_URI,
-                        $request->getUri()
+                        $uri . 'index.html'
                     );
                 }
             }

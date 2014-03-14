@@ -41,7 +41,6 @@ use TechDivision\WebServer\Interfaces\ModuleInterface;
  * @link       https://github.com/techdivision/TechDivision_WebServer
  *
  * TODO there currently is no possibility for internal subrequests
- * TODO A RewriteMap directive would come handy
  */
 class Module implements ModuleInterface
 {
@@ -239,8 +238,6 @@ class Module implements ModuleInterface
             // We have to set the server vars we take care of: SCRIPT_URL and SCRIPT_URI
             $this->setModuleVars($request);
 
-
-
             // Iterate over all rules, resolve vars and apply the rule (if needed)
             foreach ($this->rules as $rule) {
 
@@ -255,12 +252,11 @@ class Module implements ModuleInterface
                 $this->fillSslEnvironmentBackreferences();
                 $rule->resolve($this->serverBackreferences);
 
-
                 // Check if the rule matches, and if, apply the rule
                 if ($rule->matches()) {
 
                     // Apply the rule. If apply() returns false this means this was the last rule to process
-                    if ($rule->apply($this->serverContext, $request, $response) === false) {
+                    if ($rule->apply($this->serverContext, $response) === false) {
 
                         break;
                     }

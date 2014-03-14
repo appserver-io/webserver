@@ -173,6 +173,26 @@ class Rule
      */
     public function resolve(array $backreferences)
     {
+        // We have to resolve backreferences in three steps.
+        // First of all we have to resolve the backreferences based on the server vars
+        $this->resolveConditions($backreferences);
+
+        // Second we have to produce the regex based backreferences from the now semi-resolved conditions
+        $conditionBackreferences = $this->getBackreferences();
+
+        // Last but not least we have to resolve the conditions against the regex backreferences
+        $this->resolveConditions($conditionBackreferences);
+    }
+
+    /**
+     * Will resolve the directive's parts by substituting placeholders with the corresponding backreferences
+     *
+     * @param array $backreferences The backreferences used for resolving placeholders
+     *
+     * @return void
+     */
+    protected function resolveConditions(array $backreferences)
+    {
         // Separate the keys from the values so we can use them in str_replace
         $backreferenceHolders = array_keys($backreferences);
         $backreferenceValues = array_values($backreferences);
@@ -189,12 +209,14 @@ class Rule
                 // These are or-combined conditions but we have to resolve them too
                 foreach ($sortedCondition as $orKey => $orCombinedCondition) {
 
+                    // Resolve the condition
                     $orCombinedCondition->resolve($backreferences);
                     $this->sortedConditions[$key][$orKey] = $orCombinedCondition;
                 }
 
             } else {
 
+                // Resolve the condition
                 $sortedCondition->resolve($backreferences);
                 $this->sortedConditions[$key] = $sortedCondition;
             }
@@ -248,22 +270,25 @@ class Rule
      * Initiates the module
      *
      * @param \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext The server's context instance
-     * @param \TechDivision\Http\HttpRequestInterface                   $request       The request instance
      * @param \TechDivision\Http\HttpResponseInterface                  $response      The response instance
      *
      * @return boolean
      */
     public function apply(
         ServerContextInterface $serverContext,
-        HttpRequestInterface $request,
         HttpResponseInterface $response
     ) {
         $serverContext->setServerVar('REDIRECT_STATUS', '200');
-        $queryFreeRequestUri = str_replace(
-            $serverContext->getServerVar(ServerVars::QUERY_STRING),
-            '',
-            $serverContext->getServerVar(ServerVars::REQUEST_URI)
-        );
+        // Just make sure that you check for the existence of the query string first, as it might not be set
+        $queryFreeRequestUri = $serverContext->getServerVar(ServerVars::REQUEST_URI);
+        if ($serverContext->hasServerVar(ServerVars::QUERY_STRING)) {
+
+            $queryFreeRequestUri = str_replace(
+                '?' . $serverContext->getServerVar(ServerVars::QUERY_STRING),
+                '',
+                $queryFreeRequestUri
+            );
+        }
 
         $serverContext->setServerVar('REDIRECT_URL', $queryFreeRequestUri);
 
@@ -292,12 +317,16 @@ class Rule
 
         } else {
             // Last but not least we might have gotten a relative path (most likely)
-            // Build up the REQUEST_FILENAME from DOCUMENT_ROOT and REQUEST_URI (without the query string of course)
+            // Build up the REQUEST_FILENAME from DOCUMENT_ROOT and REQUEST_URI (without the query string)
             $serverContext->setServerVar(
                 ServerVars::SCRIPT_FILENAME,
                 $serverContext->getServerVar(ServerVars::DOCUMENT_ROOT) . DIRECTORY_SEPARATOR . $this->targetString
             );
             $serverContext->setServerVar(ServerVars::SCRIPT_NAME, $this->targetString);
+            // TODO the REQUEST_URI is the wrong thing to change, but we currently need this set
+            // TODO we have to set the QUERY_STRING for the same reason
+            $serverContext->setServerVar(ServerVars::REQUEST_URI, $this->targetString);
+            $serverContext->setServerVar(ServerVars::QUERY_STRING, substr(strstr($this->targetString, '?'), 1));
         }
 
         // If we got the "L"-flag we have to end here, so return false
@@ -313,27 +342,29 @@ class Rule
     /**
      * Will collect all backreferences based on regex typed conditions
      *
-     * @param integer $offset       The offset to count from, used so no integer based directive will be overwritten
-     * @param string  $requestedUri The requested URI as implicit part of the rule
-     *
      * @return array
      */
-    public function getBackreferences($offset, $requestedUri)
+    public function getBackreferences()
     {
+        // Iterate over all conditions and collect their backreferences
         $backreferences = array();
-        $matches = array();
-        if ($this->type === 'relative') {
+        foreach ($this->sortedConditions as $key => $sortedCondition) {
 
-            preg_match('`' . $this->pattern . '`', $requestedUri, $matches);
+            // If we got an array we have to iterate over it separately, but be aware they are or-combined
+            if (is_array($sortedCondition)) {
 
-            // Unset the first find of our backreferences, so we can use it automatically
-            unset($matches[0]);
-        }
+                // These are or-combined conditions but we have to resolve them too
+                foreach ($sortedCondition as $orCombinedCondition) {
 
-        // Iterate over all our found matches and give them a fine name
-        foreach ($matches as $key => $match) {
+                    // Get the backreferences of this condition
+                    $backreferences = array_merge($backreferences, $orCombinedCondition->getBackreferences());
+                }
 
-            $backreferences['$' . (string)($offset + $key)] = $match;
+            } else {
+
+                // Get the backreferences of this condition
+                $backreferences = array_merge($backreferences, $sortedCondition->getBackreferences());
+            }
         }
 
         return $backreferences;

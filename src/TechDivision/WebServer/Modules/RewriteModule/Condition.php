@@ -149,7 +149,9 @@ class Condition
         // Are we able to find any of the additions htaccess syntax offers?
         foreach ($this->htaccessAdditions as $addition => $realAction) {
 
-            if (strpos($this->action, $addition) !== false) {
+            // This only makes sense if the action is a short string, otherwise we might fall into the trap that
+            // any given regex might contain an addition string
+            if (strlen($this->action) <= 3 && strpos($this->action, $addition) !== false) {
 
                 // Check if we have to negate
                 if ($addition === '!') {
@@ -248,11 +250,9 @@ class Condition
     /**
      * Will collect all backreferences based on regex typed conditions
      *
-     * @param integer $offset The offset to count from, used so no integer based directive will be overwritten
-     *
      * @return array
      */
-    public function getBackreferences($offset)
+    public function getBackreferences()
     {
         $backreferences = array();
         $matches = array();
@@ -267,7 +267,7 @@ class Condition
         // Iterate over all our found matches and give them a fine name
         foreach ($matches as $key => $match) {
 
-            $backreferences['%' . (string)($offset + $key)] = $match;
+            $backreferences['$' . (string)$key] = $match;
         }
 
         return $backreferences;

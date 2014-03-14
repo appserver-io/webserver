@@ -183,7 +183,7 @@ class PhpModule implements ModuleInterface
             $this->initGlobals();
 
             // start new php process
-            $process = new PhpProcess(
+            $process = new PhpProcessThread(
                 $scriptFilename,
                 $this->globals
             );
@@ -293,12 +293,13 @@ class PhpModule implements ModuleInterface
         }
         // set cookie globals
         $globals->cookie = array();
-        // iterate all cookies and set them in globals
-        foreach (explode('; ', $request->getHeader(HttpProtocol::HEADER_COOKIE)) as $cookieLine) {
-            list ($key, $value) = explode('=', $cookieLine);
-            $globals->cookie[$key] = $value;
+        // iterate all cookies and set them in globals if exists
+        if ($cookieHeaderValue = $request->getHeader(HttpProtocol::HEADER_COOKIE)) {
+            foreach (explode('; ', $cookieHeaderValue) as $cookieLine) {
+                list ($key, $value) = explode('=', $cookieLine);
+                $globals->cookie[$key] = $value;
+            }
         }
-
         // $_FILES = $this->initFileGlobals($request);
     }
 

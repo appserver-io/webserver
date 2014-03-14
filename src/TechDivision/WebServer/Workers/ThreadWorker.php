@@ -43,13 +43,6 @@ class ThreadWorker extends \Thread implements WorkerInterface
 {
 
     /**
-     * Hold's all the connection handlers
-     *
-     * @return array
-     */
-    protected $connectionHandlers;
-
-    /**
      * Constructs the worker by setting the server context
      *
      * @param resource               $serverConnectionResource The server's file descriptor resource
@@ -61,7 +54,7 @@ class ThreadWorker extends \Thread implements WorkerInterface
         // connection context init
         $this->serverContext = $serverContext;
         // autostart worker
-        $this->start();
+        $this->start(PTHREADS_INHERIT_ALL | PTHREADS_ALLOW_HEADERS);
     }
 
     /**
@@ -75,13 +68,13 @@ class ThreadWorker extends \Thread implements WorkerInterface
     }
 
     /**
-     * Return's the connection handlers
+     * Return's the server's connection resource ref
      *
-     * @return array
+     * @return resource
      */
-    public function getConnectionHandlers()
+    protected function getServerConnectionResource()
     {
-        return $this->connectionHandlers;
+        return $this->serverConnectionResource;
     }
 
     /**
@@ -91,6 +84,8 @@ class ThreadWorker extends \Thread implements WorkerInterface
      */
     public function run()
     {
+        // set current dir to base dir for relative dirs
+        chdir(WEBSERVER_BASEDIR);
         // setup environment for worker
         require WEBSERVER_AUTOLOADER;
         // do work
@@ -107,9 +102,6 @@ class ThreadWorker extends \Thread implements WorkerInterface
      */
     public function work()
     {
-        // register shutdown handler
-        register_shutdown_function(array(&$this, "shutdown"));
-
         // get server context
         $serverContext = $this->getServerContext();
 
@@ -156,7 +148,7 @@ class ThreadWorker extends \Thread implements WorkerInterface
             // iterate all connection handlers to handle connection right
             foreach ($connectionHandlers as $connectionHandler) {
                 // if connectionHandler handled connection than break out of foreach
-                if ($connectionHandler->handle($connection)) {
+                if ($connectionHandler->handle($connection, $this)) {
                     break;
                 }
             }
@@ -166,12 +158,16 @@ class ThreadWorker extends \Thread implements WorkerInterface
     }
 
     /**
-     * Does shutdown logic for worker if something breaks in process
+     * Does shutdown logic for worker if something breaks in process.
+     *
+     * This shutdown function will be called from specific connection handler if an error occurs, so the connection
+     * handler can send an response in the correct protocol specifications and a new worker can be started
      *
      * @return void
      */
     public function shutdown()
     {
-        // do shutdown logic
+        // start new thread worker before shutdown
+        new ThreadWorker($this->getServerConnectionResource(), $this->getServerContext());
     }
 }

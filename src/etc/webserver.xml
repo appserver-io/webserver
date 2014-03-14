@@ -14,7 +14,7 @@
             <param name="transport" type="string">tcp</param>
             <param name="address" type="string">127.0.0.1</param>
             <param name="port" type="integer">9080</param>
-            <param name="workerNumber" type="integer">64</param>
+            <param name="workerNumber" type="integer">128</param>
             <param name="documentRoot" type="string">/var/www</param>
         </params>
 
@@ -30,10 +30,11 @@
         </authentications>
 
         <virtualHosts>
-            <virtualHost name="neos.dev neos.local neos.test">
+            <virtualHost name="phpwebserver.dev phpwebserver.local phpwebserver.test">
                 <params>
-                    <param name="admin" type="string">www@neos.dev</param>
-                    <param name="documentRoot" type="string">/var/www/neos/Web</param>
+                    <param name="admin" type="string">admin@phpwebserver.dev</param>
+                    <!-- Note: it's intended to use a relative path to get content from webservers basedir/var/www -->
+                    <param name="documentRoot" type="string">var/www</param>
                 </params>
             </virtualHost>
         </virtualHosts>
@@ -67,7 +68,7 @@
         <params>
             <param name="admin" type="string">www@localhost.localdomain</param>
             <param name="software" type="string">phpWebServer/0.1.0</param>
-            <param name="workerNumber" type="integer">64</param>
+            <param name="workerNumber" type="integer">128</param>
             <param name="transport" type="string">ssl</param>
             <param name="address" type="string">127.0.0.1</param>
             <param name="port" type="integer">9443</param>

@@ -50,9 +50,20 @@ interface ConnectionHandlerInterface
      * Handles the connection with the connected client in a proper way the given
      * protocol type and version expects for example.
      *
-     * @param \TechDivision\WebServer\Sockets\SocketInterface $connection The connection to handle
+     * @param \TechDivision\WebServer\Sockets\SocketInterface    $connection The connection to handle
+     * @param \TechDivision\WebServer\Interfaces\WorkerInterface $worker     The worker how started this handle
      *
      * @return bool Weather it was responsible to handle the firstLine or not.
      */
-    public function handle(SocketInterface $connection);
+    public function handle(SocketInterface $connection, WorkerInterface $worker);
+
+    /**
+     * Does shutdown logic for worker if something breaks in process
+     *
+     * @param \TechDivision\WebServer\Sockets\SocketInterface    $connection The connection to handle
+     * @param \TechDivision\WebServer\Interfaces\WorkerInterface $worker     The worker reference how called this
+     *
+     * @return void
+     */
+    public function shutdown(SocketInterface $connection, WorkerInterface $worker);
 }

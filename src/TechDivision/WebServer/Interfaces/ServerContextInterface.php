@@ -54,29 +54,6 @@ interface ServerContextInterface
     public function getServerConfig();
 
     /**
-     * Return's the server connection instance
-     *
-     * @param resource $connectionResource The socket resource
-     *
-     * @return SocketInterface The server connection instance
-     */
-    public function getConnectionInstance($connectionResource);
-
-    /**
-     * Return's an array of pre init modules instances
-     *
-     * @return array
-     */
-    public function getModules();
-
-    /**
-     * Return's an array of pre init connection handler instances
-     *
-     * @return array
-     */
-    public function getConnectionHandlers();
-
-    /**
      * Set's a value to specific server var
      *
      * @param string $serverVar The server var to set

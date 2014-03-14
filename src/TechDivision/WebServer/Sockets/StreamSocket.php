@@ -50,6 +50,13 @@ class StreamSocket implements SocketInterface
     protected $connectionResourceId;
 
     /**
+     * Hold's the peername of the client who connected
+     *
+     * @var string
+     */
+    protected $connectionPeername;
+
+    /**
      * Creates a stream socket server and returns a instance of Stream implementation with server socket in it.
      *
      * @param string   $socket  The address incl. transport the server should be listening to. For example 0.0.0.0:8080
@@ -103,10 +110,12 @@ class StreamSocket implements SocketInterface
      */
     public function accept($acceptTimeout = 120, $receiveTimeout = 10)
     {
-        $connectionResource = stream_socket_accept($this->getConnectionResource(), $acceptTimeout);
+        $connectionResource = stream_socket_accept($this->getConnectionResource(), $acceptTimeout, $peername);
         // set timeout for read data fom client
         stream_set_timeout($connectionResource, $receiveTimeout);
-        return $this->getInstance($connectionResource);
+        $connection = $this->getInstance($connectionResource);
+        $connection->setPeername($peername);
+        return $connection;
 
     }
 
@@ -206,6 +215,28 @@ class StreamSocket implements SocketInterface
     {
         $this->connectionResourceId = (int)$connectionResource;
         $this->connectionResource = $connectionResource;
+    }
+
+    /**
+     * Set's the peername
+     *
+     * @param string $peername The peername in format ip:port
+     *
+     * @return void
+     */
+    public function setPeername($peername)
+    {
+        $this->connectionPeername = $peername;
+    }
+
+    /**
+     * Return's the peername in format ip:port (e.g. 10.20.30.40:57128)
+     *
+     * @return string
+     */
+    public function getPeername()
+    {
+        return $this->connectionPeername;
     }
 
     /**

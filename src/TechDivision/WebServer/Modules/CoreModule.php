@@ -90,6 +90,7 @@ class CoreModule implements ModuleInterface
             $validDir = null;
             $scriptName = null;
 
+            // todo: only if file extension hits a filehandle info it will be possible to set path info etc...
             // iterate through all dirs beginning at 1 because 0 is always empty in this case
             for ($i = 1; $i < count($pathParts); ++$i) {
                 // check if no script name was found yet
@@ -106,6 +107,8 @@ class CoreModule implements ModuleInterface
                         }
                         // at this point it's def. an existing file in an existing dir. our script name
                         $scriptName = $possibleValidPath;
+                        // set special server var for existing file for that request
+                        $serverContext->setServerVar(ServerVars::REQUEST_FILENAME, $scriptName);
                     } else {
                         $validDir = $possibleValidPath;
                     }
@@ -158,6 +161,7 @@ class CoreModule implements ModuleInterface
                         ServerVars::SERVER_HANDLER,
                         $handlers['.' . $possibleValidPathExtension]
                     );
+
                     // go out and let other modules process this request
                     return;
                 }

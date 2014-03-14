@@ -114,7 +114,7 @@ interface ServerConfigurationInterface
     /**
      * Return's modules
      *
-     * @return string
+     * @return array
      */
     public function getModules();
 
@@ -131,6 +131,13 @@ interface ServerConfigurationInterface
      * @return array
      */
     public function getVirtualHosts();
+
+    /**
+     * Return's the authentications
+     *
+     * @return array
+     */
+    public function getAuthentications();
 
     /**
      * Return's handlers

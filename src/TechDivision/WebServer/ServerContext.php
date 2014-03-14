@@ -62,20 +62,6 @@ class ServerContext implements ServerContextInterface
     protected $serverConfig;
 
     /**
-     * Hold's an array of modules defined in config
-     *
-     * @var array
-     */
-    protected $modules = array();
-
-    /**
-     * Hold's an array of connection handlers defined in config
-     *
-     * @var array
-     */
-    protected $connectionHandlers = array();
-
-    /**
      * Initialises the server context
      *
      * @param \TechDivision\WebServer\Interfaces\ServerConfigurationInterface $serverConfig The servers configuration
@@ -89,32 +75,6 @@ class ServerContext implements ServerContextInterface
 
         // init server vars
         $this->initServerVars();
-
-        // initiate server connection handlers
-        $connectionHandlers = $this->getServerConfig()->getConnectionHandlers();
-        foreach ($connectionHandlers as $connectionHandlerType) {
-            // check if conenction handler type exists
-            if (!class_exists($connectionHandlerType)) {
-                throw new ConnectionHandlerNotFoundException($connectionHandlerType);
-            }
-            // instantiate connection handler type
-            $this->connectionHandlers[$connectionHandlerType] = new $connectionHandlerType();
-            // init connection handler with serverContext (this)
-            $this->connectionHandlers[$connectionHandlerType]->init($this);
-        }
-
-        // initiate server modules
-        $modules = $this->getServerConfig()->getModules();
-        foreach ($modules as $moduleType) {
-            // check if module type exists
-            if (!class_exists($moduleType)) {
-                throw new ModuleNotFoundException($moduleType);
-            }
-            // instantiate module type
-            $this->modules[$moduleType] = new $moduleType();
-            // init module with serverContext (this)
-            $this->modules[$moduleType]->init($this);
-        }
     }
 
     /**
@@ -138,26 +98,6 @@ class ServerContext implements ServerContextInterface
     {
         $socketType = $this->getServerConfig()->getSocketType();
         return $socketType::getInstance($connectionResource);
-    }
-
-    /**
-     * Return's an array of modules
-     *
-     * @return array
-     */
-    public function getModules()
-    {
-        return $this->modules;
-    }
-
-    /**
-     * Return's an array of pre init connection handler instances
-     *
-     * @return array
-     */
-    public function getConnectionHandlers()
-    {
-        return $this->connectionHandlers;
     }
 
     /**
@@ -212,7 +152,7 @@ class ServerContext implements ServerContextInterface
             return $this->serverVars[$serverVar];
         }
         // throw exception
-        throw new ServerException("Server var '$serverVar'' does not exist.");
+        throw new ServerException("Server var '$serverVar'' does not exist.", 500);
     }
 
     /**
@@ -256,7 +196,7 @@ class ServerContext implements ServerContextInterface
         $this->serverVars = array(
             ServerVars::DOCUMENT_ROOT => $this->getServerConfig()->getDocumentRoot(),
             ServerVars::SERVER_ADMIN => $this->getServerConfig()->getAdmin(),
-            ServerVars::SERVER_NAME => $serverAddress, //todo: implement vhost in config and default name (ip or localhost)
+            ServerVars::SERVER_NAME => $serverAddress,
             ServerVars::SERVER_ADDR => $serverAddress,
             ServerVars::SERVER_PORT => $serverPort,
             ServerVars::GATEWAY_INTERFACE => "PHP/" . PHP_VERSION,

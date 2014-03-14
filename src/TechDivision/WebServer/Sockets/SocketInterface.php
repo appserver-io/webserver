@@ -123,4 +123,11 @@ interface SocketInterface
      * @return mixed
      */
     public function getConnectionResource();
+
+    /**
+     * Return's the peername in format ip:port (e.g. 10.20.30.40:57128)
+     *
+     * @return string
+     */
+    public function getPeername();
 }

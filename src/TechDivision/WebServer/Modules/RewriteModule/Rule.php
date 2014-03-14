@@ -20,6 +20,13 @@
 
 namespace TechDivision\WebServer\Modules\RewriteModule;
 
+use TechDivision\Http\HttpProtocol;
+use TechDivision\Http\HttpRequestInterface;
+use TechDivision\Http\HttpResponseInterface;
+use TechDivision\Http\HttpResponseStates;
+use TechDivision\WebServer\Dictionaries\ServerVars;
+use TechDivision\WebServer\Interfaces\ServerContextInterface;
+
 /**
  * TechDivision\WebServer\Modules\RewriteModule\Rule
  *
@@ -36,6 +43,20 @@ namespace TechDivision\WebServer\Modules\RewriteModule;
  */
 class Rule
 {
+    /**
+     * The allowed values the $type member my assume
+     *
+     * @var array $allowedTypes
+     */
+    protected $allowedTypes = array();
+
+    /**
+     * The type of rule we have. This might be "relative", "absolute" or "url"
+     *
+     * @var string $type
+     */
+    protected $type;
+
     /**
      * The condition string
      *
@@ -99,6 +120,9 @@ class Rule
         $this->targetString = $targetString;
         $this->flagString = $flagString;
 
+        // Set our default values here
+        $this->allowedTypes = array('relative', 'absolute', 'url');
+
         // filter the condition string using our regex, but first of all we will append the default operand
         $conditionPieces = array();
         preg_match_all('`(.*?)@(\$[0-9a-zA-Z_]+)`', $conditionString, $conditionPieces);
@@ -110,7 +134,7 @@ class Rule
         $conditionOperands = $conditionPieces[2];
 
         // Iterate over the condition piece arrays, trim them and build our array of sorted condition objects
-        for ($i = 0; $i < count($conditionActions); $i ++) {
+        for ($i = 0; $i < count($conditionActions); $i++) {
 
             // Trim whatever we got here as the string might be a bit dirty
             $actionString = trim($conditionActions[$i], '\||,');
@@ -155,6 +179,26 @@ class Rule
 
         // Substitute the backreferences in our operation
         $this->targetString = str_replace($backreferenceHolders, $backreferenceValues, $this->targetString);
+
+        // Iterate over all conditions and resolve them too
+        foreach ($this->sortedConditions as $key => $sortedCondition) {
+
+            // If we got an array we have to iterate over it separately, but be aware they are or-combined
+            if (is_array($sortedCondition)) {
+
+                // These are or-combined conditions but we have to resolve them too
+                foreach ($sortedCondition as $orKey => $orCombinedCondition) {
+
+                    $orCombinedCondition->resolve($backreferences);
+                    $this->sortedConditions[$key][$orKey] = $orCombinedCondition;
+                }
+
+            } else {
+
+                $sortedCondition->resolve($backreferences);
+                $this->sortedConditions[$key] = $sortedCondition;
+            }
+        }
     }
 
     /**
@@ -197,6 +241,72 @@ class Rule
         }
 
         // We are still here, this sounds good
+        return true;
+    }
+
+    /**
+     * Initiates the module
+     *
+     * @param \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext The server's context instance
+     * @param \TechDivision\Http\HttpRequestInterface                   $request       The request instance
+     * @param \TechDivision\Http\HttpResponseInterface                  $response      The response instance
+     *
+     * @return boolean
+     */
+    public function apply(
+        ServerContextInterface $serverContext,
+        HttpRequestInterface $request,
+        HttpResponseInterface $response
+    ) {
+        $serverContext->setServerVar('REDIRECT_STATUS', '200');
+        $queryFreeRequestUri = str_replace(
+            $serverContext->getServerVar(ServerVars::QUERY_STRING),
+            '',
+            $serverContext->getServerVar(ServerVars::REQUEST_URI)
+        );
+
+        $serverContext->setServerVar('REDIRECT_URL', $queryFreeRequestUri);
+
+        // Back to our rule...
+        // We have to find out what type of rule we got here
+        if (is_readable($this->targetString)) {
+
+            // We have an absolute file path!
+            $this->type = 'absolute';
+
+            // Set the REQUEST_FILENAME path
+            $serverContext->setServerVar(ServerVars::REQUEST_FILENAME, $this->targetString);
+
+        } elseif (filter_var($this->targetString, FILTER_VALIDATE_URL) && strpos($this->flagString, 'R') !== false) {
+            // We were passed a valid URL and should redirect to it
+            // TODO implement better flag handling
+
+            $serverContext->setServerVar('REDIRECT_URL', $this->targetString);
+
+            // set enhance uri to response
+            $response->addHeader(HttpProtocol::HEADER_LOCATION, $this->targetString);
+            // send redirect status
+            $response->setStatusCode(301);
+            // set response state to be dispatched after this without calling other modules process
+            $response->setState(HttpResponseStates::DISPATCH);
+
+        } else {
+            // Last but not least we might have gotten a relative path (most likely)
+            // Build up the REQUEST_FILENAME from DOCUMENT_ROOT and REQUEST_URI (without the query string of course)
+            $serverContext->setServerVar(
+                ServerVars::SCRIPT_FILENAME,
+                $serverContext->getServerVar(ServerVars::DOCUMENT_ROOT) . DIRECTORY_SEPARATOR . $this->targetString
+            );
+            $serverContext->setServerVar(ServerVars::SCRIPT_NAME, $this->targetString);
+        }
+
+        // If we got the "L"-flag we have to end here, so return false
+        if (strpos($this->flagString, 'L') !== false) {
+
+            return false;
+        }
+
+        // Still here? That sounds good
         return true;
     }
 

@@ -51,22 +51,12 @@
             <connectionHandler type="\TechDivision\Http\HttpConnectionHandler"/>
         </connectionHandlers>
         <modules>
-<<<<<<< HEAD
+            <module type="\TechDivision\WebServer\Modules\AuthenticationModule" />
             <module type="\TechDivision\WebServer\Modules\VirtualHostModule"/>
             <module type="\TechDivision\WebServer\Modules\RewriteModule\Module"/>
             <module type="\TechDivision\WebServer\Modules\DirectoryModule"/>
             <module type="\TechDivision\WebServer\Modules\CoreModule"/>
             <module type="\TechDivision\WebServer\Modules\PhpModule"/>
-=======
-            <!-- <module type="\TechDivision\WebServer\Modules\DeflateModule" /> -->
-            <module type="\TechDivision\WebServer\Modules\AuthenticationModule" />
-            <module type="\TechDivision\WebServer\Modules\VirtualHostModule" />
-            <module type="\TechDivision\WebServer\Modules\DirectoryModule" />
-            <module type="\TechDivision\WebServer\Modules\CoreModule" />
-            <!-- <module type="\TechDivision\WebServer\Modules\RewriteModule" /> -->
-            <module type="\TechDivision\WebServer\Modules\PhpModule" />
->>>>>>> e6cb5dcb47696e62b6c0103978841bdbe0d47c52
-
         </modules>
         <handlers>
             <handler name="php" extension=".php"/>
@@ -93,31 +83,20 @@
             <param name="documentRoot" type="string">/var/www</param>
         </params>
 
-<<<<<<< HEAD
-=======
         <virtualHosts/>
 
         <authentications/>
 
->>>>>>> e6cb5dcb47696e62b6c0103978841bdbe0d47c52
         <connectionHandlers>
             <connectionHandler type="\TechDivision\Http\HttpConnectionHandler"/>
         </connectionHandlers>
         <modules>
-<<<<<<< HEAD
+            <module type="\TechDivision\WebServer\Modules\AuthenticationModule" />
+            <module type="\TechDivision\WebServer\Modules\VirtualHostModule"/>
             <module type="\TechDivision\WebServer\Modules\RewriteModule\Module"/>
             <module type="\TechDivision\WebServer\Modules\DirectoryModule"/>
             <module type="\TechDivision\WebServer\Modules\CoreModule"/>
             <module type="\TechDivision\WebServer\Modules\PhpModule"/>
-=======
-            <!-- <module type="\TechDivision\WebServer\Modules\DeflateModule" /> -->
-            <module type="\TechDivision\WebServer\Modules\AuthenticationModule" />
-            <module type="\TechDivision\WebServer\Modules\VirtualHostModule" />
-            <module type="\TechDivision\WebServer\Modules\DirectoryModule" />
-            <module type="\TechDivision\WebServer\Modules\CoreModule" />
-            <!-- <module type="\TechDivision\WebServer\Modules\RewriteModule" /> -->
-            <module type="\TechDivision\WebServer\Modules\PhpModule" />
->>>>>>> e6cb5dcb47696e62b6c0103978841bdbe0d47c52
         </modules>
         <handlers>
             <handler name="php" extension=".php"/>

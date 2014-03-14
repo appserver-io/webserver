@@ -277,7 +277,7 @@ class PhpModule implements ModuleInterface
         $globals->request = $request->getParams();
 
         // init post / get. default init vars as GET method case
-        if ($request->getMethod() === HttpProtocol::METHOD_GET) {
+        if ($this->getServerContext()->getServerVar(ServerVars::REQUEST_METHOD) === HttpProtocol::METHOD_GET) {
             // clear post array
             $globals->post = array();
             // set all params to get
@@ -288,7 +288,7 @@ class PhpModule implements ModuleInterface
             // set params to post
             $globals->post = $request->getParams();
             // set params given in query string to get
-            parse_str($request->getQueryString(), $getArray);
+            parse_str($this->getServerContext()->getServerVar(ServerVars::QUERY_STRING), $getArray);
             $globals->get = $getArray;
         }
         // set cookie globals

@@ -287,9 +287,12 @@ class PhpModule implements ModuleInterface
         if ($request->getMethod() === HttpProtocol::METHOD_POST) {
             // set params to post
             $globals->post = $request->getParams();
-            // set params given in query string to get
-            parse_str($this->getServerContext()->getServerVar(ServerVars::QUERY_STRING), $getArray);
-            $globals->get = $getArray;
+            $globals->get = array();
+            // set params given in query string to get if query string exists
+            if ($this->getServerContext()->hasServerVar(ServerVars::QUERY_STRING)) {
+                parse_str($this->getServerContext()->getServerVar(ServerVars::QUERY_STRING), $getArray);
+                $globals->get = $getArray;
+            }
         }
         // set cookie globals
         $globals->cookie = array();

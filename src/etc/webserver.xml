@@ -47,7 +47,7 @@
         </virtualHosts>
 
         <rewrites>
-            <rewrite condition="-f|-l|-d@$REQUEST_FILENAME" target="" flag="L"/>
+            <rewrite condition="-f|-l|-d" target="" flag="L"/>
             <rewrite condition="(.+)([/\?].+)" target="$1.do$2" flag="L"/>
             <rewrite condition="(.+)" target="$1.do" flag=""/>
         </rewrites>

@@ -45,13 +45,13 @@
                 </params>
             </virtualHost>
         </virtualHosts>
-
+<!--
         <rewrites>
             <rewrite condition="-f|-l|-d" target="" flag="L"/>
             <rewrite condition="(.+)([/\?].+)" target="$1.do$2" flag="L"/>
             <rewrite condition="(.+)" target="$1.do" flag=""/>
         </rewrites>
-
+-->
         <connectionHandlers>
             <connectionHandler type="\TechDivision\Http\HttpConnectionHandler"/>
         </connectionHandlers>

@@ -51,10 +51,16 @@ interface AuthenticationInterface
     /**
      * Try to authenticate
      *
-     * @param string $username The username to match auth for
-     * @param string $password The password to match auth for
+     * @param array $credentialData The credential data the auth implementation expects
      *
      * @return bool If auth was successful return true if no false will be returned
      */
-    public function auth($username, $password);
+    public function auth(array $credentialData);
+
+    /**
+     * Return's the authentication type token to compare with request header
+     *
+     * @return string
+     */
+    public function getType();
 }

@@ -124,7 +124,7 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
                 $paramName = (string)$paramNode->attributes()->name;
                 $params[$paramName] = (string)array_shift($authenticationNode->xpath(".//param[@name='$paramName']"));
             }
-            $this->authentications[(string)$authenticationNode->attributes()->type] = $params;
+            $this->authentications[(string)$authenticationNode->attributes()->uri] = $params;
         }
     }
 

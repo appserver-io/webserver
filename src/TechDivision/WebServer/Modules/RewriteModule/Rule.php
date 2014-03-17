@@ -293,42 +293,50 @@ class Rule
         $serverContext->setServerVar('REDIRECT_URL', $queryFreeRequestUri);
 
         // Back to our rule...
-        // We have to find out what type of rule we got here
-        if (is_readable($this->targetString)) {
+        // If the target string is empty we do not have to do anything
+        if (!empty($this->targetString)) {
 
-            // We have an absolute file path!
-            $this->type = 'absolute';
+            // We have to find out what type of rule we got here
+            if (is_readable($this->targetString)) {
 
-            // Set the REQUEST_FILENAME path
-            $serverContext->setServerVar(ServerVars::REQUEST_FILENAME, $this->targetString);
+                // We have an absolute file path!
+                $this->type = 'absolute';
 
-        } elseif (filter_var($this->targetString, FILTER_VALIDATE_URL) && strpos($this->flagString, 'R') !== false) {
-            // We were passed a valid URL and should redirect to it
-            // TODO implement better flag handling
+                // Set the REQUEST_FILENAME path
+                $serverContext->setServerVar(ServerVars::REQUEST_FILENAME, $this->targetString);
 
-            $serverContext->setServerVar('REDIRECT_URL', $this->targetString);
+            } elseif (filter_var($this->targetString, FILTER_VALIDATE_URL) && strpos(
+                $this->flagString,
+                'R'
+            ) !== false
+            ) {
+                // We were passed a valid URL and should redirect to it
+                // TODO implement better flag handling
 
-            // set enhance uri to response
-            $response->addHeader(HttpProtocol::HEADER_LOCATION, $this->targetString);
-            // send redirect status
-            $response->setStatusCode(301);
-            // set response state to be dispatched after this without calling other modules process
-            $response->setState(HttpResponseStates::DISPATCH);
+                $serverContext->setServerVar('REDIRECT_URL', $this->targetString);
 
-        } else {
-            // Last but not least we might have gotten a relative path (most likely)
-            // Build up the REQUEST_FILENAME from DOCUMENT_ROOT and REQUEST_URI (without the query string)
-            $serverContext->setServerVar(
-                ServerVars::SCRIPT_FILENAME,
-                $serverContext->getServerVar(ServerVars::DOCUMENT_ROOT) . DIRECTORY_SEPARATOR . $this->targetString
-            );
-            $serverContext->setServerVar(ServerVars::SCRIPT_NAME, $this->targetString);
-            // TODO the REQUEST_URI is the wrong thing to change, but we currently need this set
-            // TODO we have to set the QUERY_STRING for the same reason
-            $serverContext->setServerVar(ServerVars::REQUEST_URI, $this->targetString);
-            $serverContext->setServerVar(ServerVars::QUERY_STRING, substr(strstr($this->targetString, '?'), 1));
+                // set enhance uri to response
+                $response->addHeader(HttpProtocol::HEADER_LOCATION, $this->targetString);
+                // send redirect status
+                $response->setStatusCode(301);
+                // set response state to be dispatched after this without calling other modules process
+                $response->setState(HttpResponseStates::DISPATCH);
+
+            } else {
+                // Last but not least we might have gotten a relative path (most likely)
+                // Build up the REQUEST_FILENAME from DOCUMENT_ROOT and REQUEST_URI (without the query string)
+                $serverContext->setServerVar(
+                    ServerVars::SCRIPT_FILENAME,
+                    $serverContext->getServerVar(ServerVars::DOCUMENT_ROOT) . DIRECTORY_SEPARATOR . $this->targetString
+                );
+                $serverContext->setServerVar(ServerVars::SCRIPT_NAME, $this->targetString);
+                $serverContext->setServerVar('REDIRECT_QUERY_STRING', substr(strstr($this->targetString, '?'), 1));
+                // TODO the REQUEST_URI is the wrong thing to change, but we currently need this set
+                // TODO we have to set the QUERY_STRING for the same reason
+                $serverContext->setServerVar(ServerVars::REQUEST_URI, $this->targetString);
+                $serverContext->setServerVar(ServerVars::QUERY_STRING, substr(strstr($this->targetString, '?'), 1));
+            }
         }
-
         // If we got the "L"-flag we have to end here, so return false
         if (strpos($this->flagString, 'L') !== false) {
 

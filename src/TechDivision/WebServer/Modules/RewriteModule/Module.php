@@ -138,9 +138,8 @@ class Module implements ModuleInterface
         // We have to throw a ModuleException on failure, so surround the body with a try...catch block
         try {
 
-            // Prefill the backreferences we got from server context
+            // Save the server context for later re-use
             $this->serverContext = $serverContext;
-            $this->fillContextBackreferences();
 
             // Get the rules as the array they are within the config
             // We might not even get anything, so prepare our rules accordingly
@@ -231,9 +230,12 @@ class Module implements ModuleInterface
      * @throws \TechDivision\WebServer\Exceptions\ModuleException
      */
     public function process(HttpRequestInterface $request, HttpResponseInterface $response)
-    {
+    {error_log(var_export($this->serverContext->getServerVars(), true));
         // We have to throw a ModuleException on failure, so surround the body with a try...catch block
         try {
+
+            // Reset the $serverBackreferences array to avoid mixups of different requests
+            $this->serverBackreferences = array();
 
             // We have to set the server vars we take care of: SCRIPT_URL and SCRIPT_URI
             $this->setModuleVars($request);

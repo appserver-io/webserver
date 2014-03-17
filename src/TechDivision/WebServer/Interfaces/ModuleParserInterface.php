@@ -21,9 +21,9 @@
 namespace TechDivision\WebServer\Interfaces;
 
 /**
- * TechDivision\WebServer\Interfaces\ConfigParserInterface
+ * TechDivision\WebServer\Interfaces\ModuleParserInterface
  *
- * <TODO CLASS DESCRIPTION>
+ * Interface for module parsers
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
@@ -34,7 +34,7 @@ namespace TechDivision\WebServer\Interfaces;
  *             Open Software License (OSL 3.0)
  * @link       http://www.techdivision.com/
  */
-interface ConfigParserInterface
+interface ModuleParserInterface
 {
     /**
      * Will return the type of the configuration as the parser might encounter different configuration types
@@ -49,7 +49,7 @@ interface ConfigParserInterface
      * @param string $documentRoot The servers document root as a fallback
      * @param string $requestedUri The requested uri
      *
-     * @return \TechDivision\WebServer\ConfigParser\Config
+     * @return \TechDivision\WebServer\Modules\Parser\Config
      */
     public function getConfigForFile($documentRoot, $requestedUri);
 }

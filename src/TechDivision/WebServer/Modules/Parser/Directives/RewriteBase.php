@@ -10,7 +10,7 @@
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
- * @subpackage ConfigParser
+ * @subpackage Modules
  * @author     Bernhard Wick <b.wick@techdivision.com>
  * @copyright  2014 TechDivision GmbH - <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php
@@ -18,41 +18,41 @@
  * @link       http://www.techdivision.com/
  */
 
-namespace TechDivision\WebServer\ConfigParser\Directives;
+namespace TechDivision\WebServer\Modules\Parser\Directives;
 
 use TechDivision\WebServer\Interfaces\DirectiveInterface;
 
 /**
- * TechDivision\WebServer\ConfigParser\Directives\RewriteEngine
+ * TechDivision\WebServer\Modules\Parser\Directives\RewriteBase
  *
- * The RewriteEngine directive
+ * Class which contains the RewriteBase directive used in directory based rewrite rules
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
- * @subpackage ConfigParser
+ * @subpackage Modules
  * @author     Bernhard Wick <b.wick@techdivision.com>
  * @copyright  2014 TechDivision GmbH - <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php
  *             Open Software License (OSL 3.0)
  * @link       http://www.techdivision.com/
  */
-class RewriteEngine implements DirectiveInterface
+class RewriteBase implements DirectiveInterface
 {
     /**
-     * Status to set the rewrite engine to. Can be either "on" or "off".
+     * The url which builds up the rewrite base
      *
-     * @var string $status
+     * @var string $urlPath
      */
-    protected $status;
+    protected $urlPath;
 
     /**
      * Default constructor
      *
-     * @param string|null $status Status of the rewrite engine, might be "on" or "off"
+     * @param string|null $urlPath The url which builds up the rewrite base
      */
-    public function __construct($status = null)
+    public function __construct($urlPath = null)
     {
-        $this->status = $status;
+        $this->urlPath = $urlPath;
     }
 
     /**
@@ -62,27 +62,27 @@ class RewriteEngine implements DirectiveInterface
      */
     public function __tostring()
     {
-        if (is_null($this->getStatus())) {
+        if (is_null($this->getUrlPath())) {
 
             return '';
         }
 
-        return $this->getStatus();
+        return $this->getUrlPath();
     }
 
     /**
-     * Getter for the $status member
+     * Getter for the url path of our rewrite base
      *
-     * @return string|null
+     * @return null|string
      */
-    public function getStatus()
+    public function getUrlPath()
     {
-        return $this->status;
+        return $this->urlPath;
     }
 
     /**
      * Will fill an empty directive object with vital information delivered via an array.
-     * This is mostly useful as an interface for different parsers.
+     * This is mostly useful as an interface for different parsers
      *
      * @param array $parts The array to extract information from
      *
@@ -97,24 +97,7 @@ class RewriteEngine implements DirectiveInterface
             throw new \InvalidArgumentException('Could not process line ' . implode($parts, ' '));
         }
 
-        // Fill the status
-        $this->status = $parts[1];
-    }
-
-    /**
-     * Will return true if the rewrite engine is set to on and false if not.
-     *
-     * @return boolean
-     */
-    public function isOn()
-    {
-        if ($this->status === 'on') {
-
-            return true;
-
-        } else {
-
-            return false;
-        }
+        // Fill the url
+        $this->urlPath = $parts[1];
     }
 }

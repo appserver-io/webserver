@@ -10,7 +10,7 @@
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
- * @subpackage ConfigParser
+ * @subpackage Modules
  * @author     Bernhard Wick <b.wick@techdivision.com>
  * @copyright  2014 TechDivision GmbH - <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php
@@ -18,24 +18,26 @@
  * @link       http://www.techdivision.com/
  */
 
-namespace TechDivision\WebServer\ConfigParser;
+namespace TechDivision\WebServer\Modules\Parser;
+
+use TechDivision\WebServer\Interfaces\ModuleParserInterface;
 
 /**
- * TechDivision\WebServer\ConfigParser\HtaccessParser
+ * TechDivision\WebServer\Modules\Parser\HtaccessParser
  *
  * This class provides a very basic htaccess parser which is able to extract several htaccess specific
  * directives.
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
- * @subpackage ConfigParser
+ * @subpackage Modules
  * @author     Bernhard Wick <b.wick@techdivision.com>
  * @copyright  2014 TechDivision GmbH - <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php
  *             Open Software License (OSL 3.0)
  * @link       http://www.techdivision.com/
  */
-class HtaccessParser extends AbstractParser
+class HtaccessParser implements ModuleParserInterface
 {
     /**
      * The type of configuration we can parse

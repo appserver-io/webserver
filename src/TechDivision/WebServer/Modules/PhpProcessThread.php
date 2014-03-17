@@ -49,6 +49,13 @@ class PhpProcessThread extends \Thread
     public $outputBuffer;
 
     /**
+     * Hold's last error information as array
+     *
+     * @var array
+     */
+    public $lastError;
+
+    /**
      * Constructs the process
      *
      * @param string                                     $scriptFilename The script filename to execute
@@ -87,6 +94,8 @@ class PhpProcessThread extends \Thread
         appserver_set_headers_sent(false);
         // require script filename
         require $this->scriptFilename;
+        // save last error
+        $this->lastError = error_get_last();
     }
 
     /**
@@ -96,10 +105,20 @@ class PhpProcessThread extends \Thread
      */
     public function shutdown()
     {
+        // save last error
+        $this->lastError = error_get_last();
+        // get php output buffer
+        if (strlen($outputBuffer = ob_get_clean()) === 0) {
+            if ($this->lastError['type'] == 1) {
+                $errorMessage = 'PHP Fatal error: ' . $this->lastError['message'] .
+                    ' in ' . $this->lastError['file'] . ' on line ' . $this->lastError['line'];
+            }
+            $outputBuffer = $errorMessage;
+        }
         // set headers set by script inclusion
         $this->headers = appserver_get_headers(true);
         // set output buffer set by script inclusion
-        $this->outputBuffer = ob_get_clean();
+        $this->outputBuffer = $outputBuffer;
     }
 
     /**
@@ -120,5 +139,16 @@ class PhpProcessThread extends \Thread
     public function getHeaders()
     {
         return $this->headers;
+    }
+
+    /**
+     * Return's last error informations as array got from function error_get_last()
+     *
+     * @return array
+     * @see error_get_last()
+     */
+    public function getLastError()
+    {
+        return $this->lastError;
     }
 }

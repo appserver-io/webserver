@@ -134,6 +134,16 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     }
 
     /**
+     * Return's admin
+     *
+     * @return string
+     */
+    public function getErrorsPageTemplatePath()
+    {
+        return $this->data->errorsPageTemplatePath;
+    }
+
+    /**
      * Return's worker number
      *
      * @return int

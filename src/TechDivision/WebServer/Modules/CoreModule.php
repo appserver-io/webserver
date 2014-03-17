@@ -178,7 +178,6 @@ class CoreModule implements ModuleInterface
                 }
 
                 // at this point there was no one who can deliver that file so its time to throw a 404
-                $response->setStatusCode(404);
                 throw new ModuleException(null, 404);
             }
 
@@ -186,7 +185,6 @@ class CoreModule implements ModuleInterface
             // todo: implement directory index view and surfing
 
             // for now we will throw a 404 as well here for non existing index files in directory
-            $response->setStatusCode(404);
             throw new ModuleException(null, 404);
         }
     }

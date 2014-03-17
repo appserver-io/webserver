@@ -193,6 +193,15 @@ class PhpModule implements ModuleInterface
             // wait for process to finish
             $process->join();
 
+            // check if process fatal error occurred so throw module exception because the modules process class
+            // is not responsible for set correct headers and messages for error's in module context
+            if ($lastError = $process->getLastError()) {
+                $errorMessage = 'PHP Fatal error: ' . $lastError['message'] .
+                    ' in ' . $lastError['file'] . ' on line ' . $lastError['line'];
+                // set internal server error code with error mesage to exception
+                throw new ModuleException($errorMessage, 500);
+            }
+
             // prepare response
             $this->prepareResponse(
                 $process->getHeaders()

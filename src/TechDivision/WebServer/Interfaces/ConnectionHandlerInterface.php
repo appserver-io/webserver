@@ -38,13 +38,14 @@ interface ConnectionHandlerInterface
 {
 
     /**
-     * Inits the connection handler
+     * Inits the connection handler by given context and params
      *
      * @param \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext The server's context
+     * @param array                                                     $params        The params for connection handler
      *
      * @return void
      */
-    public function init(ServerContextInterface $serverContext);
+    public function init(ServerContextInterface $serverContext, array $params = null);
 
     /**
      * Handles the connection with the connected client in a proper way the given

@@ -58,7 +58,8 @@ class VirtualHostModule implements ModuleInterface
     protected $paramServerVarsMap = array(
         'admin' => ServerVars::SERVER_ADMIN,
         'documentRoot' => ServerVars::DOCUMENT_ROOT,
-        'software' => ServerVars::SERVER_SOFTWARE
+        'software' => ServerVars::SERVER_SOFTWARE,
+        'errorsPageTemplatePath' => ServerVars::SERVER_ERRORS_PAGE_TEMPLATE_PATH
     );
 
     /**

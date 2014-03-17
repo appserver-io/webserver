@@ -3,19 +3,20 @@
     <description><![CDATA[This is an example of a php WebServer configuration in xml]]></description>
 
     <server
-            type="\TechDivision\WebServer\Servers\MultiThreadedServer"
-            worker="\TechDivision\WebServer\Workers\ThreadWorker"
-            socket="\TechDivision\WebServer\Sockets\StreamSocket"
-            serverContext="\TechDivision\WebServer\ServerContext">
+        type="\TechDivision\WebServer\Servers\MultiThreadedServer"
+        worker="\TechDivision\WebServer\Workers\ThreadWorker"
+        socket="\TechDivision\WebServer\Sockets\StreamSocket"
+        serverContext="\TechDivision\WebServer\ServerContext">
 
         <params>
             <param name="admin" type="string">www@localhost.localdomain</param>
             <param name="software" type="string">phpWebServer/0.1.0</param>
             <param name="transport" type="string">tcp</param>
-            <param name="address" type="string">127.0.0.1</param>
+            <param name="address" type="string">0.0.0.0</param>
             <param name="port" type="integer">9080</param>
-            <param name="workerNumber" type="integer">64</param>
-            <param name="documentRoot" type="string">/Library/WebServer/Documents</param>
+            <param name="workerNumber" type="integer">128</param>
+            <param name="documentRoot" type="string">/var/www</param>
+            <param name="errorsPageTemplatePath" type="string"/>
         </params>
 
         <authentications>
@@ -30,18 +31,12 @@
         </authentications>
 
         <virtualHosts>
-
-            <virtualHost name="htaccess.dev">
-                <params>
-                    <param name="admin" type="string">www@htaccess.dev</param>
-                    <param name="documentRoot" type="string">/Library/WebServer/Documents/htaccessTest</param>
-                </params>
-            </virtualHost>
             <virtualHost name="phpwebserver.dev phpwebserver.local phpwebserver.test">
                 <params>
                     <param name="admin" type="string">admin@phpwebserver.dev</param>
                     <!-- Note: it's intended to use a relative path to get content from webservers basedir/var/www -->
                     <param name="documentRoot" type="string">var/www</param>
+                    <param name="errorsPageTemplatePath" type="string">var/www/errors/error.phtml</param>
                 </params>
             </virtualHost>
         </virtualHosts>
@@ -53,8 +48,9 @@
         </rewrites>
 -->
         <connectionHandlers>
-            <connectionHandler type="\TechDivision\Http\HttpConnectionHandler"/>
+            <connectionHandler type="\TechDivision\Http\HttpConnectionHandler" />
         </connectionHandlers>
+
         <modules>
             <module type="\TechDivision\WebServer\Modules\AuthenticationModule"/>
             <module type="\TechDivision\WebServer\Modules\VirtualHostModule"/>
@@ -71,30 +67,41 @@
     </server>
 
     <server
-            type="\TechDivision\WebServer\Servers\MultiThreadedServer"
-            worker="\TechDivision\WebServer\Workers\ThreadWorker"
-            socket="\TechDivision\WebServer\Sockets\StreamSocket"
-            serverContext="\TechDivision\WebServer\ServerContext">
+        type="\TechDivision\WebServer\Servers\MultiThreadedServer"
+        worker="\TechDivision\WebServer\Workers\ThreadWorker"
+        socket="\TechDivision\WebServer\Sockets\StreamSocket"
+        serverContext="\TechDivision\WebServer\ServerContext">
 
         <params>
             <param name="admin" type="string">www@localhost.localdomain</param>
             <param name="software" type="string">phpWebServer/0.1.0</param>
             <param name="workerNumber" type="integer">128</param>
             <param name="transport" type="string">ssl</param>
-            <param name="address" type="string">127.0.0.1</param>
+            <param name="address" type="string">0.0.0.0</param>
             <param name="port" type="integer">9443</param>
             <param name="certPath" type="string">etc/webserver.pem</param>
             <param name="passphrase" type="string">passphrase</param>
             <param name="documentRoot" type="string">/var/www</param>
+            <param name="errorsPageTemplatePath" type="string"/>
         </params>
 
-        <virtualHosts/>
+        <virtualHosts>
+            <virtualHost name="phpwebserver.dev phpwebserver.local phpwebserver.test">
+                <params>
+                    <param name="admin" type="string">admin@phpwebserver.dev</param>
+                    <!-- Note: it's intended to use a relative path to get content from webservers basedir/var/www -->
+                    <param name="documentRoot" type="string">var/www</param>
+                    <param name="errorsPageTemplatePath" type="string">var/www/errors/error.phtml</param>
+                </params>
+            </virtualHost>
+        </virtualHosts>
 
         <authentications/>
 
         <connectionHandlers>
-            <connectionHandler type="\TechDivision\Http\HttpConnectionHandler"/>
+            <connectionHandler type="\TechDivision\Http\HttpConnectionHandler" />
         </connectionHandlers>
+
         <modules>
             <module type="\TechDivision\WebServer\Modules\AuthenticationModule"/>
             <module type="\TechDivision\WebServer\Modules\VirtualHostModule"/>

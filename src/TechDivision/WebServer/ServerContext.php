@@ -203,9 +203,11 @@ class ServerContext implements ServerContextInterface
             ServerVars::SERVER_SOFTWARE => $serverSoftware,
             ServerVars::SERVER_SIGNATURE => "<address>$serverSoftware Server at $serverAddress Port $serverPort</address>\r\n",
             ServerVars::SERVER_HANDLER => CoreModule::MODULE_NAME,
+            ServerVars::SERVER_ERRORS_PAGE_TEMPLATE_PATH => $this->getServerConfig()->getErrorsPageTemplatePath(),
             ServerVars::PATH => getenv('PATH'),
             ServerVars::HTTPS => ServerVars::VALUE_HTTPS_OFF
         );
+
         // check if ssl is going on and set server var for it like apache does
         if ($this->getServerConfig()->getTransport() === 'ssl') {
             $this->setServerVar(ServerVars::HTTPS, ServerVars::VALUE_HTTPS_ON);

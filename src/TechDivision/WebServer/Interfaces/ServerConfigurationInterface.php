@@ -84,6 +84,13 @@ interface ServerConfigurationInterface
     public function getAdmin();
 
     /**
+     * Return's template path for errors page
+     *
+     * @return string
+     */
+    public function getErrorsPageTemplatePath();
+
+    /**
      * Return's server context type
      *
      * @return string

@@ -46,16 +46,16 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         $this->workerType = (string)$node->attributes()->worker;
         $this->socketType = (string)$node->attributes()->socket;
         $this->serverContextType = (string)$node->attributes()->serverContext;
-        $this->transport = (string)array_shift($node->xpath(".//param[@name='transport']"));
-        $this->address = (string)array_shift($node->xpath(".//param[@name='address']"));
-        $this->port = (int)array_shift($node->xpath(".//param[@name='port']"));
-        $this->software = (string)array_shift($node->xpath(".//param[@name='software']"));
-        $this->workerNumber = (int)array_shift($node->xpath(".//param[@name='workerNumber']"));
-        $this->certPath = (string)array_shift($node->xpath(".//param[@name='certPath']"));
-        $this->passphrase = (string)array_shift($node->xpath(".//param[@name='passphrase']"));
-        $this->documentRoot = (string)array_shift($node->xpath(".//param[@name='documentRoot']"));
-        $this->admin = (string)array_shift($node->xpath(".//param[@name='admin']"));
-
+        $this->transport = (string)array_shift($node->xpath("./params/param[@name='transport']"));
+        $this->address = (string)array_shift($node->xpath("./params/param[@name='address']"));
+        $this->port = (int)array_shift($node->xpath("./params/param[@name='port']"));
+        $this->software = (string)array_shift($node->xpath("./params/param[@name='software']"));
+        $this->workerNumber = (int)array_shift($node->xpath("./params/param[@name='workerNumber']"));
+        $this->certPath = (string)array_shift($node->xpath("./params/param[@name='certPath']"));
+        $this->passphrase = (string)array_shift($node->xpath("./params/param[@name='passphrase']"));
+        $this->documentRoot = (string)array_shift($node->xpath("./params/param[@name='documentRoot']"));
+        $this->admin = (string)array_shift($node->xpath("./params/param[@name='admin']"));
+        $this->errorsPageTemplatePath = (string)array_shift($node->xpath("./params/param[@name='errorsPageTemplatePath']"));
         // init modules
         $this->modules = array();
         foreach ($node->modules->module as $moduleNode) {
@@ -64,8 +64,19 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         // init connection handlers
         $this->connectionHandlers = array();
         foreach ($node->connectionHandlers->connectionHandler as $connectionHandlerNode) {
-            $this->connectionHandlers[] = (string)$connectionHandlerNode->attributes()->type;
+            $connectionHandlerType = (string)$connectionHandlerNode->attributes()->type;
+            /**
+             * Maybe later on we need params here too
+             *
+            $params = array();
+            foreach ($connectionHandlerNode->params->param as $paramNode) {
+                $paramName = (string)$paramNode->attributes()->name;
+                $params[$paramName] = (string)array_shift($connectionHandlerNode->xpath(".//param[@name='$paramName']"));
+            }
+             */
+            $this->connectionHandlers[] = $connectionHandlerType;
         }
+
         // init handlers
         $this->handlers = array();
         foreach ($node->handlers->handler as $handlerNode) {
@@ -157,6 +168,16 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
     public function getAdmin()
     {
         return $this->admin;
+    }
+
+    /**
+     * Return's template path for errors page
+     *
+     * @return string
+     */
+    public function getErrorsPageTemplatePath()
+    {
+        return $this->errorsPageTemplatePath;
     }
 
     /**

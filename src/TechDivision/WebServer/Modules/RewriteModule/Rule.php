@@ -137,30 +137,40 @@ class Rule
         for ($i = 0; $i < count($conditionActions); $i++) {
 
             // Trim whatever we got here as the string might be a bit dirty
-            $actionString = trim($conditionActions[$i], '\||,');
+            $actionString = trim(
+                $conditionActions[$i],
+                self::CONDITION_OR_DELIMETER . '|' . self::CONDITION_AND_DELIMETER
+            );
 
-            // Everything is and-combined (plain array) unless combined otherwise (with a "|" symbol)
-            // If we find an or-combination we will make a deeper array within our sorted condition array
-            if (strpos($actionString, self::CONDITION_OR_DELIMETER) !== false) {
+            // Collect all and-combined pieces of the conditionstring
+            $andActionStringPieces = explode(self::CONDITION_AND_DELIMETER, $actionString);
 
-                // Collect all or-combined conditions into a separate array
-                $actionStringPieces = explode(self::CONDITION_OR_DELIMETER, $actionString);
+            // Iterate through them and build up conditions or or-combined condition groups
+            foreach ($andActionStringPieces as $andActionStringPiece) {
 
-                // Iterate over the pieces we found and create a condition for each of them
-                $entry = array();
-                foreach ($actionStringPieces as $actionStringPiece) {
+                // Everything is and-combined (plain array) unless combined otherwise (with a "|" symbol)
+                // If we find an or-combination we will make a deeper array within our sorted condition array
+                if (strpos($andActionStringPiece, self::CONDITION_OR_DELIMETER) !== false) {
+
+                    // Collect all or-combined conditions into a separate array
+                    $actionStringPieces = explode(self::CONDITION_OR_DELIMETER, $andActionStringPiece);
+
+                    // Iterate over the pieces we found and create a condition for each of them
+                    $entry = array();
+                    foreach ($actionStringPieces as $actionStringPiece) {
+
+                        // Get a new condition instance
+                        $entry[] = new Condition($conditionOperands[$i], $actionStringPiece);
+                    }
+
+                } else {
 
                     // Get a new condition instance
-                    $entry[] = new Condition($conditionOperands[$i], $actionStringPiece);
+                    $entry = new Condition($conditionOperands[$i], $andActionStringPiece);
                 }
 
-            } else {
-
-                // Get a new condition instance
-                $entry = new Condition($conditionOperands[$i], $actionString);
+                $this->sortedConditions[] = $entry;
             }
-
-            $this->sortedConditions[] = $entry;
         }
     }
 
@@ -303,9 +313,9 @@ class Rule
                 $serverContext->setServerVar(ServerVars::REQUEST_FILENAME, $this->targetString);
 
             } elseif (filter_var($this->targetString, FILTER_VALIDATE_URL) && strpos(
-                $this->flagString,
-                'R'
-            ) !== false
+                    $this->flagString,
+                    'R'
+                ) !== false
             ) {
                 // We were passed a valid URL and should redirect to it
                 // TODO implement better flag handling

@@ -66,7 +66,7 @@
         <modules>
             <module type="\TechDivision\WebServer\Modules\AuthenticationModule"/>
             <module type="\TechDivision\WebServer\Modules\VirtualHostModule"/>
-
+            <module type="\TechDivision\WebServer\Modules\RewriteModule\Module"/>
             <module type="\TechDivision\WebServer\Modules\DirectoryModule"/>
             <module type="\TechDivision\WebServer\Modules\CoreModule"/>
             <module type="\TechDivision\WebServer\Modules\PhpModule"/>
@@ -138,7 +138,7 @@
         <modules>
             <module type="\TechDivision\WebServer\Modules\AuthenticationModule"/>
             <module type="\TechDivision\WebServer\Modules\VirtualHostModule"/>
-
+            <module type="\TechDivision\WebServer\Modules\RewriteModule\Module"/>
             <module type="\TechDivision\WebServer\Modules\DirectoryModule"/>
             <module type="\TechDivision\WebServer\Modules\CoreModule"/>
             <module type="\TechDivision\WebServer\Modules\PhpModule"/>

@@ -120,11 +120,11 @@ class Condition
             '<' => 'strcmp(\'#1\', \'#2\') < 0',
             '>' => 'strcmp(\'#1\', \'#2\') > 0',
             '=' => 'strcmp(\'#1\', \'#2\') == 0',
-            '-d' => 'is_dir(\'#1\')',
-            '-f' => 'is_file(\'#1\')',
-            '-s' => 'is_file(\'#1\') && filesize(\'#1\') > 0',
-            '-l' => 'is_link(\'#1\')',
-            '-x' => 'is_executable(\'#1\')'
+            '-d' => 'is_dir(\'$DOCUMENT_ROOT#1\')',
+            '-f' => 'is_file(\'$DOCUMENT_ROOT#1\')',
+            '-s' => 'is_file(\'$DOCUMENT_ROOT#1\') && filesize(\'$DOCUMENT_ROOT#1\') > 0',
+            '-l' => 'is_link(\'$DOCUMENT_ROOT#1\')',
+            '-x' => 'is_executable(\'$DOCUMENT_ROOT#1\')'
         );
         $this->allowedModifiers = array('[NC]', '[nocase]');
 

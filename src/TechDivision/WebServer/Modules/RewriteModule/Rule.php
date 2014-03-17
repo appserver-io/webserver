@@ -253,11 +253,8 @@ class Rule
 
                     return false;
                 }
-            }
-
-            // The single conditions have to match as they are and-combined
-            if (!$sortedCondition->matches()) {
-
+            } elseif (!$sortedCondition->matches()) {
+                // The single conditions have to match as they are and-combined
                 return false;
             }
         }
@@ -333,6 +330,8 @@ class Rule
                 $serverContext->setServerVar('REDIRECT_QUERY_STRING', substr(strstr($this->targetString, '?'), 1));
                 // TODO the REQUEST_URI is the wrong thing to change, but we currently need this set
                 // TODO we have to set the QUERY_STRING for the same reason
+                // Requested uri always has to begin with a slash
+                $this->targetString = '/' . ltrim($this->targetString, '/');
                 $serverContext->setServerVar(ServerVars::REQUEST_URI, $this->targetString);
                 $serverContext->setServerVar(ServerVars::QUERY_STRING, substr(strstr($this->targetString, '?'), 1));
             }

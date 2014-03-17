@@ -141,22 +141,6 @@ class Module implements ModuleInterface
             // Save the server context for later re-use
             $this->serverContext = $serverContext;
 
-            // Get the rules as the array they are within the config
-            // We might not even get anything, so prepare our rules accordingly
-            $rules = $this->serverContext->getServerConfig()->getRewrites();
-            $this->rules = array();
-
-            // Only act if we got something
-            if (is_array($rules)) {
-
-                // Convert the rules to our internally used objects
-                foreach ($rules as $rule) {
-
-                    // Add the rule as a Rule object
-                    $this->rules[] = new Rule($rule['condition'], $rule['target'], $rule['flag']);
-                }
-            }
-
             // Register our dependencies
             $this->dependencies = array(
                 'virtualHost'
@@ -230,19 +214,16 @@ class Module implements ModuleInterface
      * @throws \TechDivision\WebServer\Exceptions\ModuleException
      */
     public function process(HttpRequestInterface $request, HttpResponseInterface $response)
-    {error_log(var_export($this->serverContext->getServerVars(), true));
-        error_log(var_export($this->rules, true));
+    {
         // We have to throw a ModuleException on failure, so surround the body with a try...catch block
         try {
 
-            // Reset the $serverBackreferences array to avoid mixups of different requests
-            $this->serverBackreferences = array();
+            $requestUri = $this->serverContext->getServerVar(ServerVars::REQUEST_URI);
 
-            // We have to set the server vars we take care of: SCRIPT_URL and SCRIPT_URI
-            $this->setModuleVars($request);
+            if (!isset($this->rules[$requestUri])) {
 
-            // Iterate over all rules, resolve vars and apply the rule (if needed)
-            foreach ($this->rules as $rule) {
+                // Reset the $serverBackreferences array to avoid mixups of different requests
+                $this->serverBackreferences = array();
 
                 // Resolve all used backreferences which are NOT linked to the query string.
                 // We will resolve query string related backreferences separately as we are not able to cache them
@@ -253,7 +234,31 @@ class Module implements ModuleInterface
                 $this->fillContextBackreferences();
                 $this->fillHeaderBackreferences($request);
                 $this->fillSslEnvironmentBackreferences();
-                $rule->resolve($this->serverBackreferences);
+
+                // Get the rules as the array they are within the config
+                // We might not even get anything, so prepare our rules accordingly
+                $rules = $this->serverContext->getServerConfig()->getRewrites();
+                $this->rules[$requestUri] = array();
+
+                // Only act if we got something
+                if (is_array($rules)) {
+
+                    // Convert the rules to our internally used objects
+                    foreach ($rules as $rule) {
+
+                        // Add the rule as a Rule object
+                        $rule = new Rule($rule['condition'], $rule['target'], $rule['flag']);
+                        $rule->resolve($this->serverBackreferences);
+                        $this->rules[$requestUri][] = $rule;
+                    }
+                }
+            }
+
+            // We have to set the server vars we take care of: SCRIPT_URL and SCRIPT_URI
+            $this->setModuleVars($request);
+
+            // Iterate over all rules, resolve vars and apply the rule (if needed)
+            foreach ($this->rules[$requestUri] as $rule) {
 
                 // Check if the rule matches, and if, apply the rule
                 if ($rule->matches()) {

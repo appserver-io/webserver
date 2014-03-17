@@ -24,7 +24,7 @@
                 <params>
                     <param name="type" type="string">\TechDivision\WebServer\Authentication\BasicAuthentication</param>
                     <param name="realm" type="string">PhpWebServer Basic Authentication System</param>
-                    <param name="hash" type="string">Ghwd2Vic2VydmVyOnBocHdlYnNlcnZlci5pMA==</param>
+                    <param name="hash" type="string">cGhwd2Vic2VydmVyOnBocHdlYnNlcnZlci5pMA==</param>
                     <!-- <param name="file" type="string">var/www/auth/basic/phpwebserver</param> -->
                     <!-- <param name="username" type="string">phpwebserver</param> -->
                     <!-- <param name="password" type="string">wURpZpgIT.w1I</param> -->
@@ -113,7 +113,7 @@
                 <params>
                     <param name="type" type="string">\TechDivision\WebServer\Authentication\BasicAuthentication</param>
                     <param name="realm" type="string">PhpWebServer Basic Authentication System</param>
-                    <param name="hash" type="string">Ghwd2Vic2VydmVyOnBocHdlYnNlcnZlci5pMA==</param>
+                    <param name="hash" type="string">cGhwd2Vic2VydmVyOnBocHdlYnNlcnZlci5pMA==</param>
                     <!-- <param name="file" type="string">var/www/auth/basic/phpwebserver</param> -->
                     <!-- <param name="username" type="string">phpwebserver</param> -->
                     <!-- <param name="password" type="string">wURpZpgIT.w1I</param> -->

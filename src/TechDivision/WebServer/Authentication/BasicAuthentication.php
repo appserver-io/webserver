@@ -148,4 +148,14 @@ class BasicAuthentication implements AuthenticationInterface
     {
         return self::AUTH_TYPE;
     }
+
+    /**
+     * Return's the parsed username
+     *
+     * @return string
+     */
+    public function getUsername()
+    {
+        return $this->username;
+    }
 }

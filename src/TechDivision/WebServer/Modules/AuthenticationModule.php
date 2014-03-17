@@ -181,6 +181,9 @@ class AuthenticationModule implements ModuleInterface
                     $typeInstance->init($authHeader);
                     // check if auth works
                     if ($typeInstance->auth($data)) {
+                        // set server vars
+                        $this->getServerContext()->setServerVar(ServerVars::REMOTE_USER, $typeInstance->getUsername());
+                        // break out because everything is fine at this point
                         return true;
                     }
                 }
@@ -189,8 +192,8 @@ class AuthenticationModule implements ModuleInterface
                     HttpProtocol::HEADER_WWW_AUTHENTICATE,
                     $typeInstance->getType() . ' realm="' . $data["realm"] . "'"
                 );
-                $response->setStatusCode(401);
-                $response->setState(HttpResponseStates::DISPATCH);
+                // throw exception for auth required
+                throw new ModuleException(null, 401);
             }
         }
     }

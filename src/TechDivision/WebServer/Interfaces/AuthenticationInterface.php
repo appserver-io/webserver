@@ -63,4 +63,11 @@ interface AuthenticationInterface
      * @return string
      */
     public function getType();
+
+    /**
+     * Return's the parsed username
+     *
+     * @return string
+     */
+    public function getUsername();
 }

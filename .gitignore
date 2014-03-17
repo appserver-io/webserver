@@ -8,4 +8,4 @@ php.ini
 /.project
 /.settings
 /.build.properties
-/composer.lock
+composer.lock

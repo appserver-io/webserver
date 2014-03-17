@@ -18,10 +18,10 @@
  * @link       http://www.techdivision.com/
  */
 
-namespace TechDivision\WebServer\ConfigParser;
+namespace TechDivision\WebServer\Modules\Parser;
 
 /**
- * TechDivision\WebServer\ConfigParser\Config
+ * TechDivision\WebServer\Modules\Parser\Config
  *
  * Base class which will hold all configuration directives
  *

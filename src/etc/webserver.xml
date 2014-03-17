@@ -3,10 +3,10 @@
     <description><![CDATA[This is an example of a php WebServer configuration in xml]]></description>
 
     <server
-        type="\TechDivision\WebServer\Servers\MultiThreadedServer"
-        worker="\TechDivision\WebServer\Workers\ThreadWorker"
-        socket="\TechDivision\WebServer\Sockets\StreamSocket"
-        serverContext="\TechDivision\WebServer\ServerContext">
+            type="\TechDivision\WebServer\Servers\MultiThreadedServer"
+            worker="\TechDivision\WebServer\Workers\ThreadWorker"
+            socket="\TechDivision\WebServer\Sockets\StreamSocket"
+            serverContext="\TechDivision\WebServer\ServerContext">
 
         <params>
             <param name="admin" type="string">www@localhost.localdomain</param>
@@ -14,8 +14,8 @@
             <param name="transport" type="string">tcp</param>
             <param name="address" type="string">127.0.0.1</param>
             <param name="port" type="integer">9080</param>
-            <param name="workerNumber" type="integer">128</param>
-            <param name="documentRoot" type="string">/var/www</param>
+            <param name="workerNumber" type="integer">64</param>
+            <param name="documentRoot" type="string">/Library/WebServer/Documents</param>
         </params>
 
         <authentications>
@@ -30,6 +30,13 @@
         </authentications>
 
         <virtualHosts>
+
+            <virtualHost name="htaccess.dev">
+                <params>
+                    <param name="admin" type="string">www@htaccess.dev</param>
+                    <param name="documentRoot" type="string">/Library/WebServer/Documents/htaccessTest</param>
+                </params>
+            </virtualHost>
             <virtualHost name="phpwebserver.dev phpwebserver.local phpwebserver.test">
                 <params>
                     <param name="admin" type="string">admin@phpwebserver.dev</param>
@@ -38,32 +45,36 @@
                 </params>
             </virtualHost>
         </virtualHosts>
-
+<!--
+        <rewrites>
+            <rewrite condition="-f|-l|-d" target="" flag="L"/>
+            <rewrite condition="(.+)([/\?].+)" target="$1.do$2" flag="L"/>
+            <rewrite condition="(.+)" target="$1.do" flag=""/>
+        </rewrites>
+-->
         <connectionHandlers>
             <connectionHandler type="\TechDivision\Http\HttpConnectionHandler"/>
         </connectionHandlers>
         <modules>
-            <!-- <module type="\TechDivision\WebServer\Modules\DeflateModule" /> -->
-            <module type="\TechDivision\WebServer\Modules\AuthenticationModule" />
-            <module type="\TechDivision\WebServer\Modules\VirtualHostModule" />
-            <module type="\TechDivision\WebServer\Modules\DirectoryModule" />
-            <module type="\TechDivision\WebServer\Modules\CoreModule" />
-            <!-- <module type="\TechDivision\WebServer\Modules\RewriteModule" /> -->
-            <module type="\TechDivision\WebServer\Modules\PhpModule" />
-
+            <module type="\TechDivision\WebServer\Modules\AuthenticationModule"/>
+            <module type="\TechDivision\WebServer\Modules\VirtualHostModule"/>
+            <module type="\TechDivision\WebServer\Modules\RewriteModule\Module"/>
+            <module type="\TechDivision\WebServer\Modules\DirectoryModule"/>
+            <module type="\TechDivision\WebServer\Modules\CoreModule"/>
+            <module type="\TechDivision\WebServer\Modules\PhpModule"/>
         </modules>
         <handlers>
-            <handler name="php" extension=".php" />
-            <handler name="php" extension=".phtml" />
-            <handler name="servlet" extension=".do" />
+            <handler name="php" extension=".php"/>
+            <handler name="php" extension=".phtml"/>
+            <handler name="servlet" extension=".do"/>
         </handlers>
     </server>
 
     <server
-        type="\TechDivision\WebServer\Servers\MultiThreadedServer"
-        worker="\TechDivision\WebServer\Workers\ThreadWorker"
-        socket="\TechDivision\WebServer\Sockets\StreamSocket"
-        serverContext="\TechDivision\WebServer\ServerContext">
+            type="\TechDivision\WebServer\Servers\MultiThreadedServer"
+            worker="\TechDivision\WebServer\Workers\ThreadWorker"
+            socket="\TechDivision\WebServer\Sockets\StreamSocket"
+            serverContext="\TechDivision\WebServer\ServerContext">
 
         <params>
             <param name="admin" type="string">www@localhost.localdomain</param>
@@ -85,18 +96,17 @@
             <connectionHandler type="\TechDivision\Http\HttpConnectionHandler"/>
         </connectionHandlers>
         <modules>
-            <!-- <module type="\TechDivision\WebServer\Modules\DeflateModule" /> -->
-            <module type="\TechDivision\WebServer\Modules\AuthenticationModule" />
-            <module type="\TechDivision\WebServer\Modules\VirtualHostModule" />
-            <module type="\TechDivision\WebServer\Modules\DirectoryModule" />
-            <module type="\TechDivision\WebServer\Modules\CoreModule" />
-            <!-- <module type="\TechDivision\WebServer\Modules\RewriteModule" /> -->
-            <module type="\TechDivision\WebServer\Modules\PhpModule" />
+            <module type="\TechDivision\WebServer\Modules\AuthenticationModule"/>
+            <module type="\TechDivision\WebServer\Modules\VirtualHostModule"/>
+            <module type="\TechDivision\WebServer\Modules\RewriteModule\Module"/>
+            <module type="\TechDivision\WebServer\Modules\DirectoryModule"/>
+            <module type="\TechDivision\WebServer\Modules\CoreModule"/>
+            <module type="\TechDivision\WebServer\Modules\PhpModule"/>
         </modules>
         <handlers>
-            <handler name="php" extension=".php" />
-            <handler name="php" extension=".phtml" />
-            <handler name="servlet" extension=".do" />
+            <handler name="php" extension=".php"/>
+            <handler name="php" extension=".phtml"/>
+            <handler name="servlet" extension=".do"/>
         </handlers>
     </server>
 

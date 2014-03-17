@@ -10,7 +10,7 @@
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
- * @subpackage ConfigParser
+ * @subpackage Modules
  * @author     Bernhard Wick <b.wick@techdivision.com>
  * @copyright  2014 TechDivision GmbH - <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php
@@ -18,18 +18,18 @@
  * @link       http://www.techdivision.com/
  */
 
-namespace TechDivision\WebServer\ConfigParser\Directives;
+namespace TechDivision\WebServer\Modules\Parser\Directives;
 
 use TechDivision\WebServer\Interfaces\DirectiveInterface;
 
 /**
- * TechDivision\WebServer\ConfigParser\Directives\RewriteCondition
+ * TechDivision\WebServer\Modules\Parser\Directives\RewriteCondition
  *
  * This class acts as a generic implementation of a rewrite condition which should be usable by apache and nginx alike
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
- * @subpackage ConfigParser
+ * @subpackage Modules
  * @author     Bernhard Wick <b.wick@techdivision.com>
  * @copyright  2014 TechDivision GmbH - <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php
@@ -48,11 +48,11 @@ class RewriteCondition implements DirectiveInterface
     protected $allowedTypes = array();
 
     /**
-     * A mapping of possible flags and the resulting modifier
+     * All possible modifiers aka flags
      *
      * @var array<string> $flagMapping
      */
-    protected $flagMapping = array();
+    protected $allowedModifiers = array();
 
     /**
      * Possible additions to the known PCRE regex. These additions get used by htaccess notation only.
@@ -98,6 +98,13 @@ class RewriteCondition implements DirectiveInterface
     protected $modifier;
 
     /**
+     * When the ornext|OR flag is used we have to set this member to true
+     *
+     * @var boolean $orCombined
+     */
+    protected $orCombined;
+
+    /**
      * At least in the apache universe we can negate the logical meaning with a "!"
      *
      * @var boolean $isNegated
@@ -107,14 +114,14 @@ class RewriteCondition implements DirectiveInterface
     /**
      * Default constructor
      *
-     * @param string      $type     Type of this condition directive
-     * @param string      $operand  The value to check with the given action
-     * @param string      $action   How the operand has to be checked, this will hold the needed action
-     * @param string|null $modifier Modifier which should be used to integrate things like apache flags and others
+     * @param string $type     Type of this condition directive
+     * @param string $operand  The value to check with the given action
+     * @param string $action   How the operand has to be checked, this will hold the needed action
+     * @param string $modifier Modifier which should be used to integrate things like apache flags and others
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($type = 'regex', $operand = '', $action = '', $modifier = null)
+    public function __construct($type = 'regex', $operand = '', $action = '', $modifier = '')
     {
         // Fill the default values for our members here
         $this->allowedTypes = array('regex', 'check');
@@ -131,16 +138,25 @@ class RewriteCondition implements DirectiveInterface
             '-F',
             '-U'
         );
-        $this->flagMapping = array('[NC]', '[OR]', '[NV]');
+        $this->allowedModifiers = array('[NC]', '[OR]', '[NV]', '[nocase]', '[ornext]', '[novary]');
 
-        // We do not negate by default
+        // We do not negate by default, nor do we combine with the following condition via "or"
         $this->isNegated = false;
+        $this->orCombined = false;
 
+        // Check if the passed type is valid
         if (!isset(array_flip($this->allowedTypes)[$type])) {
 
             throw new \InvalidArgumentException($type . ' is not an allowed condition type.');
         }
 
+        // Check if the passed modifier is valid (or empty)
+        if (!isset(array_flip($this->allowedModifiers)[$modifier]) && !empty($modifier)) {
+
+            throw new \InvalidArgumentException($modifier . ' is not an allowed condition modifier.');
+        }
+
+        // Fill the instance using the array logic
         $this->fillFromArray(array(__CLASS__, $operand, $action, $modifier));
     }
 
@@ -182,6 +198,16 @@ class RewriteCondition implements DirectiveInterface
     public function getModifier()
     {
         return $this->modifier;
+    }
+
+    /**
+     * Will return true if this conditions is or-combined with the one behind it, false if not
+     *
+     * @return boolean
+     */
+    public function isOrCombined()
+    {
+        return $this->orCombined;
     }
 
     /**
@@ -260,20 +286,30 @@ class RewriteCondition implements DirectiveInterface
     public function fillFromArray(array $parts)
     {
         // Array should be 3 or 4 pieces long
+        $failureMessage = 'Could not process line ' . implode($parts, ' ');
         if (count($parts) < 3 || count($parts) > 4) {
 
-            throw new \InvalidArgumentException('Could not process line ' . implode($parts, ' '));
+            throw new \InvalidArgumentException($failureMessage);
+        }
+
+        // If the array has 4 parts we have to check if the last part is a valid modifier
+        if (!isset(array_flip($this->allowedModifiers)[$parts[3]])) {
+
+            throw new \InvalidArgumentException($failureMessage);
         }
 
         // Fill operand and action to preserve it
         $this->operand = $parts[1];
         $this->action = $parts[2];
 
+        // We have to handle the different modifiers
+        $this->applyModifiers($parts[3]);
+
         // Fill the instance, "regex" is the default type
         $this->type = 'regex';
 
         // Preset the operation with a regex check
-        $this->operation = 'preg_match(\'`' . $parts[2] . '`\', \'' . $parts[1] . '\') === 1';
+        $this->operation = 'preg_match(\'`' . $this->action . '`\', \'' . $this->operand . '\') === 1';
 
         // Are we able to find any of the additions htaccess syntax offers?
         foreach ($this->htaccessAdditions as $addition => $realAction) {
@@ -301,6 +337,34 @@ class RewriteCondition implements DirectiveInterface
         if (isset($parts[3])) {
 
             $this->modifier = $parts[3];
+        }
+    }
+
+    /**
+     * <TODO FUNCTION DESCRIPTION>
+     *
+     * @param string $modifier The modifier we have to apply
+     *
+     * @return void
+     */
+    protected function applyModifiers($modifier)
+    {
+        // If we got the "no case" modifier we have to lowercase both action and operand
+        if ($modifier === '[NC]' || $modifier === '[nocase]') {
+
+            $this->operand = strtolower($this->operand);
+            $this->action = strtolower($this->action);
+
+        } elseif ($modifier === '[OR]' || $modifier === '[ornext]') {
+            // If we got the "or next condition" modifier we have to tell $this
+
+            $this->orCombined = true;
+
+        } elseif ($modifier === '[NV]' || $modifier === '[novary]') {
+            // If we got the "no vary"
+
+            $this->operand = strtolower($this->operand);
+            $this->action = strtolower($this->action);
         }
     }
 }

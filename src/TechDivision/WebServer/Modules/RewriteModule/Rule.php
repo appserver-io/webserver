@@ -313,9 +313,9 @@ class Rule
                 $serverContext->setServerVar(ServerVars::REQUEST_FILENAME, $this->targetString);
 
             } elseif (filter_var($this->targetString, FILTER_VALIDATE_URL) && strpos(
-                    $this->flagString,
-                    'R'
-                ) !== false
+                $this->flagString,
+                'R'
+            ) !== false
             ) {
                 // We were passed a valid URL and should redirect to it
                 // TODO implement better flag handling

@@ -102,7 +102,7 @@ class CoreModule implements ModuleInterface
 
             // todo: only if file extension hits a filehandle info it will be possible to set path info etc...
             // iterate through all dirs beginning at 1 because 0 is always empty in this case
-            for ($i = 0; $i < count($pathParts); ++$i) {
+            for ($i = 1; $i < count($pathParts); ++$i) {
                 // check if no script name was found yet
                 if (!$scriptName) {
                     // append valid path

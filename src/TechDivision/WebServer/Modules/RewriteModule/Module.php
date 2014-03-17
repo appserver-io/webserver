@@ -231,6 +231,7 @@ class Module implements ModuleInterface
      */
     public function process(HttpRequestInterface $request, HttpResponseInterface $response)
     {error_log(var_export($this->serverContext->getServerVars(), true));
+        error_log(var_export($this->rules, true));
         // We have to throw a ModuleException on failure, so surround the body with a try...catch block
         try {
 
@@ -277,6 +278,8 @@ class Module implements ModuleInterface
      * over any rewrite.
      *
      * @return void
+     *
+     * TODO do we need the query string as well?
      */
     protected function setModuleVars()
     {
@@ -288,7 +291,7 @@ class Module implements ModuleInterface
 
         // Preserve the complete URL as it was requested
         $this->serverContext->setServerVar(
-            self::SCRIPT_URI,
+            self::SCRIPT_URL,
             $this->serverContext->getServerVar(ServerVars::SERVER_ADDR) .
             $this->serverContext->getServerVar(ServerVars::REQUEST_URI)
         );

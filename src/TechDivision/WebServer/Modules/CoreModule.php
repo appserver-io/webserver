@@ -141,7 +141,7 @@ class CoreModule implements ModuleInterface
                     $serverContext->setServerVar(ServerVars::SCRIPT_FILENAME, $documentRoot . $scriptName);
                     // if path info is set put it into server vars
                     if (strlen($pathInfo) > 0) {
-                        // todo: check and implement ORIG_PATH_INFO server var
+                        // set path info vars
                         $serverContext->setServerVar(ServerVars::PATH_INFO, $pathInfo);
                         $serverContext->setServerVar(ServerVars::PATH_TRANSLATED, $documentRoot . $pathInfo);
                     }

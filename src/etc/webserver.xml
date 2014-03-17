@@ -20,12 +20,24 @@
         </params>
 
         <authentications>
-            <authentication type="\TechDivision\WebServer\Authentication\BasicAuthentication">
+            <authentication uri="^\/auth\/basic\/phpwebserver.*">
                 <params>
-                    <param name="pattern" type="string">^\/xyz.*</param>
-                    <!-- <param name="file" type="string"></param> -->
-                    <param name="username" type="string">appserver</param>
-                    <param name="password" type="string">wURpZpgIT.w1I</param>
+                    <param name="type" type="string">\TechDivision\WebServer\Authentication\BasicAuthentication</param>
+                    <param name="realm" type="string">PhpWebServer Basic Authentication System</param>
+                    <param name="hash" type="string">cGhwd2Vic2VydmVyOnBocHdlYnNlcnZlci5pMA==</param>
+                    <!-- <param name="file" type="string">var/www/auth/basic/phpwebserver</param> -->
+                    <!-- <param name="username" type="string">phpwebserver</param> -->
+                    <!-- <param name="password" type="string">wURpZpgIT.w1I</param> -->
+                </params>
+            </authentication>
+            <authentication uri="^\/auth\/basic\/appserver.*">
+                <params>
+                    <param name="type" type="string">\TechDivision\WebServer\Authentication\BasicAuthentication</param>
+                    <param name="realm" type="string">appserver.io Basic Authentication System</param>
+                    <param name="hash" type="string">YXBwc2VydmVyOmFwcHNlcnZlci5pMA==</param>
+                    <!-- <param name="file" type="string">var/www/auth/basic/appserver</param> -->
+                    <!-- <param name="username" type="string">appserver</param> -->
+                    <!-- <param name="password" type="string">wURpZpgIT.w1I</param> -->
                 </params>
             </authentication>
         </authentications>
@@ -96,7 +108,28 @@
             </virtualHost>
         </virtualHosts>
 
-        <authentications/>
+        <authentications>
+            <authentication uri="^\/auth\/basic\/phpwebserver.*">
+                <params>
+                    <param name="type" type="string">\TechDivision\WebServer\Authentication\BasicAuthentication</param>
+                    <param name="realm" type="string">PhpWebServer Basic Authentication System</param>
+                    <param name="hash" type="string">cGhwd2Vic2VydmVyOnBocHdlYnNlcnZlci5pMA==</param>
+                    <!-- <param name="file" type="string">var/www/auth/basic/phpwebserver</param> -->
+                    <!-- <param name="username" type="string">phpwebserver</param> -->
+                    <!-- <param name="password" type="string">wURpZpgIT.w1I</param> -->
+                </params>
+            </authentication>
+            <authentication uri="^\/auth\/basic\/appserver.*">
+                <params>
+                    <param name="type" type="string">\TechDivision\WebServer\Authentication\BasicAuthentication</param>
+                    <param name="realm" type="string">appserver.io Basic Authentication System</param>
+                    <param name="hash" type="string">YXBwc2VydmVyOmFwcHNlcnZlci5pMA==</param>
+                    <!-- <param name="file" type="string">var/www/auth/basic/appserver</param> -->
+                    <!-- <param name="username" type="string">appserver</param> -->
+                    <!-- <param name="password" type="string">wURpZpgIT.w1I</param> -->
+                </params>
+            </authentication>
+        </authentications>
 
         <connectionHandlers>
             <connectionHandler type="\TechDivision\Http\HttpConnectionHandler" />

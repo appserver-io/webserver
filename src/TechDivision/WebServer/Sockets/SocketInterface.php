@@ -130,4 +130,18 @@ interface SocketInterface
      * @return string
      */
     public function getPeername();
+
+    /**
+     * Return's the address of connection
+     *
+     * @return string
+     */
+    public function getAddress();
+
+    /**
+     * Return's the port of connection
+     *
+     * @return string
+     */
+    public function getPort();
 }

@@ -183,7 +183,7 @@ class PhpModule implements ModuleInterface
             $this->initGlobals();
 
             // start new php process
-            $process = new PhpProcess(
+            $process = new PhpProcessThread(
                 $scriptFilename,
                 $this->globals
             );
@@ -287,18 +287,22 @@ class PhpModule implements ModuleInterface
         if ($request->getMethod() === HttpProtocol::METHOD_POST) {
             // set params to post
             $globals->post = $request->getParams();
-            // set params given in query string to get
-            parse_str($this->getServerContext()->getServerVar(ServerVars::QUERY_STRING), $getArray);
-            $globals->get = $getArray;
+            $globals->get = array();
+            // set params given in query string to get if query string exists
+            if ($this->getServerContext()->hasServerVar(ServerVars::QUERY_STRING)) {
+                parse_str($this->getServerContext()->getServerVar(ServerVars::QUERY_STRING), $getArray);
+                $globals->get = $getArray;
+            }
         }
         // set cookie globals
         $globals->cookie = array();
-        // iterate all cookies and set them in globals
-        foreach (explode('; ', $request->getHeader(HttpProtocol::HEADER_COOKIE)) as $cookieLine) {
-            list ($key, $value) = explode('=', $cookieLine);
-            $globals->cookie[$key] = $value;
+        // iterate all cookies and set them in globals if exists
+        if ($cookieHeaderValue = $request->getHeader(HttpProtocol::HEADER_COOKIE)) {
+            foreach (explode('; ', $cookieHeaderValue) as $cookieLine) {
+                list ($key, $value) = explode('=', $cookieLine);
+                $globals->cookie[$key] = $value;
+            }
         }
-
         // $_FILES = $this->initFileGlobals($request);
     }
 

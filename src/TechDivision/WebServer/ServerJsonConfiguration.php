@@ -36,11 +36,32 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
 {
 
     /**
-     * Hold's data instance
+     * Hold's raw data instance
      *
      * @var \stdClass
      */
     protected $data;
+
+    /**
+     * Hold's the handlers array
+     *
+     * @var array
+     */
+    protected $handlers;
+
+    /**
+     * Hold's the virtual hosts array
+     *
+     * @var array
+     */
+    protected $virtualHosts;
+
+    /**
+     * Hold's the authentications array
+     *
+     * @var array
+     */
+    protected $authentications;
 
     /**
      * Constructs config
@@ -179,7 +200,21 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
      */
     public function getVirtualHosts()
     {
-        return $this->data->virtualHosts;
+        if (!$this->virtualHosts) {
+            foreach ($this->data->virtualHosts as $virtualHost) {
+                $virtualHostNames = explode(' ', $virtualHost->name);
+                // get all params
+                $params = get_object_vars($virtualHost);
+                // remove name
+                unset($params["name"]);
+                // set all virtual host information's
+                foreach ($virtualHostNames as $virtualHostName) {
+                    // set all virtual hosts params per key for faster matching later on
+                    $this->virtualHosts[trim($virtualHostName)] = $params;
+                }
+            }
+        }
+        return $this->virtualHosts;
     }
 
     /**
@@ -189,7 +224,18 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
      */
     public function getAuthentications()
     {
-        return $this->data->authentications;
+        if (!$this->authentications) {
+            foreach ($this->data->authentications as $authentication) {
+                $authenticationType = $authentication->type;
+                // get all params
+                $params = get_object_vars($authentication);
+                // remove type
+                unset($params["type"]);
+                // set all authentication information's
+                $this->authentications[$authenticationType] = $params;
+            }
+        }
+        return $this->authentications;
     }
 
     /**
@@ -209,7 +255,12 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
      */
     public function getHandlers()
     {
-        return $this->data->handlers;
+        if (!$this->handlers) {
+            foreach ($this->data->handlers as $handler) {
+                $this->handlers[$handler->extension] = $handler->name;
+            }
+        }
+        return $this->handlers;
     }
 
     /**

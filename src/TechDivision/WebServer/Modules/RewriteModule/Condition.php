@@ -116,7 +116,6 @@ class Condition
         // Fill the default values for our members here
         $this->allowedTypes = array('regex', 'check');
         $this->htaccessAdditions = array(
-            '!' => '!',
             '<' => 'strcmp(\'#1\', \'#2\') < 0',
             '>' => 'strcmp(\'#1\', \'#2\') > 0',
             '=' => 'strcmp(\'#1\', \'#2\') == 0',
@@ -142,6 +141,15 @@ class Condition
         $this->action = $action;
         $this->modifier = $modifier;
 
+        // Check if we have a negation
+        if (strpos($this->action, '!') === 0) {
+
+            // Tell them we have to negate the check
+            $this->isNegated = true;
+            // Remove the "!" as it might kill the regex otherwise
+            $this->action = ltrim($this->action, '!');
+        }
+
         // Preset the operation with a regex check
         $this->type = 'regex';
         $this->operation = 'preg_match(\'`' . $this->action . '`\', \'' . $this->operand . '\') === 1';
@@ -151,14 +159,7 @@ class Condition
 
             // This only makes sense if the action is a short string, otherwise we might fall into the trap that
             // any given regex might contain an addition string
-            if (strlen($this->action) <= 3 && strpos($this->action, $addition) !== false) {
-
-                // Check if we have to negate
-                if ($addition === '!') {
-
-                    $this->isNegated = true;
-                    continue;
-                }
+            if (strlen($this->action) <= 2 && strpos($this->action, $addition) !== false) {
 
                 // If we reach this point we are of the check type
                 $this->type = 'check';
@@ -239,7 +240,7 @@ class Condition
     {
         if ($this->isNegated) {
 
-            return eval('if (!' . $this->operation . '){return true;}');
+            return eval('if (!(' . $this->operation . ')){return true;}');
 
         } else {
 

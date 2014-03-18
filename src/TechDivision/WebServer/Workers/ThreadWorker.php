@@ -103,6 +103,7 @@ class ThreadWorker extends \Thread implements WorkerInterface
      */
     public function work()
     {
+
         // get server context
         $serverContext = $this->getServerContext();
 
@@ -110,7 +111,6 @@ class ThreadWorker extends \Thread implements WorkerInterface
         $serverConfig = $serverContext->getServerConfig();
 
         // get server connection
-        // @var TechDivision\WebServer\Interfaces\ServerContextInterface $serverConnection
         $serverConnection = $serverContext->getConnectionInstance($this->serverConnectionResource);
 
         // init modules array
@@ -150,6 +150,7 @@ class ThreadWorker extends \Thread implements WorkerInterface
 
         // accept connections and process connection by handler
         while ($connection = $serverConnection->accept()) {
+
             /**
              * Fill up several server vars with connection info
              * Not yet implemented due to performance issues
@@ -182,6 +183,7 @@ class ThreadWorker extends \Thread implements WorkerInterface
                     break;
                 }
             }
+
             // init server vars afterwards to avoid performance issues
             $serverContext->initServerVars();
         }

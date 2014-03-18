@@ -25,6 +25,7 @@ use TechDivision\Http\HttpConnectionHandler;
 use TechDivision\WebServer\Dictionaries\ServerVars;
 use TechDivision\WebServer\Interfaces\ConfigInterface;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
+use TechDivision\WebServer\Interfaces\ServerInterface;
 use TechDivision\WebServer\Interfaces\WorkerInterface;
 use TechDivision\WebServer\Exceptions\ModuleNotFoundException;
 use TechDivision\WebServer\Exceptions\ConnectionHandlerNotFoundException;
@@ -42,6 +43,13 @@ use TechDivision\WebServer\Exceptions\ConnectionHandlerNotFoundException;
  */
 class ThreadWorker extends \Thread implements WorkerInterface
 {
+
+    /**
+     * Flag if worker should be restarted by server
+     *
+     * @var bool
+     */
+    public $shouldRestart;
 
     /**
      * Constructs the worker by setting the server context
@@ -104,6 +112,9 @@ class ThreadWorker extends \Thread implements WorkerInterface
     public function work()
     {
 
+        // set should restart initial flag
+        $this->shouldRestart = false;
+
         // get server context
         $serverContext = $this->getServerContext();
 
@@ -145,8 +156,9 @@ class ThreadWorker extends \Thread implements WorkerInterface
             $connectionHandlers[$connectionHandlerType]->injectModules($modules);
         }
 
-        // init time measurement
-        $datetime = new \DateTime('now');
+        // init connection count
+        $connectionCount = 0;
+        $connectionLimit = rand(16, 64);
 
         // accept connections and process connection by handler
         while ($connection = $serverConnection->accept()) {
@@ -184,6 +196,14 @@ class ThreadWorker extends \Thread implements WorkerInterface
                 }
             }
 
+            // check if worker reached my connection limit
+            if (++$connectionCount >= $connectionLimit) {
+                // call shoutdown
+                $this->shutdown();
+                // and break out loop
+                break;
+            }
+
             // init server vars afterwards to avoid performance issues
             $serverContext->initServerVars();
         }
@@ -199,7 +219,16 @@ class ThreadWorker extends \Thread implements WorkerInterface
      */
     public function shutdown()
     {
-        // start new thread worker before shutdown
-        new ThreadWorker($this->getServerConnectionResource(), $this->getServerContext());
+        $this->shouldRestart = true;
+    }
+
+    /**
+     * Return's if worker should be restarted by server
+     *
+     * @return bool
+     */
+    public function shouldRestart()
+    {
+        return $this->shouldRestart;
     }
 }

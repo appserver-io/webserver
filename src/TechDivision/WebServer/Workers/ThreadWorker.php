@@ -151,8 +151,6 @@ class ThreadWorker extends \Thread implements WorkerInterface
         // accept connections and process connection by handler
         while ($connection = $serverConnection->accept()) {
 
-            $mem = memory_get_usage();
-
             /**
              * Fill up several server vars with connection info
              * Not yet implemented due to performance issues

@@ -38,13 +38,14 @@ interface ConnectionHandlerInterface
 {
 
     /**
-     * Inits the connection handler
+     * Inits the connection handler by given context and params
      *
      * @param \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext The server's context
+     * @param array                                                     $params        The params for connection handler
      *
      * @return void
      */
-    public function init(ServerContextInterface $serverContext);
+    public function init(ServerContextInterface $serverContext, array $params = null);
 
     /**
      * Handles the connection with the connected client in a proper way the given
@@ -60,10 +61,7 @@ interface ConnectionHandlerInterface
     /**
      * Does shutdown logic for worker if something breaks in process
      *
-     * @param \TechDivision\WebServer\Sockets\SocketInterface    $connection The connection to handle
-     * @param \TechDivision\WebServer\Interfaces\WorkerInterface $worker     The worker reference how called this
-     *
      * @return void
      */
-    public function shutdown(SocketInterface $connection, WorkerInterface $worker);
+    public function shutdown();
 }

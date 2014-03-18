@@ -61,11 +61,18 @@ class AuthenticationModule implements ModuleInterface
     protected $serverContext;
 
     /**
-     * Hold's all authenticationType given by config in server's context
+     * Hold's all authenticationType instances used within server while running
      *
      * @var array
      */
-    protected $authenticationTypes;
+    protected $typeInstances;
+
+    /**
+     * Hold's an array of all uri patterns to match uri for
+     *
+     * @var array
+     */
+    protected $uriPatterns;
 
     /**
      * Return's the request instance
@@ -102,10 +109,11 @@ class AuthenticationModule implements ModuleInterface
 
         // check if authentication are given
         if (is_array($this->authentications)) {
-            // init all types
-            foreach ($this->authentications as $authType => $params) {
-                $authTypeInstance = new $authType();
-                $this->authenticationTypes[$authTypeInstance::AUTH_TYPE] = $authTypeInstance;
+            // init all uri patterns
+            foreach ($this->authentications as $uri => $params) {
+                $this->uriPatterns[$uri] = $params;
+                // pre init types by calling getter in init
+                $this->getAuthenticationTypeInstance($params["type"], $params);
             }
         }
     }
@@ -123,21 +131,23 @@ class AuthenticationModule implements ModuleInterface
     /**
      * Return's pre initiated auth type instance by given type
      *
-     * @param string $authType The authentication type
-     * @param string $authData The data got from client for authentication process
+     * @param string $type The authentication type
+     * @param string $data The data got from client for authentication process
      *
      * @return \TechDivision\WebServer\Interfaces\AuthenticationInterface
      * @throws \TechDivision\WebServer\Exceptions\ModuleException
      */
-    public function getAuthenticationTypeInstance($authType, $authData)
+    public function getAuthenticationTypeInstance($type, array $data = array())
     {
-        if (isset($this->authenticationTypes[$authType])) {
-            // init auth type by given auth data
-            $this->authenticationTypes[$authType]->init($authData);
-
-            return $this->authenticationTypes[$authType];
+        if (!is_object($this->typeInstances[$type])) {
+            // check if type class does not exist
+            if (!class_exists($type)) {
+                throw new ModuleException("No auth type found for '$type'", 500);
+            }
+            // init type by given class definition and data
+            $this->typeInstances[$type] = new $type();
         }
-        throw new ModuleException("No auth type found for given request '$authType'", 500);
+        return $this->typeInstances[$type];
     }
 
     /**
@@ -156,44 +166,34 @@ class AuthenticationModule implements ModuleInterface
         $this->response = $response;
 
         // check authentication informations if something matches
-        foreach ($this->authentications as $authentication) {
+        foreach ($this->authentications as $uriPattern => $data) {
             // check if pattern matches uri
             if (preg_match(
-                '/' . $authentication["pattern"] . '/',
+                '/' . $uriPattern . '/',
                 $this->getServerContext()->getServerVar(ServerVars::REQUEST_URI)
             )
             ) {
+                // set type Instance to local ref
+                $typeInstance = $this->getAuthenticationTypeInstance($data["type"]);
                 // check if client sends an authentication header
                 if ($authHeader = $request->getHeader(HttpProtocol::HEADER_AUTHORIZATION)) {
-                    // get auth type and content out of header
-                    list($authType, $authData) = explode(' ', $authHeader);
-                    // get corresponding authenticator for this auth type
-                    $authenticator = $this->getAuthenticationTypeInstance($authType, $authData);
-                    // check if auth works with given credentials
-                    if ($authenticator->auth($authentication["username"], $authentication["password"])) {
-                        $response->appendBodyStream('OK');
-                    } else {
-                        $response->setStatusCode(401);
-                        $response->appendBodyStream('NOK');
-                        $response->addHeader(
-                            HttpProtocol::HEADER_WWW_AUTHENTICATE,
-                            'Basic realm="Test Authentication System"'
-                        );
+                    // init type instance by auth header
+                    $typeInstance->init($authHeader);
+                    // check if auth works
+                    if ($typeInstance->auth($data)) {
+                        // set server vars
+                        $this->getServerContext()->setServerVar(ServerVars::REMOTE_USER, $typeInstance->getUsername());
+                        // break out because everything is fine at this point
+                        return true;
                     }
-
-                    $response->addHeader(HttpProtocol::HEADER_CONTENT_TYPE, 'text/plain');
-                    $response->setState(HttpResponseStates::DISPATCH);
-
-                } else {
-
-                    $response->addHeader(
-                        HttpProtocol::HEADER_WWW_AUTHENTICATE,
-                        'Basic realm="Test Authentication System"'
-                    );
-                    $response->setStatusCode(401);
-                    $response->setState(HttpResponseStates::DISPATCH);
                 }
-
+                // send header for challenge authentication against client
+                $response->addHeader(
+                    HttpProtocol::HEADER_WWW_AUTHENTICATE,
+                    $typeInstance->getType() . ' realm="' . $data["realm"] . "'"
+                );
+                // throw exception for auth required
+                throw new ModuleException(null, 401);
             }
         }
     }

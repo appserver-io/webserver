@@ -22,6 +22,7 @@
 namespace TechDivision\WebServer\Workers;
 
 use TechDivision\Http\HttpConnectionHandler;
+use TechDivision\WebServer\Dictionaries\ServerVars;
 use TechDivision\WebServer\Interfaces\ConfigInterface;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
 use TechDivision\WebServer\Interfaces\WorkerInterface;
@@ -45,8 +46,8 @@ class ThreadWorker extends \Thread implements WorkerInterface
     /**
      * Constructs the worker by setting the server context
      *
-     * @param resource               $serverConnectionResource The server's file descriptor resource
-     * @param ServerContextInterface $serverContext            The server's context
+     * @param resource                                                  $serverConnectionResource The server's file descriptor resource
+     * @param \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext            The server's context
      */
     public function __construct($serverConnectionResource, $serverContext)
     {
@@ -60,7 +61,7 @@ class ThreadWorker extends \Thread implements WorkerInterface
     /**
      * Return's the server context instance
      *
-     * @return ServerContextInterface The server's context
+     * @return \TechDivision\WebServer\Interfaces\ServerContextInterface The server's context
      */
     public function getServerContext()
     {
@@ -102,6 +103,7 @@ class ThreadWorker extends \Thread implements WorkerInterface
      */
     public function work()
     {
+
         // get server context
         $serverContext = $this->getServerContext();
 
@@ -143,8 +145,37 @@ class ThreadWorker extends \Thread implements WorkerInterface
             $connectionHandlers[$connectionHandlerType]->injectModules($modules);
         }
 
+        // init time measurement
+        $datetime = new \DateTime('now');
+
         // accept connections and process connection by handler
         while ($connection = $serverConnection->accept()) {
+
+            /**
+             * Fill up several server vars with connection info
+             * Not yet implemented due to performance issues
+             *
+             * REMOTE_HOST
+             * REMOTE_IDENT
+             */
+            $serverContext->setServerVar(ServerVars::REMOTE_ADDR, $connection->getAddress());
+            $serverContext->setServerVar(ServerVars::REMOTE_PORT, $connection->getPort());
+            // time settings
+            $serverContext->setServerVar(ServerVars::REQUEST_TIME, time());
+            /**
+             * Todo: maybe later on there have to be other time vars too especially for rewrite module.
+             *
+             * REQUEST_TIME_FLOAT
+             * TIME_YEAR
+             * TIME_MON
+             * TIME_DAY
+             * TIME_HOUR
+             * TIME_MIN
+             * TIME_SEC
+             * TIME_WDAY
+             * TIME
+             */
+
             // iterate all connection handlers to handle connection right
             foreach ($connectionHandlers as $connectionHandler) {
                 // if connectionHandler handled connection than break out of foreach
@@ -152,6 +183,7 @@ class ThreadWorker extends \Thread implements WorkerInterface
                     break;
                 }
             }
+
             // init server vars afterwards to avoid performance issues
             $serverContext->initServerVars();
         }

@@ -240,6 +240,26 @@ class StreamSocket implements SocketInterface
     }
 
     /**
+     * Return's the address of connection
+     *
+     * @return string
+     */
+    public function getAddress()
+    {
+        return strstr($this->getPeername(), ':', true);
+    }
+
+    /**
+     * Return's the port of connection
+     *
+     * @return string
+     */
+    public function getPort()
+    {
+        return str_replace(':', '', strstr($this->getPeername(), ':'));
+    }
+
+    /**
      * Return's the connection resource
      *
      * @return mixed

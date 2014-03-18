@@ -141,7 +141,7 @@ class CoreModule implements ModuleInterface
                     $serverContext->setServerVar(ServerVars::SCRIPT_FILENAME, $documentRoot . $scriptName);
                     // if path info is set put it into server vars
                     if (strlen($pathInfo) > 0) {
-                        // todo: check and implement ORIG_PATH_INFO server var
+                        // set path info vars
                         $serverContext->setServerVar(ServerVars::PATH_INFO, $pathInfo);
                         $serverContext->setServerVar(ServerVars::PATH_TRANSLATED, $documentRoot . $pathInfo);
                     }
@@ -178,7 +178,6 @@ class CoreModule implements ModuleInterface
                 }
 
                 // at this point there was no one who can deliver that file so its time to throw a 404
-                $response->setStatusCode(404);
                 throw new ModuleException(null, 404);
             }
 
@@ -186,7 +185,6 @@ class CoreModule implements ModuleInterface
             // todo: implement directory index view and surfing
 
             // for now we will throw a 404 as well here for non existing index files in directory
-            $response->setStatusCode(404);
             throw new ModuleException(null, 404);
         }
     }

@@ -65,6 +65,13 @@ class BasicAuthentication implements AuthenticationInterface
     protected $authData;
 
     /**
+     * Hold's the auth hash to compare with auth information given by system
+     *
+     * @var string
+     */
+    protected $authHash;
+
+    /**
      * Parses the header content set in init before
      *
      * @return bool If parsing was successful
@@ -72,9 +79,9 @@ class BasicAuthentication implements AuthenticationInterface
     protected function parse()
     {
         // set auth hash got from auth data request header
-        $authHash = $this->getAuthData();
+        $this->authHash = trim(strstr($this->getAuthData(), " "));
         // get out username and password
-        list($this->username, $this->password) = explode(':', base64_decode($authHash));
+        list($this->username, $this->password) = explode(':', base64_decode($this->authHash));
         // check if either username or password was not found and return false
         if (($this->password === null) || ($this->username === null)) {
             return false;
@@ -106,17 +113,49 @@ class BasicAuthentication implements AuthenticationInterface
     }
 
     /**
+     * Return's the auth hash got from request parsing
+     *
+     * @return string
+     */
+    public function getAuthHash()
+    {
+        return $this->authHash;
+    }
+
+    /**
      * Try to authenticate
      *
-     * @param string $username The username to match auth for
-     * @param string $password The password to match auth for
+     * @param array $credentialData The credential data to auth against
      *
      * @return bool If auth was successful return true if no false will be returned
      */
-    public function auth($username, $password)
+    public function auth(array $credentialData)
     {
-        if (($username === $this->username) && ($password === $this->password)) {
+        if ($this->getAuthHash() === $credentialData["hash"]) {
             return true;
         }
+        // todo: check if hashFile is given and try to auth against
+        // todo: check if username password combination is given and try to auth against
+        return false;
+    }
+
+    /**
+     * Return's the authentication type token
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return self::AUTH_TYPE;
+    }
+
+    /**
+     * Return's the parsed username
+     *
+     * @return string
+     */
+    public function getUsername()
+    {
+        return $this->username;
     }
 }

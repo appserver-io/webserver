@@ -134,6 +134,16 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     }
 
     /**
+     * Return's admin
+     *
+     * @return string
+     */
+    public function getErrorsPageTemplatePath()
+    {
+        return $this->data->errorsPageTemplatePath;
+    }
+
+    /**
      * Return's worker number
      *
      * @return int
@@ -226,11 +236,11 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     {
         if (!$this->authentications) {
             foreach ($this->data->authentications as $authentication) {
-                $authenticationType = $authentication->type;
+                $authenticationType = $authentication->uri;
                 // get all params
                 $params = get_object_vars($authentication);
                 // remove type
-                unset($params["type"]);
+                unset($params["uri"]);
                 // set all authentication information's
                 $this->authentications[$authenticationType] = $params;
             }

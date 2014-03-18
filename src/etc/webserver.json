@@ -11,17 +11,23 @@
             "admin": "www@localhost.localdomain",
             "software": "phpWebServer/0.1.0",
             "transport": "tcp",
-            "address": "127.0.0.1",
+            "address": "0.0.0.0",
             "port": "9080",
             "documentRoot" : "/var/www",
+            "errorsPageTemplatePath": "",
 
             "authentications" : [
                 {
+                    "uri": "^\\/auth\\/basic\\/phpwebserver.*",
+                    "realm": "PhpWebServer Basic Authentication System",
                     "type": "\\TechDivision\\WebServer\\Authentication\\BasicAuthentication",
-                    "pattern": "^\\/xyz.*",
-                    "file": "var/www/passwd",
-                    "username": "webserver",
-                    "password": "wURpZpgIT.w1I"
+                    "hash": "cGhwd2Vic2VydmVyOnBocHdlYnNlcnZlci5pMA=="
+                },
+                {
+                    "uri": "^\\/auth\\/basic\\/appserver.*",
+                    "realm": "appserver.io Basic Authentication System",
+                    "type": "\\TechDivision\\WebServer\\Authentication\\BasicAuthentication",
+                    "hash": "YXBwc2VydmVyOmFwcHNlcnZlci5pMA=="
                 }
             ],
 
@@ -29,7 +35,8 @@
                 {
                     "name": "phpwebserver.dev phpwebserver.local phpwebserver.test",
                     "admin": "admin@phpwebserver.dev",
-                    "documentRoot": "var/www"
+                    "documentRoot": "var/www",
+                    "errorsPageTemplatePath": "var/www/errors/error.phtml"
                 }
             ],
 
@@ -40,6 +47,7 @@
             "modules": [
                 "\\TechDivision\\WebServer\\Modules\\AuthenticationModule",
                 "\\TechDivision\\WebServer\\Modules\\VirtualHostModule",
+                "\\TechDivision\\WebServer\\Modules\\RewriteModule\\Module",
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",
                 "\\TechDivision\\WebServer\\Modules\\PhpModule"
@@ -62,18 +70,25 @@
             "admin": "www@localhost.localdomain",
             "software": "phpWebServer/0.1.0",
             "transport": "ssl",
-            "address": "127.0.0.1",
+            "address": "0.0.0.0",
             "port": "9443",
             "certPath": "etc/webserver.pem",
             "passphrase": "passphrase",
-            "documentRoot" : "/var/www",
+            "documentRoot": "/var/www",
+            "errorsPageTemplatePath": "",
 
             "authentications" : [
                 {
+                    "uri": "^\\/auth\\/basic\\/phpwebserver.*",
+                    "realm": "PhpWebServer Basic Authentication System",
                     "type": "\\TechDivision\\WebServer\\Authentication\\BasicAuthentication",
-                    "file": "var/www/passwd",
-                    "username": "webserver",
-                    "password": "wURpZpgIT.w1I"
+                    "hash": "cGhwd2Vic2VydmVyOnBocHdlYnNlcnZlci5pMA=="
+                },
+                {
+                    "uri": "^\\/auth\\/basic\\/appserver.*",
+                    "realm": "appserver.io Basic Authentication System",
+                    "type": "\\TechDivision\\WebServer\\Authentication\\BasicAuthentication",
+                    "hash": "YXBwc2VydmVyOmFwcHNlcnZlci5pMA=="
                 }
             ],
 
@@ -81,7 +96,8 @@
                 {
                     "name": "phpwebserver.dev phpwebserver.local phpwebserver.test",
                     "admin": "admin@phpwebserver.dev",
-                    "documentRoot": "var/www"
+                    "documentRoot": "var/www",
+                    "errorsPageTemplatePath": "var/www/errors/error.phtml"
                 }
             ],
 
@@ -92,6 +108,7 @@
             "modules": [
                 "\\TechDivision\\WebServer\\Modules\\AuthenticationModule",
                 "\\TechDivision\\WebServer\\Modules\\VirtualHostModule",
+                "\\TechDivision\\WebServer\\Modules\\RewriteModule\\Module",
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",
                 "\\TechDivision\\WebServer\\Modules\\PhpModule"

@@ -134,7 +134,7 @@ class MultiThreadedServer extends \Thread implements ServerInterface
                 if ($workers[$i]->shouldRestart()) {
                     // unset origin worker ref
                     unset($workers[$i]);
-                    // build up and start new worker ref
+                    // build up and start new worker instance
                     $workers[$i] = new $workerType(
                         $serverConnection->getConnectionResource(),
                         $serverContext

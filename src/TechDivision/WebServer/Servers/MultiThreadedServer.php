@@ -43,20 +43,6 @@ class MultiThreadedServer extends \Thread implements ServerInterface
 {
 
     /**
-     * Hold's the modules pre initiated
-     *
-     * @var array
-     */
-    protected $modules;
-
-    /**
-     * Hold's the connection Handlers pre initiated
-     *
-     * @var array
-     */
-    protected $connectionHandlers;
-
-    /**
      * Hold's the server context instance
      *
      * @var \TechDivision\WebServer\Interfaces\ServerContextInterface The server context instance
@@ -84,26 +70,6 @@ class MultiThreadedServer extends \Thread implements ServerInterface
     public function getServerContext()
     {
         return $this->serverContext;
-    }
-
-    /**
-     * Return's the modules as array
-     *
-     * @return array
-     */
-    protected function getModules()
-    {
-        return $this->modules;
-    }
-
-    /**
-     * Return's connection handlers as array
-     *
-     * @return array
-     */
-    protected function getConnectionHandlers()
-    {
-        return $this->connectionHandlers;
     }
 
     /**
@@ -157,9 +123,26 @@ class MultiThreadedServer extends \Thread implements ServerInterface
             );
         }
 
-        // wait until all workers finished
-        foreach ($workers as $worker) {
-            $worker->join();
+        // todo: switch this to any controller that maintains an server thread
+        $serverUp = true;
+
+        // watch dog for all workers to restart if it's needed while server is up
+        while ($serverUp === true) {
+            // iterate all workers
+            for ($i=1; $i <= $serverConfig->getWorkerNumber(); ++$i) {
+                // check if worker should be restarted
+                if ($workers[$i]->shouldRestart()) {
+                    // unset origin worker ref
+                    unset($workers[$i]);
+                    // build up and start new worker ref
+                    $workers[$i] = new $workerType(
+                        $serverConnection->getConnectionResource(),
+                        $serverContext
+                    );
+                }
+            }
+            // little sleep to avoid cpu burning
+            usleep(5000);
         }
     }
 }

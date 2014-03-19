@@ -51,7 +51,7 @@
                     <param name="errorsPageTemplatePath" type="string">var/www/errors/error.phtml</param>
                 </params>
                 <rewrites>
-                    <rewrite condition="-f|-l|-d" target="/info.php" flag="L"/>
+                    <rewrite condition="-f|-l|-d" target="" flag="L"/>
                 </rewrites>
             </virtualHost>
         </virtualHosts>

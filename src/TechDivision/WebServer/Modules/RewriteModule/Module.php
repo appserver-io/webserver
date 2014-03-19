@@ -218,9 +218,11 @@ class Module implements ModuleInterface
         // We have to throw a ModuleException on failure, so surround the body with a try...catch block
         try {
 
-            $requestUri = $this->serverContext->getServerVar(ServerVars::REQUEST_URI);
+            $requestUrl = $this->serverContext->getServerVar(
+                ServerVars::HTTP_HOST
+            ) . $this->serverContext->getServerVar(ServerVars::REQUEST_URI);
 
-            if (!isset($this->rules[$requestUri])) {
+            if (!isset($this->rules[$requestUrl])) {
 
                 // Reset the $serverBackreferences array to avoid mixups of different requests
                 $this->serverBackreferences = array();
@@ -238,7 +240,7 @@ class Module implements ModuleInterface
                 // Get the rules as the array they are within the config
                 // We might not even get anything, so prepare our rules accordingly
                 $rules = $this->serverContext->getServerConfig()->getRewrites();
-                $this->rules[$requestUri] = array();
+                $this->rules[$requestUrl] = array();
 
                 // Only act if we got something
                 if (is_array($rules)) {
@@ -249,7 +251,7 @@ class Module implements ModuleInterface
                         // Add the rule as a Rule object
                         $rule = new Rule($rule['condition'], $rule['target'], $rule['flag']);
                         $rule->resolve($this->serverBackreferences);
-                        $this->rules[$requestUri][] = $rule;
+                        $this->rules[$requestUrl][] = $rule;
                     }
                 }
             }
@@ -258,7 +260,7 @@ class Module implements ModuleInterface
             $this->setModuleVars($request);
 
             // Iterate over all rules, resolve vars and apply the rule (if needed)
-            foreach ($this->rules[$requestUri] as $rule) {
+            foreach ($this->rules[$requestUrl] as $rule) {
 
                 // Check if the rule matches, and if, apply the rule
                 if ($rule->matches()) {

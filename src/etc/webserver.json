@@ -36,7 +36,22 @@
                     "name": "phpwebserver.dev phpwebserver.local phpwebserver.test",
                     "admin": "admin@phpwebserver.dev",
                     "documentRoot": "var/www",
-                    "errorsPageTemplatePath": "var/www/errors/error.phtml"
+                    "errorsPageTemplatePath": "var/www/errors/error.phtml",
+                    "rewrites" : [
+                        {
+                            "condition" : "-f|-l|-d",
+                            "target" : "/info.php",
+                            "flag" : "L"
+                        }
+                    ]
+                }
+            ],
+
+            "rewrites" : [
+                {
+                    "condition" : "-f|-l|-d",
+                    "target" : "",
+                    "flag" : "L"
                 }
             ],
 
@@ -98,6 +113,14 @@
                     "admin": "admin@phpwebserver.dev",
                     "documentRoot": "var/www",
                     "errorsPageTemplatePath": "var/www/errors/error.phtml"
+                }
+            ],
+
+            "rewrites" : [
+                {
+                    "condition" : "-f|-l|-d",
+                    "target" : "",
+                    "flag" : "L"
                 }
             ],
 

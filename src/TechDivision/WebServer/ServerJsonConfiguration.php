@@ -64,6 +64,13 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     protected $authentications;
 
     /**
+     * Hold's the rewrites array
+     *
+     * @var array
+     */
+    protected $rewrites = array();
+
+    /**
      * Constructs config
      *
      * @param \stdClass $data The data object use
@@ -217,13 +224,29 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
                 $params = get_object_vars($virtualHost);
                 // remove name
                 unset($params["name"]);
+
+                // If we got rewrites we have to preserve them and remove them from the params array
+                $rewrites = array();
+                if (isset($params['rewrites'])) {
+
+                    foreach ($params['rewrites'] as $rewrite) {
+
+                        $rewrites[] = (array) $rewrite;
+                    }
+
+                    unset($params['rewrites']);
+                }
+
                 // set all virtual host information's
                 foreach ($virtualHostNames as $virtualHostName) {
                     // set all virtual hosts params per key for faster matching later on
-                    $this->virtualHosts[trim($virtualHostName)] = $params;
+                    $this->virtualHosts[trim($virtualHostName)]['params'] = $params;
+                    // Also set all the rewrites for this virtual host
+                    $this->virtualHosts[trim($virtualHostName)]['rewrites'] = $rewrites;
                 }
             }
         }
+
         return $this->virtualHosts;
     }
 
@@ -245,6 +268,7 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
                 $this->authentications[$authenticationType] = $params;
             }
         }
+
         return $this->authentications;
     }
 
@@ -270,6 +294,7 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
                 $this->handlers[$handler->extension] = $handler->name;
             }
         }
+
         return $this->handlers;
     }
 
@@ -291,5 +316,48 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     public function getPassphrase()
     {
         return $this->data->passphrase;
+    }
+
+    /**
+     * Returns the rewrite configuration.
+     *
+     * @return array
+     */
+    public function getRewrites()
+    {
+        // init rewrites
+        if (!$this->rewrites) {
+
+            $this->rewrites = array();
+        }
+
+        // prepare the array with the rewrite rules
+        foreach ($this->data->rewrites as $rewrite) {
+
+            // Build up the array entry
+            $this->rewrites[] = array(
+                'condition' => $rewrite->condition,
+                'target' => $rewrite->target,
+                'flag' => $rewrite->flag
+            );
+        }
+
+        // return the rewrites
+        return $this->rewrites;
+    }
+
+    /**
+     * Will prepend a given array of rewrite arrays to the global rewrite pool.
+     * Rewrites arrays have to be the form of array('condition' => ..., 'target' => ..., 'flag' => ...)
+     *
+     * @param array $rewriteArrays The array of rewrite arrays(!) to prepend
+     *
+     * @return boolean
+     */
+    public function prependRewriteArrays(array $rewriteArrays)
+    {
+        $this->rewrites = array_merge($rewriteArrays, $this->rewrites);
+
+        return (bool) $this->rewrites;
     }
 }

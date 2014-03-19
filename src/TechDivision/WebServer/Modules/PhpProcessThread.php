@@ -56,15 +56,24 @@ class PhpProcessThread extends \Thread
     public $lastError;
 
     /**
+     * Hold's the uploaded filename's
+     *
+     * @var array
+     */
+    protected $uploadedFiles;
+
+    /**
      * Constructs the process
      *
      * @param string                                     $scriptFilename The script filename to execute
      * @param \TechDivision\WebServer\Modules\PhpGlobals $globals        The globals instance
+     * @param array                                      $uploadedFiles  The uploaded files as array
      */
-    public function __construct($scriptFilename, PhpGlobals $globals)
+    public function __construct($scriptFilename, PhpGlobals $globals, array $uploadedFiles = array())
     {
-        $this->globals = $globals;
         $this->scriptFilename = $scriptFilename;
+        $this->globals = $globals;
+        $this->uploadedFiles = $uploadedFiles;
     }
 
     /**
@@ -74,10 +83,11 @@ class PhpProcessThread extends \Thread
      */
     public function run()
     {
-        // init globals to local var
-        $globals = $this->globals;
         // register shutdown handler
         register_shutdown_function(array(&$this, "shutdown"));
+        // init globals to local var
+        $globals = $this->globals;
+
         // start output buffering
         ob_start();
         // set globals
@@ -86,7 +96,12 @@ class PhpProcessThread extends \Thread
         $_POST = $globals->post;
         $_GET = $globals->get;
         $_COOKIE = $globals->cookie;
-        //$_FILES = $globals->files;
+        $_FILES = $globals->files;
+
+        // register uploaded files for thread process context internal hashmap
+        foreach ($this->uploadedFiles as $uploadedFile) {
+            appserver_register_file_upload($uploadedFile);
+        }
 
         // change dir to be in real php process context
         chdir(dirname($this->scriptFilename));

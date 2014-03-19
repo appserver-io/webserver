@@ -87,6 +87,13 @@ class PhpModule implements ModuleInterface
     protected $globals;
 
     /**
+     * Hold's the uploaded filename's
+     *
+     * @var array
+     */
+    protected $uploadedFiles;
+
+    /**
      * Initiates the module
      *
      * @param \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext The server's context instance
@@ -98,6 +105,7 @@ class PhpModule implements ModuleInterface
     {
         $this->serverContext = $serverContext;
         $this->globals = new PhpGlobals();
+        $this->uploadedFiles = array();
     }
 
     /**
@@ -185,7 +193,8 @@ class PhpModule implements ModuleInterface
             // start new php process
             $process = new PhpProcessThread(
                 $scriptFilename,
-                $this->globals
+                $this->globals,
+                $this->uploadedFiles
             );
 
             // start process
@@ -315,7 +324,76 @@ class PhpModule implements ModuleInterface
                 $globals->cookie[$key] = $value;
             }
         }
-        // $_FILES = $this->initFileGlobals($request);
+        // set files globals
+        $globals->files = $this->initFileGlobals($request);
+    }
+
+    /**
+     * Returns the array with the $_FILES vars.
+     *
+     * @param \TechDivision\Http\HttpRequestInterface $request The request instance
+     *
+     * @return array The $_FILES vars
+     */
+    protected function initFileGlobals(\TechDivision\Http\HttpRequestInterface $request)
+    {
+        // init query str
+        $queryStr = '';
+
+        // iterate all files
+        foreach ($request->getParts() as $part) {
+            // check if filename is given, write and register it
+            if ($part->getFilename()) {
+                // generate temp filename
+                $tempName = tempnam(ini_get('upload_tmp_dir'), 'php');
+                // write part
+                $part->write($tempName);
+                // register uploaded file
+                $this->registerFileUpload($tempName);
+                // init error state
+                $errorState = UPLOAD_ERR_OK;
+            } else {
+                // set error state
+                $errorState = UPLOAD_ERR_NO_FILE;
+                // clear tmp file
+                $tempName = '';
+            }
+            // check if file has array info
+            if (preg_match('/^([^\[]+)(\[.+)?/', $part->getName(), $matches)) {
+
+                // get first part group name and array definition if exists
+                $partGroup = $matches[1];
+                $partArrayDefinition = '';
+                if (isset($matches[2])) {
+                    $partArrayDefinition = $matches[2];
+                }
+                $queryStr .= $partGroup . '[name]' . $partArrayDefinition . '=' . $part->getFilename() .
+                    '&' . $partGroup . '[type]' . $partArrayDefinition . '=' . $part->getContentType() .
+                    '&' . $partGroup . '[tmp_name]' . $partArrayDefinition . '=' . $tempName .
+                    '&' . $partGroup . '[error]' . $partArrayDefinition . '=' . $errorState .
+                    '&' . $partGroup . '[size]' . $partArrayDefinition . '=' . $part->getSize() . '&';
+            }
+        }
+        // parse query string to array
+        parse_str($queryStr, $filesArray);
+
+        // return files array finally.
+        return $filesArray;
+    }
+
+    /**
+     * Register's a file upload on internal php hash table for being able to use core functions
+     * like move_uploaded_file or is_uploaded_file as usual.
+     *
+     * @param string $filename the filename to register
+     * @return bool
+     */
+    public function registerFileUpload($filename)
+    {
+        // add filename to uploaded file array
+        $this->uploadedFiles[] = $filename;
+        // registers file upload in this context for php process without threading
+        return appserver_register_file_upload($filename);
     }
 
     /**

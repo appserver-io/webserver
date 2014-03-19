@@ -385,7 +385,8 @@ class PhpModule implements ModuleInterface
      * Register's a file upload on internal php hash table for being able to use core functions
      * like move_uploaded_file or is_uploaded_file as usual.
      *
-     * @param string $filename the filename to register
+     * @param string $filename The filename to register
+     *
      * @return bool
      */
     public function registerFileUpload($filename)

@@ -166,4 +166,21 @@ interface ServerConfigurationInterface
      * @return string
      */
     public function getPassphrase();
+
+    /**
+     * Returns the rewrite configuration.
+     *
+     * @return array
+     */
+    public function getRewrites();
+
+    /**
+     * Will prepend a given array of rewrite arrays to the global rewrite pool.
+     * Rewrites arrays have to be the form of array('condition' => ..., 'target' => ..., 'flag' => ...)
+     *
+     * @param array $rewriteArrays The array of rewrite arrays(!) to prepend
+     *
+     * @return boolean
+     */
+    public function prependRewriteArrays(array $rewriteArrays);
 }

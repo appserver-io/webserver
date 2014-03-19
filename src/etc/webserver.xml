@@ -50,15 +50,16 @@
                     <param name="documentRoot" type="string">var/www</param>
                     <param name="errorsPageTemplatePath" type="string">var/www/errors/error.phtml</param>
                 </params>
+                <rewrites>
+                    <rewrite condition="-f|-l|-d" target="/info.php" flag="L"/>
+                </rewrites>
             </virtualHost>
         </virtualHosts>
-<!--
+
         <rewrites>
             <rewrite condition="-f|-l|-d" target="" flag="L"/>
-            <rewrite condition="(.+)([/\?].+)" target="$1.do$2" flag="L"/>
-            <rewrite condition="(.+)" target="$1.do" flag=""/>
         </rewrites>
--->
+
         <connectionHandlers>
             <connectionHandler type="\TechDivision\Http\HttpConnectionHandler" />
         </connectionHandlers>
@@ -105,8 +106,15 @@
                     <param name="documentRoot" type="string">var/www</param>
                     <param name="errorsPageTemplatePath" type="string">var/www/errors/error.phtml</param>
                 </params>
+                <rewrites>
+                    <rewrite condition="-f|-l|-d" target="" flag="L"/>
+                </rewrites>
             </virtualHost>
         </virtualHosts>
+
+        <rewrites>
+            <rewrite condition="-f|-l|-d" target="" flag="L"/>
+        </rewrites>
 
         <authentications>
             <authentication uri="^\/auth\/basic\/phpwebserver.*">

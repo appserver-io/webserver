@@ -99,7 +99,7 @@ class VirtualHostModule implements ModuleInterface
      */
     public function init(ServerContextInterface $serverContext)
     {
-        $this->serverContext= $serverContext;
+        $this->serverContext = $serverContext;
     }
 
     /**
@@ -133,7 +133,7 @@ class VirtualHostModule implements ModuleInterface
         // check if current host matches any virtual host configuration
         if (isset($virtualHosts[$serverName])) {
             // read out params
-            $params = $virtualHosts[$serverName];
+            $params = $virtualHosts[$serverName]['params'];
             // iterate over all params and try to set as server var via mapping
             foreach ($params as $paramName => $paramValue) {
                 // check if server var mapping exists
@@ -145,6 +145,16 @@ class VirtualHostModule implements ModuleInterface
                     );
                 }
             }
+
+            // Add the rewrites we have (if any) to the configuration's rewrite pool
+            if (!empty($virtualHosts[$serverName]['rewrites'])) {
+
+                // Prepend the virtual host specific rewrite entries
+                $this->getServerContext()->getServerConfig()->prependRewriteArrays(
+                    $virtualHosts[$serverName]['rewrites']
+                );
+            }
+
         }
 
     }

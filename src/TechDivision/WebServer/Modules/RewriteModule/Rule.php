@@ -72,6 +72,13 @@ class Rule
     protected $sortedConditions = array();
 
     /**
+     * Will hold the backreferences of the condition(s) which matched
+     *
+     * @var array $matchingBackreferences
+     */
+    protected $matchingBackreferences = array();
+
+    /**
      * The target to rewrite the REDIRECT_URL to
      *
      * @var string $targetString
@@ -122,6 +129,7 @@ class Rule
 
         // Set our default values here
         $this->allowedTypes = array('relative', 'absolute', 'url');
+        $this->matchingBackreferences = array();
 
         // filter the condition string using our regex, but first of all we will append the default operand
         $conditionPieces = array();
@@ -203,13 +211,6 @@ class Rule
      */
     protected function resolveConditions(array $backreferences)
     {
-        // Separate the keys from the values so we can use them in str_replace
-        $backreferenceHolders = array_keys($backreferences);
-        $backreferenceValues = array_values($backreferences);
-
-        // Substitute the backreferences in our operation
-        $this->targetString = str_replace($backreferenceHolders, $backreferenceValues, $this->targetString);
-
         // Iterate over all conditions and resolve them too
         foreach ($this->sortedConditions as $key => $sortedCondition) {
 
@@ -254,6 +255,10 @@ class Rule
                     if ($orCombinedCondition->matches()) {
 
                         $orGroupMatched = true;
+                        $this->matchingBackreferences = array_merge(
+                            $this->matchingBackreferences,
+                            $orCombinedCondition->getBackreferences()
+                        );
                         break;
                     }
                 }
@@ -266,6 +271,12 @@ class Rule
             } elseif (!$sortedCondition->matches()) {
                 // The single conditions have to match as they are and-combined
                 return false;
+            } else {
+
+                $this->matchingBackreferences = array_merge(
+                    $this->matchingBackreferences,
+                    $sortedCondition->getBackreferences()
+                );
             }
         }
 
@@ -289,6 +300,14 @@ class Rule
         // Back to our rule...
         // If the target string is empty we do not have to do anything
         if (!empty($this->targetString)) {
+
+            // First of all we have to resolve the target string with the backreferences of the matching condition
+            // Separate the keys from the values so we can use them in str_replace
+            $backreferenceHolders = array_keys($this->matchingBackreferences);
+            $backreferenceValues = array_values($this->matchingBackreferences);
+
+            // Substitute the backreferences in our operation
+            $this->targetString = str_replace($backreferenceHolders, $backreferenceValues, $this->targetString);
 
             // We have to find out what type of rule we got here
             if (is_readable($this->targetString)) {
@@ -380,13 +399,19 @@ class Rule
                 foreach ($sortedCondition as $orCombinedCondition) {
 
                     // Get the backreferences of this condition
-                    $backreferences = array_merge($backreferences, $orCombinedCondition->getBackreferences());
+                    $backreferences = array_merge(
+                        $backreferences,
+                        $orCombinedCondition->getBackreferences()
+                    );
                 }
 
             } else {
 
                 // Get the backreferences of this condition
-                $backreferences = array_merge($backreferences, $sortedCondition->getBackreferences());
+                $backreferences = array_merge(
+                    $backreferences,
+                    $sortedCondition->getBackreferences()
+                );
             }
         }
 

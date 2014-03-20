@@ -345,19 +345,4 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
         // return the rewrites
         return $this->rewrites;
     }
-
-    /**
-     * Will prepend a given array of rewrite arrays to the global rewrite pool.
-     * Rewrites arrays have to be the form of array('condition' => ..., 'target' => ..., 'flag' => ...)
-     *
-     * @param array $rewriteArrays The array of rewrite arrays(!) to prepend
-     *
-     * @return boolean
-     */
-    public function prependRewriteArrays(array $rewriteArrays)
-    {
-        $this->rewrites = array_merge($rewriteArrays, $this->rewrites);
-
-        return (bool) $this->rewrites;
-    }
 }

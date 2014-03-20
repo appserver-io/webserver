@@ -28,6 +28,7 @@ use TechDivision\WebServer\Interfaces\ServerContextInterface;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
 use TechDivision\WebServer\Interfaces\ModuleInterface;
+use TechDivision\WebServer\Dictionaries\ModuleVars;
 
 /**
  * \TechDivision\WebServer\Modules\RewriteModule\Module
@@ -68,11 +69,18 @@ class Module implements ModuleInterface
     protected $locations = array();
 
     /**
-     * All rules we have to check
+     * All rules we have to check (sorted by requested URL)
      *
      * @var array $rules
      */
     protected $rules = array();
+
+    /**
+     * The rules as we got it from our basic configuration
+     *
+     * @var array $configuredRules
+     */
+    protected $configuredRules = array();
 
     /**
      * Will hold all configs we have encountered to be used via the location mapping
@@ -102,7 +110,6 @@ class Module implements ModuleInterface
      * @var array $dependencies The modules we depend on
      */
     protected $dependencies = array();
-
 
     /**
      * Defines the module name
@@ -197,6 +204,10 @@ class Module implements ModuleInterface
                 SslEnvironmentVars::SSL_TLS_SNI
             );
 
+            // Get the rules as the array they are within the config
+            // We might not even get anything, so prepare our rules accordingly
+            $this->configuredRules = $this->serverContext->getServerConfig()->getRewrites();
+
         } catch (\Exception $e) {
 
             // Re-throw as a ModuleException
@@ -239,7 +250,10 @@ class Module implements ModuleInterface
 
                 // Get the rules as the array they are within the config
                 // We might not even get anything, so prepare our rules accordingly
-                $rules = $this->serverContext->getServerConfig()->getRewrites();
+                $rules = array_merge(
+                    $this->serverContext->getModuleVars(ModuleVars::VOLATILE_REWRITES)[ModuleVars::VOLATILE_REWRITES],
+                    $this->configuredRules
+                );
                 $this->rules[$requestUrl] = array();
 
                 // Only act if we got something

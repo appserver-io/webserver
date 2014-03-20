@@ -138,6 +138,13 @@ class VirtualHostModule implements ModuleInterface
             foreach ($params as $paramName => $paramValue) {
                 // check if server var mapping exists
                 if (isset($this->paramServerVarsMap[$paramName])) {
+                    // check if documentRoot is changed
+                    if ($this->paramServerVarsMap[$paramName] === ServerVars::DOCUMENT_ROOT) {
+                        // check if relative path is given and make is absolute by using cwd as prefix
+                        if (substr($paramValue, 0, 1) !== "/") {
+                            $paramValue = getcwd() . DIRECTORY_SEPARATOR . $paramValue;
+                        }
+                    }
                     // set server var
                     $this->getServerContext()->setServerVar(
                         $this->paramServerVarsMap[$paramName],

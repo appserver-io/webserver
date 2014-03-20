@@ -49,15 +49,24 @@ class PhpProcess
     public $outputBuffer;
 
     /**
+     * Hold's the uploaded filename's
+     *
+     * @var array
+     */
+    protected $uploadedFiles;
+
+    /**
      * Constructs the process
      *
      * @param string                                     $scriptFilename The script filename to execute
      * @param \TechDivision\WebServer\Modules\PhpGlobals $globals        The globals instance
+     * @param array                                      $uploadedFiles  The uploaded files as array
      */
-    public function __construct($scriptFilename, PhpGlobals $globals)
+    public function __construct($scriptFilename, PhpGlobals $globals, array $uploadedFiles = array())
     {
-        $this->globals = $globals;
         $this->scriptFilename = $scriptFilename;
+        $this->globals = $globals;
+        $this->uploadedFiles = $uploadedFiles;
     }
 
     /**
@@ -79,7 +88,7 @@ class PhpProcess
         $_POST = $globals->post;
         $_GET = $globals->get;
         $_COOKIE = $globals->cookie;
-        //$_FILES = $globals->files;
+        $_FILES = $globals->files;
 
         // get current working dir for reset after processing
         $oldCwd = getcwd();

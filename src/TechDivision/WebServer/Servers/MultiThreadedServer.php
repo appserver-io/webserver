@@ -98,8 +98,16 @@ class MultiThreadedServer extends \Thread implements ServerInterface
         $socketType = $serverConfig->getSocketType();
         $workerType = $serverConfig->getWorkerType();
 
+
+        // set socket backlog to 1024 for perform many concurrent connections
+        $opts = array(
+            'socket' => array(
+                'backlog' => 1024,
+            )
+        );
+
         // init stream context for server connection
-        $streamContext = stream_context_create();
+        $streamContext = stream_context_create($opts);
         // check if ssl server config
         if ($serverConfig->getTransport() === 'ssl') {
             stream_context_set_option($streamContext, 'ssl', 'local_cert', WEBSERVER_BASEDIR . $serverConfig->getCertPath());

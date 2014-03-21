@@ -94,4 +94,48 @@ interface ServerContextInterface
      * @return void
      */
     public function initServerVars();
+
+    /**
+     * Set's a value to specific module var
+     *
+     * @param string $moduleVar The module var to set
+     * @param string $value     The value to module var
+     *
+     * @return void
+     */
+    public function setModuleVar($moduleVar, $value);
+
+    /**
+     * Return's a value for specific module var
+     *
+     * @param string $moduleVar The module var to get value for
+     *
+     * @throws \TechDivision\WebServer\Exceptions\ServerException
+     *
+     * @return string The value to given module var
+     */
+    public function getModuleVar($moduleVar);
+
+    /**
+     * Return's all the module vars as array key value pair format
+     *
+     * @return array The module vars as array
+     */
+    public function getModuleVars();
+
+    /**
+     * Check's if value exists for given module var
+     *
+     * @param string $moduleVar The module var to check
+     *
+     * @return boolean Weather it has moduleVar (true) or not (false)
+     */
+    public function hasModuleVar($moduleVar);
+
+    /**
+     * Will init the module vars, which means we will clean it completely
+     *
+     * @return void
+     */
+    public function initModuleVars();
 }

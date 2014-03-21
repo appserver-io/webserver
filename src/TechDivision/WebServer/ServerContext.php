@@ -57,9 +57,17 @@ class ServerContext implements ServerContextInterface
     /**
      * Hold's the config instance
      *
-     * @var \TechDivision\WebServer\Interfaces\ServerConfigurationInterface
+     * @var \TechDivision\WebServer\Interfaces\ServerConfigurationInterface $serverConfig
      */
     protected $serverConfig;
+
+    /**
+     * This member will hold the module variables which different modules can set/get to communicate with each
+     * other without knowing each other.
+     *
+     * @var array $moduleVars
+     */
+    protected $moduleVars;
 
     /**
      * Initialises the server context
@@ -97,6 +105,7 @@ class ServerContext implements ServerContextInterface
     public function getConnectionInstance($connectionResource)
     {
         $socketType = $this->getServerConfig()->getSocketType();
+
         return $socketType::getInstance($connectionResource);
     }
 
@@ -142,6 +151,8 @@ class ServerContext implements ServerContextInterface
      *
      * @param string $serverVar The server var to get value for
      *
+     * @throws \TechDivision\WebServer\Exceptions\ServerException
+     *
      * @return string The value to given server var
      */
     public function getServerVar($serverVar)
@@ -178,6 +189,7 @@ class ServerContext implements ServerContextInterface
         if (!isset($this->serverVars[$serverVar])) {
             return false;
         }
+
         return true;
     }
 
@@ -201,7 +213,8 @@ class ServerContext implements ServerContextInterface
             ServerVars::SERVER_PORT => $serverPort,
             ServerVars::GATEWAY_INTERFACE => "PHP/" . PHP_VERSION,
             ServerVars::SERVER_SOFTWARE => $serverSoftware,
-            ServerVars::SERVER_SIGNATURE => "<address>$serverSoftware Server at $serverAddress Port $serverPort</address>\r\n",
+            ServerVars::SERVER_SIGNATURE =>
+                "<address>$serverSoftware Server at $serverAddress Port $serverPort</address>\r\n",
             ServerVars::SERVER_HANDLER => CoreModule::MODULE_NAME,
             ServerVars::SERVER_ERRORS_PAGE_TEMPLATE_PATH => $this->getServerConfig()->getErrorsPageTemplatePath(),
             ServerVars::PATH => getenv('PATH'),
@@ -216,5 +229,78 @@ class ServerContext implements ServerContextInterface
          * Todo: set auth server vars by mod_auth later on if it exists
          * AUTH_TYPE
          */
+    }
+
+    /**
+     * Set's a value to specific module var
+     *
+     * @param string $moduleVar The module var to set
+     * @param string $value     The value to module var
+     *
+     * @return void
+     */
+    public function setModuleVar($moduleVar, $value)
+    {
+        if (!is_null($value)) {
+            $this->moduleVars[$moduleVar] = $value;
+        }
+    }
+
+    /**
+     * Return's a value for specific module var
+     *
+     * @param string $moduleVar The module var to get value for
+     *
+     * @throws \TechDivision\WebServer\Exceptions\ServerException
+     *
+     * @return string The value to given module var
+     */
+    public function getModuleVar($moduleVar)
+    {
+        // check if server var is set
+        if (isset($this->moduleVars[$moduleVar])) {
+            // return server vars value
+            return $this->moduleVars[$moduleVar];
+        }
+        // throw exception
+        throw new ServerException("Module var '$moduleVar'' does not exist.", 500);
+    }
+
+    /**
+     * Return's all the module vars as array key value pair format
+     *
+     * @return array The module vars as array
+     */
+    public function getModuleVars()
+    {
+        return $this->moduleVars;
+    }
+
+    /**
+     * Check's if value exists for given module var
+     *
+     * @param string $moduleVar The module var to check
+     *
+     * @return boolean Weather it has moduleVar (true) or not (false)
+     */
+    public function hasModuleVar($moduleVar)
+    {
+        // check if server var is set
+        if (!isset($this->moduleVars[$moduleVar])) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Will init the module vars, which means we will clean it completely
+     *
+     * @return void
+     */
+    public function initModuleVars()
+    {
+        // set module vars array
+        $this->moduleVars = array();
     }
 }

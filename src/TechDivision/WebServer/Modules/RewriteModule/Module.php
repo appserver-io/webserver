@@ -251,7 +251,7 @@ class Module implements ModuleInterface
                 // Get the rules as the array they are within the config
                 // We might not even get anything, so prepare our rules accordingly
                 $rules = array_merge(
-                    $this->serverContext->getModuleVars(ModuleVars::VOLATILE_REWRITES)[ModuleVars::VOLATILE_REWRITES],
+                    $this->serverContext->getModuleVar(ModuleVars::VOLATILE_REWRITES),
                     $this->configuredRules
                 );
                 $this->rules[$requestUrl] = array();

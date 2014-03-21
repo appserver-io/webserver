@@ -62,7 +62,7 @@
             "modules": [
                 "\\TechDivision\\WebServer\\Modules\\AuthenticationModule",
                 "\\TechDivision\\WebServer\\Modules\\VirtualHostModule",
-                "\\TechDivision\\WebServer\\Modules\\RewriteModule\\Module",
+                "\\TechDivision\\RewriteModule\\RewriteModule",
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",
                 "\\TechDivision\\WebServer\\Modules\\PhpModule"
@@ -138,7 +138,7 @@
             "modules": [
                 "\\TechDivision\\WebServer\\Modules\\AuthenticationModule",
                 "\\TechDivision\\WebServer\\Modules\\VirtualHostModule",
-                "\\TechDivision\\WebServer\\Modules\\RewriteModule\\Module",
+                "\\TechDivision\\RewriteModule\\RewriteModule",
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",
                 "\\TechDivision\\WebServer\\Modules\\PhpModule"

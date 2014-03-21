@@ -248,10 +248,18 @@ class Module implements ModuleInterface
                 $this->fillHeaderBackreferences($request);
                 $this->fillSslEnvironmentBackreferences();
 
-                // Get the rules as the array they are within the config
+                // Get the rules as the array they are within the config.
+                // We have to also collect any volative rules which might be set on request base.
                 // We might not even get anything, so prepare our rules accordingly
+                $volatileRewrites = array();
+                if ($this->serverContext->hasModuleVar(ModuleVars::VOLATILE_REWRITES)) {
+
+                    $volatileRewrites = $this->serverContext->getModuleVar(ModuleVars::VOLATILE_REWRITES);
+                }
+
+                // Build up the complete ruleset, volatile rules up front
                 $rules = array_merge(
-                    $this->serverContext->getModuleVar(ModuleVars::VOLATILE_REWRITES),
+                    $volatileRewrites,
                     $this->configuredRules
                 );
                 $this->rules[$requestUrl] = array();

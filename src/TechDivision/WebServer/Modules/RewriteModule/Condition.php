@@ -8,7 +8,7 @@
  *
  * PHP version 5
  *
- * @category   Php-by-contract
+ * @category   Webserver
  * @package    TechDivision_WebServer
  * @subpackage Modules
  * @author     Bernhard Wick <b.wick@techdivision.com>
@@ -23,9 +23,9 @@ namespace TechDivision\WebServer\Modules\RewriteModule;
 /**
  * TechDivision\WebServer\Modules\RewriteModule\Condition
  *
- * <TODO CLASS DESCRIPTION>
+ * This class provides an object based representation of a rewrite rules condition including logic for checking itself.
  *
- * @category   Php-by-contract
+ * @category   Webserver
  * @package    TechDivision_WebServer
  * @subpackage Modules
  * @author     Bernhard Wick <b.wick@techdivision.com>

@@ -8,7 +8,7 @@
  *
  * PHP version 5
  *
- * @category   Php-by-contract
+ * @category   Webserver
  * @package    TechDivision_WebServer
  * @subpackage Modules
  * @author     Bernhard Wick <b.wick@techdivision.com>
@@ -30,9 +30,10 @@ use TechDivision\WebServer\Interfaces\ServerContextInterface;
 /**
  * TechDivision\WebServer\Modules\RewriteModule\Rule
  *
- * <TODO CLASS DESCRIPTION>
+ * This class provides an object based representation of a rewrite rule, including logic for testing, applying
+ * and handeling conditions.
  *
- * @category   Php-by-contract
+ * @category   Webserver
  * @package    TechDivision_WebServer
  * @subpackage Modules
  * @author     Bernhard Wick <b.wick@techdivision.com>

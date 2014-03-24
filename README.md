@@ -1,4 +1,4 @@
-TechDivision_WebServer
+TechDivision_WebServer [![Build Status](https://travis-ci.org/techdivision/TechDivision_WebServer.png)](https://travis-ci.org/techdivision/TechDivision_WebServer)
 ======================
 
 ####Are you serious? A web server written in pure PHP for PHP?

@@ -62,6 +62,8 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         $this->passphrase = (string)array_shift($node->xpath("./params/param[@name='passphrase']"));
         $this->documentRoot = (string)array_shift($node->xpath("./params/param[@name='documentRoot']"));
         $this->admin = (string)array_shift($node->xpath("./params/param[@name='admin']"));
+        $this->keepAliveMax = (string)array_shift($node->xpath("./params/param[@name='keepAliveMax']"));
+        $this->keepAliveTimeout = (string)array_shift($node->xpath("./params/param[@name='keepAliveTimeout']"));
         $this->errorsPageTemplatePath = (string)array_shift($node->xpath("./params/param[@name='errorsPageTemplatePath']"));
         // init modules
         $this->modules = array();
@@ -188,7 +190,7 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
      */
     public function getPort()
     {
-        return $this->port;
+        return (int)$this->port;
     }
 
     /**
@@ -212,6 +214,26 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
     }
 
     /**
+     * Return's keep-alive max connection
+     *
+     * @return int
+     */
+    public function getKeepAliveMax()
+    {
+        return (int)$this->keepAliveMax;
+    }
+
+    /**
+     * Return's keep-alive timeout
+     *
+     * @return int
+     */
+    public function getKeepAliveTimeout()
+    {
+        return (int)$this->keepAliveTimeout;
+    }
+
+    /**
      * Return's template path for errors page
      *
      * @return string
@@ -228,7 +250,7 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
      */
     public function getWorkerNumber()
     {
-        return $this->workerNumber;
+        return (int)$this->workerNumber;
     }
 
     /**

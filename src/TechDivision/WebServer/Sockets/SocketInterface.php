@@ -59,18 +59,21 @@ interface SocketInterface
      * @param int $acceptTimeout  The timeout in seconds to wait for accepting connections.
      * @param int $receiveTimeout The timeout in seconds to wait for read a line.
      *
-     * @return \TechDivision\WebServer\Sockets\SocketInterface The Stream instance with the connection socket accepted.
+     * @return \TechDivision\WebServer\Sockets\StreamSocket|bool The Stream instance with the connection socket
+     *                                                           accepted or bool false if timeout or error occurred.
      */
     public function accept($acceptTimeout = 600, $receiveTimeout = 60);
 
     /**
      * Return's the line read from connection resource
      *
-     * @param int $readLength The max length to read for a line.
+     * @param int $readLength     The max length to read for a line.
+     * @param int $receiveTimeout The max time to wait for read the next line
      *
      * @return string;
+     * @throws \TechDivision\WebServer\Sockets\SocketReadTimeoutException
      */
-    public function readLine($readLength = 256);
+    public function readLine($readLength = 256, $receiveTimeout = null);
 
     /**
      * Read's the given length from connection resource

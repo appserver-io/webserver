@@ -160,53 +160,41 @@ class ThreadWorker extends \Thread implements WorkerInterface
         $connectionCount = 0;
         $connectionLimit = rand(16, 64);
 
-        // accept connections and process connection by handler
-        while ($connection = $serverConnection->accept()) {
+        // while worker not reached connection limit accept connections and process
+        while (++$connectionCount < $connectionLimit) {
 
-            /**
-             * Fill up several server vars with connection info
-             * Not yet implemented due to performance issues
-             *
-             * REMOTE_HOST
-             * REMOTE_IDENT
-             */
-            $serverContext->setServerVar(ServerVars::REMOTE_ADDR, $connection->getAddress());
-            $serverContext->setServerVar(ServerVars::REMOTE_PORT, $connection->getPort());
-            // time settings
-            $serverContext->setServerVar(ServerVars::REQUEST_TIME, time());
-            /**
-             * Todo: maybe later on there have to be other time vars too especially for rewrite module.
-             *
-             * REQUEST_TIME_FLOAT
-             * TIME_YEAR
-             * TIME_MON
-             * TIME_DAY
-             * TIME_HOUR
-             * TIME_MIN
-             * TIME_SEC
-             * TIME_WDAY
-             * TIME
-             */
+            // accept connections and process working connection by handlers
+            if (($connection = $serverConnection->accept()) !== false) {
 
-            // iterate all connection handlers to handle connection right
-            foreach ($connectionHandlers as $connectionHandler) {
-                // if connectionHandler handled connection than break out of foreach
-                if ($connectionHandler->handle($connection, $this)) {
-                    break;
+                /**
+                 * This is for testing async request processing only.
+                 *
+                 * It'll delegate the request handling to another thread which will be processed async.
+                 *
+                // call async request handler to handle connection
+                $requestHandler = new RequestHandlerThread(
+                    $connection->getConnectionResource(),
+                    $connectionHandlers,
+                    $serverContext,
+                    $this
+                );
+                */
+
+                // iterate all connection handlers to handle connection right
+                foreach ($connectionHandlers as $connectionHandler) {
+                    // if connectionHandler handled connection than break out of foreach
+                    if ($connectionHandler->handle($connection, $this)) {
+                        break;
+                    }
                 }
-            }
 
-            // check if worker reached my connection limit
-            if (++$connectionCount >= $connectionLimit) {
-                // call shoutdown
-                $this->shutdown();
-                // and break out loop
-                break;
+                // init server vars afterwards to avoid performance issues
+                $serverContext->initServerVars();
             }
-
-            // init server vars afterwards to avoid performance issues
-            $serverContext->initServerVars();
         }
+
+        // call internal shutdown
+        $this->shutdown();
     }
 
     /**

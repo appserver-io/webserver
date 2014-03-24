@@ -84,6 +84,20 @@ interface ServerConfigurationInterface
     public function getAdmin();
 
     /**
+     * Return's keep-alive max connection
+     *
+     * @return int
+     */
+    public function getKeepAliveMax();
+
+    /**
+     * Return's keep-alive timeout
+     *
+     * @return int
+     */
+    public function getKeepAliveTimeout();
+
+    /**
      * Return's template path for errors page
      *
      * @return string

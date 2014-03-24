@@ -21,7 +21,10 @@
 
 namespace TechDivision\WebServer\Interfaces;
 
-use \TechDivision\WebServer\Interfaces\ServerConfigurationInterface;
+use TechDivision\WebServer\Interfaces\ServerConfigurationInterface;
+use TechDivision\WebServer\Sockets\SocketInterface;
+
+
 
 /**
  * Interface ServerContextInterface
@@ -94,4 +97,13 @@ interface ServerContextInterface
      * @return void
      */
     public function initServerVars();
+
+    /**
+     * Add's connection relevant informations to server vars
+     *
+     * @param \TechDivision\WebServer\Sockets\SocketInterface $connection The connection
+     *
+     * @return void
+     */
+    public function setConnectionServerVars(SocketInterface $connection);
 }

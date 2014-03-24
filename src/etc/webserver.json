@@ -13,7 +13,9 @@
             "transport": "tcp",
             "address": "0.0.0.0",
             "port": "9080",
-            "documentRoot" : "/var/www",
+            "documentRoot" : "var/www",
+            "keepAliveMax": 64,
+            "keepAliveTimeout": 16,
             "errorsPageTemplatePath": "",
 
             "authentications" : [
@@ -89,7 +91,9 @@
             "port": "9443",
             "certPath": "etc/webserver.pem",
             "passphrase": "passphrase",
-            "documentRoot": "/var/www",
+            "documentRoot": "var/www",
+            "keepAliveMax": 64,
+            "keepAliveTimeout": 16,
             "errorsPageTemplatePath": "",
 
             "authentications" : [

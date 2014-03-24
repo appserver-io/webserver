@@ -11,7 +11,6 @@ before_install:
 
 before_script:
   - composer selfupdate
-  - composer install
 
 script:
   - ant build

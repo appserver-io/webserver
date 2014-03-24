@@ -9,9 +9,9 @@ We use this in the [`appserver.io`](<http://www.appserver.io>) project as a serv
 Requirements
 ------------
 If you want to use the php webserver in stand alone mode, you have to prepare several things
-* [`PHP`](<http://php.net>) compiled with ZTS Enabled (Thread Safety)
-* [`pthreads`](<https://github.com/krakjoe/pthreads>) PHP extension (Version 1.0.1 is preferred!)
-* [`appserver`](<https://github.com/techdivision/php-ext-appserver>) PHP extension
+* [`PHP`](<http://php.net>) compiled with ZTS Enabled. (Thread Safety)
+* [`pthreads`](<https://github.com/krakjoe/pthreads>) PHP extension for Multithreading. (Version 1.0.1 is preferred!)
+* [`appserver`](<https://github.com/techdivision/php-ext-appserver>) PHP extension to handle php headers and uploads within a daemon process.
 
 ... or just install [`appserver.io`](<http://www.appserver.io>) which provides the perfect runtime environment for the webserver to rock.
 

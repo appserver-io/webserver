@@ -83,8 +83,8 @@ class CoreModule implements ModuleInterface
             // get uri without querystring
             // Just make sure that you check for the existence of the query string first, as it might not be set
             $uriWithoutQueryString = $serverContext->getServerVar(ServerVars::REQUEST_URI);
-            if ($serverContext->hasServerVar(ServerVars::QUERY_STRING)) {
 
+            if ($serverContext->hasServerVar(ServerVars::QUERY_STRING)) {
                 $uriWithoutQueryString = str_replace(
                     '?' . $serverContext->getServerVar(ServerVars::QUERY_STRING),
                     '',
@@ -100,7 +100,8 @@ class CoreModule implements ModuleInterface
             $validDir = null;
             $scriptName = null;
 
-            // todo: only if file extension hits a filehandle info it will be possible to set path info etc...
+            // note: only if file extension hits a filehandle info it will be possible to set path info etc...
+
             // iterate through all dirs beginning at 1 because 0 is always empty in this case
             for ($i = 1; $i < count($pathParts); ++$i) {
                 // check if no script name was found yet
@@ -111,14 +112,15 @@ class CoreModule implements ModuleInterface
                     if (!is_dir($documentRoot . $possibleValidPath)) {
                         // check if its not a file too
                         if (!is_file($documentRoot . $possibleValidPath)) {
-                            // maybe there is a special request going on. break here an go on processing to let other
+                            // maybe there is a special request going on. Go on processing to let other
                             // modules react on this uri if some virtual file handling was registered.
-                            break;
+
+                        } else {
+                            // at this point it's def. an existing file in an existing dir. our script name
+                            $scriptName = $possibleValidPath;
+                            // set special server var for existing file for that request
+                            $serverContext->setServerVar(ServerVars::REQUEST_FILENAME, $scriptName);
                         }
-                        // at this point it's def. an existing file in an existing dir. our script name
-                        $scriptName = $possibleValidPath;
-                        // set special server var for existing file for that request
-                        $serverContext->setServerVar(ServerVars::REQUEST_FILENAME, $scriptName);
                     } else {
                         $validDir = $possibleValidPath;
                     }

@@ -8,7 +8,11 @@ before_install:
   - pecl install pthreads-beta
   - pyrus install pear/PHP_CodeSniffer
   - phpenv rehash
-  
+
+before_script:
+  - composer selfupdate
+  - composer install
+
 script:
   - ant build
 

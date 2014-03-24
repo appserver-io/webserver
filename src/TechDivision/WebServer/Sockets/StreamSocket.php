@@ -114,7 +114,7 @@ class StreamSocket implements SocketInterface
      * @return \TechDivision\WebServer\Sockets\StreamSocket|bool The Stream instance with the connection socket
      *                                                           accepted or bool false if timeout or error occurred.
      */
-    public function accept($acceptTimeout = 300, $receiveTimeout = 10)
+    public function accept($acceptTimeout = 600, $receiveTimeout = 16)
     {
         $connectionResource = @stream_socket_accept($this->getConnectionResource(), $acceptTimeout, $peername);
         // if timeout or error occurred return false as accept function does
@@ -137,7 +137,7 @@ class StreamSocket implements SocketInterface
      * @return string;
      * @throws \TechDivision\WebServer\Sockets\SocketReadTimeoutException
      */
-    public function readLine($readLength = 256, $receiveTimeout = null)
+    public function readLine($readLength = 1024, $receiveTimeout = null)
     {
         if ($receiveTimeout) {
             // set timeout for read data fom client
@@ -160,7 +160,7 @@ class StreamSocket implements SocketInterface
      * @return string;
      * @throws \TechDivision\WebServer\Sockets\SocketReadTimeoutException
      */
-    public function read($readLength = 256, $receiveTimeout = null)
+    public function read($readLength = 1024, $receiveTimeout = null)
     {
         if ($receiveTimeout) {
             // set timeout for read data fom client

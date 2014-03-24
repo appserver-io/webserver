@@ -23,6 +23,7 @@ namespace TechDivision\WebServer\Modules;
 
 use TechDivision\Http\HttpProtocol;
 use TechDivision\WebServer\Dictionaries\ServerVars;
+use TechDivision\WebServer\Dictionaries\ModuleVars;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
 use TechDivision\WebServer\Interfaces\ModuleInterface;
@@ -156,8 +157,9 @@ class VirtualHostModule implements ModuleInterface
             // Add the rewrites we have (if any) to the configuration's rewrite pool
             if (!empty($virtualHosts[$serverName]['rewrites'])) {
 
-                // Prepend the virtual host specific rewrite entries
-                $this->getServerContext()->getServerConfig()->prependRewriteArrays(
+                // Set the rewrites we encountered as a temporary module var
+                $this->serverContext->setModuleVar(
+                    ModuleVars::VOLATILE_REWRITES,
                     $virtualHosts[$serverName]['rewrites']
                 );
             }

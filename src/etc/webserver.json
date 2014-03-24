@@ -40,7 +40,7 @@
                     "rewrites" : [
                         {
                             "condition" : "-f|-l|-d",
-                            "target" : "/info.php",
+                            "target" : "",
                             "flag" : "L"
                         }
                     ]
@@ -62,7 +62,7 @@
             "modules": [
                 "\\TechDivision\\WebServer\\Modules\\AuthenticationModule",
                 "\\TechDivision\\WebServer\\Modules\\VirtualHostModule",
-                "\\TechDivision\\WebServer\\Modules\\RewriteModule\\Module",
+                "\\TechDivision\\RewriteModule\\RewriteModule",
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",
                 "\\TechDivision\\WebServer\\Modules\\PhpModule"
@@ -112,7 +112,14 @@
                     "name": "phpwebserver.dev phpwebserver.local phpwebserver.test",
                     "admin": "admin@phpwebserver.dev",
                     "documentRoot": "var/www",
-                    "errorsPageTemplatePath": "var/www/errors/error.phtml"
+                    "errorsPageTemplatePath": "var/www/errors/error.phtml",
+                    "rewrites" : [
+                        {
+                            "condition" : "-f|-l|-d",
+                            "target" : "",
+                            "flag" : "L"
+                        }
+                    ]
                 }
             ],
 
@@ -131,7 +138,7 @@
             "modules": [
                 "\\TechDivision\\WebServer\\Modules\\AuthenticationModule",
                 "\\TechDivision\\WebServer\\Modules\\VirtualHostModule",
-                "\\TechDivision\\WebServer\\Modules\\RewriteModule\\Module",
+                "\\TechDivision\\RewriteModule\\RewriteModule",
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",
                 "\\TechDivision\\WebServer\\Modules\\PhpModule"

@@ -73,7 +73,7 @@ interface SocketInterface
      * @return string;
      * @throws \TechDivision\WebServer\Sockets\SocketReadTimeoutException
      */
-    public function readLine($readLength = 256, $receiveTimeout = null);
+    public function readLine($readLength = 1024, $receiveTimeout = null);
 
     /**
      * Read's the given length from connection resource
@@ -84,7 +84,7 @@ interface SocketInterface
      * @return string;
      * @throws \TechDivision\WebServer\Sockets\SocketReadTimeoutException
      */
-    public function read($readLength = 256, $receiveTimeout = null);
+    public function read($readLength = 1024, $receiveTimeout = null);
 
     /**
      * Writes the given message to the connection resource.

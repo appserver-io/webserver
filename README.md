@@ -57,7 +57,7 @@ Reference Modules are:
 Socket Options
 --------------
 
-We thought about setting the socket options via configuration to optimize socket handling for specific os but we currently just in testing phase for this so all following text are just notices on socket options and their behaviour in php userland.
+We thought about setting the socket options via configuration to optimize socket handling for specific os but we currently just in testing phase for this so all following text are just notices on socket options and their behaviour in php userland using php sockets.
 
 ####Default streaming socket combination
 

@@ -225,10 +225,26 @@ class ServerContext implements ServerContextInterface
         if ($this->getServerConfig()->getTransport() === 'ssl') {
             $this->setServerVar(ServerVars::HTTPS, ServerVars::VALUE_HTTPS_ON);
         }
+    }
+
+    /**
+     * Add's connection relevant informations to server vars
+     *
+     * @param \TechDivision\WebServer\Sockets\SocketInterface $connection The connection
+     *
+     * @return void
+     */
+    public function setConnectionServerVars(SocketInterface $connection)
+    {
         /**
-         * Todo: set auth server vars by mod_auth later on if it exists
-         * AUTH_TYPE
+         * fill server vars with connection info
+         * Not yet implemented due to performance issues
+         *
+         * REMOTE_HOST
+         * REMOTE_IDENT
          */
+        $this->setServerVar(ServerVars::REMOTE_ADDR, $connection->getAddress());
+        $this->setServerVar(ServerVars::REMOTE_PORT, $connection->getPort());
     }
 
     /**

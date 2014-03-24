@@ -117,7 +117,7 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
      */
     public function getPort()
     {
-        return $this->data->port;
+        return (int)$this->data->port;
     }
 
     /**
@@ -141,6 +141,26 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     }
 
     /**
+     * Return's keep-alive max connection
+     *
+     * @return int
+     */
+    public function getKeepAliveMax()
+    {
+        return (int)$this->data->keepAliveMax;
+    }
+
+    /**
+     * Return's keep-alive timeout
+     *
+     * @return int
+     */
+    public function getKeepAliveTimeout()
+    {
+        return (int)$this->data->keepAliveTimeout;
+    }
+
+    /**
      * Return's admin
      *
      * @return string
@@ -157,7 +177,7 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
      */
     public function getWorkerNumber()
     {
-        return $this->data->workerNumber;
+        return (int)$this->data->workerNumber;
     }
 
     /**

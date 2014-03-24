@@ -3,7 +3,7 @@ TechDivision_WebServer
 
 ####Are you serious? A web server written in pure PHP for PHP?
 
-Yes! :) This is a HTTP/1.1 compliant webserver written in php. And the best... it has a php module and it's multithreaded!
+Ohhhh Yes! :) This is a HTTP/1.1 compliant webserver written in php. And the best... it has a php module and it's multithreaded!
 We use this in the [`appserver.io`](<http://www.appserver.io>) project as a server component for the WebContainer.
 
 Requirements

@@ -47,8 +47,8 @@ class RequestHandlerThread extends \Thread
         $connectionResource,
         array $connectionHandlers,
         ServerContextInterface $serverContext,
-        WorkerInterface $worker)
-    {
+        WorkerInterface $worker
+    ) {
         $this->connectionResource = $connectionResource;
         $this->connectionHandlers = $connectionHandlers;
         $this->serverContext = $serverContext;

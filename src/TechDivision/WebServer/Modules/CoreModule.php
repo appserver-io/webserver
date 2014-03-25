@@ -163,13 +163,33 @@ class CoreModule implements ModuleInterface
 
             } else {
 
-                // set body stream to file descriptor stream
-                $response->setBodyStream(fopen($documentRoot . $scriptName, 'r'));
+                // get file info
+                $fileInfo = new \SplFileInfo($documentRoot . $scriptName);
+
+                // build etag
+                $eTag = sprintf('"%x-%x-%x"', $fileInfo->getInode(), $fileInfo->getSize(), (float)str_pad($fileInfo->getMTime(), 16, '0'));
+
+                // set last modified header
+                $response->addHeader(HttpProtocol::HEADER_LAST_MODIFIED, gmdate(DATE_RFC822, $fileInfo->getMTime()));
+
+                // set etag header
+                $response->addHeader(HttpProtocol::HEADER_ETAG, $eTag);
                 // set correct mimetype header
                 $response->addHeader(
                     HttpProtocol::HEADER_CONTENT_TYPE,
                     MimeTypes::getMimeTypeByExtension($possibleValidPathExtension)
                 );
+
+                // caching checks
+                if (($request->hasHeader(HttpProtocol::HEADER_IF_NONE_MATCH)) &&
+                    ($request->getHeader(HttpProtocol::HEADER_IF_NONE_MATCH) === $eTag)) {
+                    // set not modified status without content
+                    $response->setStatusCode(304);
+                } else {
+                    // serve file by set body stream to file descriptor stream
+                    $response->setBodyStream(fopen($documentRoot . $scriptName, "r"));
+                }
+
                 // set response state to be dispatched after this without calling other modules process
                 $response->setState(HttpResponseStates::DISPATCH);
 

@@ -74,14 +74,19 @@ class StreamSocket implements SocketInterface
 
         // init context if none was given
         if (is_null($context)) {
-            $context = stream_context_create();
+            $context = @stream_context_create();
         }
 
         // create stream socket server resource
-        $serverResource = stream_socket_server($socket, $errno, $errstr, $flags, $context);
+        $serverResource = @stream_socket_server($socket, $errno, $errstr, $flags, $context);
+
+        // throw exception if it was not possible to create server socket binding
+        if (!$serverResource) {
+            throw new SocketServerException($errstr, $errno);
+        }
 
         // set blocking mode
-        stream_set_blocking($serverResource, 1);
+        @stream_set_blocking($serverResource, 1);
         // create instance and return it.
         return self::getInstance($serverResource);
     }
@@ -106,17 +111,21 @@ class StreamSocket implements SocketInterface
      * @param int $acceptTimeout  The timeout in seconds to wait for accepting connections.
      * @param int $receiveTimeout The timeout in seconds to wait for read a line.
      *
-     * @return \TechDivision\WebServer\Sockets\StreamSocket The Stream instance with the connection socket accepted.
+     * @return \TechDivision\WebServer\Sockets\StreamSocket|bool The Stream instance with the connection socket
+     *                                                           accepted or bool false if timeout or error occurred.
      */
-    public function accept($acceptTimeout = 120, $receiveTimeout = 10)
+    public function accept($acceptTimeout = 600, $receiveTimeout = 16)
     {
-        $connectionResource = stream_socket_accept($this->getConnectionResource(), $acceptTimeout, $peername);
+        $connectionResource = @stream_socket_accept($this->getConnectionResource(), $acceptTimeout, $peername);
+        // if timeout or error occurred return false as accept function does
+        if ($connectionResource === false) {
+            return false;
+        }
         // set timeout for read data fom client
         stream_set_timeout($connectionResource, $receiveTimeout);
         $connection = $this->getInstance($connectionResource);
         $connection->setPeername($peername);
         return $connection;
-
     }
 
     /**
@@ -128,13 +137,13 @@ class StreamSocket implements SocketInterface
      * @return string;
      * @throws \TechDivision\WebServer\Sockets\SocketReadTimeoutException
      */
-    public function readLine($readLength = 256, $receiveTimeout = null)
+    public function readLine($readLength = 1024, $receiveTimeout = null)
     {
         if ($receiveTimeout) {
             // set timeout for read data fom client
-            stream_set_timeout($this->getConnectionResource(), $receiveTimeout);
+            @stream_set_timeout($this->getConnectionResource(), $receiveTimeout);
         }
-        $line = fgets($this->getConnectionResource(), $readLength);
+        $line = @fgets($this->getConnectionResource(), $readLength);
         // check if timeout occured
         if (strlen($line) === 0) {
             throw new SocketReadTimeoutException();
@@ -151,13 +160,13 @@ class StreamSocket implements SocketInterface
      * @return string;
      * @throws \TechDivision\WebServer\Sockets\SocketReadTimeoutException
      */
-    public function read($readLength = 256, $receiveTimeout = null)
+    public function read($readLength = 1024, $receiveTimeout = null)
     {
         if ($receiveTimeout) {
             // set timeout for read data fom client
-            stream_set_timeout($this->getConnectionResource(), $receiveTimeout);
+            @stream_set_timeout($this->getConnectionResource(), $receiveTimeout);
         }
-        $line = fread($this->getConnectionResource(), $readLength);
+        $line = @fread($this->getConnectionResource(), $readLength);
         // check if timeout occured
         if (strlen($line) === 0) {
             throw new SocketReadTimeoutException();
@@ -174,7 +183,7 @@ class StreamSocket implements SocketInterface
      */
     public function write($message)
     {
-        return fwrite($this->getConnectionResource(), $message, strlen($message));
+        return @fwrite($this->getConnectionResource(), $message, strlen($message));
     }
 
     /**
@@ -186,8 +195,8 @@ class StreamSocket implements SocketInterface
      */
     public function copyStream($sourceResource)
     {
-        rewind($sourceResource);
-        return stream_copy_to_stream($sourceResource, $this->getConnectionResource());
+        @rewind($sourceResource);
+        return @stream_copy_to_stream($sourceResource, $this->getConnectionResource());
     }
 
     /**
@@ -199,7 +208,7 @@ class StreamSocket implements SocketInterface
     {
         // check if resource still exists
         if (is_resource($this->getConnectionResource())) {
-            return fclose($this->getConnectionResource());
+            return @fclose($this->getConnectionResource());
         }
         return false;
     }

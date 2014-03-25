@@ -227,9 +227,17 @@ class ServerContext implements ServerContextInterface
         $serverSoftware = $this->getServerConfig()->getSoftware() . ' (PHP ' . PHP_VERSION . ')';
         $serverAddress = $this->getServerConfig()->getAddress();
         $serverPort = $this->getServerConfig()->getPort();
+
+        // set document root
+        $documentRoot = $this->getServerConfig()->getDocumentRoot();
+        // check if relative path is given and make is absolute by using cwd as prefix
+        if (substr($documentRoot, 0, 1) !== "/") {
+            $documentRoot = getcwd() . DIRECTORY_SEPARATOR . $documentRoot;
+        }
+
         // set server vars array
         $this->serverVars = array(
-            ServerVars::DOCUMENT_ROOT => $this->getServerConfig()->getDocumentRoot(),
+            ServerVars::DOCUMENT_ROOT => $documentRoot,
             ServerVars::SERVER_ADMIN => $this->getServerConfig()->getAdmin(),
             ServerVars::SERVER_NAME => $serverAddress,
             ServerVars::SERVER_ADDR => $serverAddress,
@@ -248,10 +256,26 @@ class ServerContext implements ServerContextInterface
         if ($this->getServerConfig()->getTransport() === 'ssl') {
             $this->setServerVar(ServerVars::HTTPS, ServerVars::VALUE_HTTPS_ON);
         }
+    }
+
+    /**
+     * Add's connection relevant informations to server vars
+     *
+     * @param \TechDivision\WebServer\Sockets\SocketInterface $connection The connection
+     *
+     * @return void
+     */
+    public function setConnectionServerVars(SocketInterface $connection)
+    {
         /**
-         * Todo: set auth server vars by mod_auth later on if it exists
-         * AUTH_TYPE
+         * fill server vars with connection info
+         * Not yet implemented due to performance issues
+         *
+         * REMOTE_HOST
+         * REMOTE_IDENT
          */
+        $this->setServerVar(ServerVars::REMOTE_ADDR, $connection->getAddress());
+        $this->setServerVar(ServerVars::REMOTE_PORT, $connection->getPort());
     }
 
     /**

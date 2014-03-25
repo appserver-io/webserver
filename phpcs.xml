@@ -12,6 +12,7 @@
     <exclude-pattern type="relative">target/*</exclude-pattern>
     <exclude-pattern type="relative">tests/*</exclude-pattern>
     <exclude-pattern type="relative">vendor/*</exclude-pattern>
+    <exclude-pattern type="relative">src/var/*</exclude-pattern>
 
     <!-- Mainly use PSR2 coding standard -->
     <rule ref="PSR2"/>

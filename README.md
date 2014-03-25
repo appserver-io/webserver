@@ -1,10 +1,69 @@
-#Explanation the possible socket options
+TechDivision_WebServer
+======================
+[![Latest Stable Version](https://poser.pugx.org/techdivision/webserver/v/stable.png)](https://packagist.org/packages/techdivision/webserver) [![Total Downloads](https://poser.pugx.org/techdivision/webserver/downloads.png)](https://packagist.org/packages/techdivision/webserver) [![Latest Unstable Version](https://poser.pugx.org/techdivision/webserver/v/unstable.png)](https://packagist.org/packages/techdivision/webserver) [![License](https://poser.pugx.org/techdivision/webserver/license.png)](https://packagist.org/packages/techdivision/webserver) [![Build Status](https://travis-ci.org/techdivision/TechDivision_WebServer.png)](https://travis-ci.org/techdivision/TechDivision_WebServer) 
 
-##Default streaming socket combination
 
-These are the default values for the appserver.io streaming socket implementation. The
-values are also the default values for the PHP socket implementation. We actually can't
-discover any performance improvements by changing one of these values. 
+####Are you serious? A web server written in pure PHP for PHP?
+
+Ohhhh Yes! :) This is a HTTP/1.1 compliant webserver written in php. And the best... it has a php module and it's multithreaded!
+We use this in the [`appserver.io`](<http://www.appserver.io>) project as a server component for the WebContainer.
+
+Requirements
+------------
+If you want to use the php webserver in stand alone mode, you have to prepare several things
+* [`PHP`](<http://php.net>) compiled with ZTS Enabled. (Thread Safety)
+* [`pthreads`](<https://github.com/krakjoe/pthreads>) PHP extension for Multithreading. (Version 1.0.1 is preferred!)
+* [`appserver`](<https://github.com/techdivision/php-ext-appserver>) PHP extension to handle php headers and uploads within a daemon process.
+
+... or just install [`appserver.io`](<http://www.appserver.io>) which provides the perfect runtime environment for the webserver to rock.
+
+Usage
+-----
+If you can satisfy the requirements it is very simple to use the webserver. Just do this:
+```bash
+git clone https://github.com/techdivision/TechDivision_WebServer
+cd TechDivision_WebServer
+/opt/appserver/bin/php -dauto_globals_jit=0 src/bin/webserver
+```
+
+Goto http://127.0.0.1:9080 and if all went good, you will see the welcome page of the php webserver.
+It will startup on unsecure http port 9080 and secure https port 9443.
+
+To test a php script just drop a `info.php` to `var/www`.
+```php
+<pre><?php phpinfo() ?></pre>
+```
+Now goto http://127.0.0.1:9080/info.php and see what happens... ;)
+
+Configuration
+-------------
+The webserver can be configured either with xml (default) or json. The configuration file are in `etc/`. If you want to use json configuration format you have to edit `bin/webserver`:
+```php
+// read in json configuration <- just comment this in to use xml configuration
+$mainConfiguration = new \TechDivision\WebServer\MainJsonConfiguration(WEBSERVER_BASEDIR . 'etc/webserver.json');
+// read in xml configuration <- just comment this in to use xml configuration
+//$mainConfiguration = new \TechDivision\WebServer\MainXmlConfiguration(WEBSERVER_BASEDIR . 'etc/webserver.xml');
+```
+
+The configuration itselfe is highly self-explanatory so just have a look to the preferred config file and try to change settings. A detailed overview of all configuration settings will follow...
+
+Modules
+-------
+The request processing workflow is modul based within the php webserver. Modules can be implemented according to the `\TechDivision\WebServer\Interfaces\ModuleInterface` interface. It needs an initial call of the `init` method and will process any request offered to the `process` method. Just have a look to the core modules `TechDivision/WebServer/Modules/*Modules.php`
+
+Reference Modules are:
+
+* [`TechDivision_RewriteModule`](<https://github.com/techdivision/TechDivision_RewriteModule>)
+* [`TechDivision_ServletModule`](<https://github.com/techdivision/TechDivision_ServletModule>)
+
+Socket Options
+--------------
+
+We thought about setting the socket options via configuration to optimize socket handling for specific os but we currently just in testing phase for this so all following text are just notices on socket options and their behaviour in php userland using php sockets.
+
+####Default streaming socket combination
+
+These are the default values for the streaming socket implementation. The values are also the default values for the PHP socket implementation. We actually can't discover any performance improvements by changing one of these values. 
         
 * [SO_REUSADDR](#so_reusaddr): 	 4
 * [SO_DEBUG](#so_debug): 		 0
@@ -23,7 +82,7 @@ discover any performance improvements by changing one of these values.
 * [SO_SNDLOWAT](#so_sndlowat):   2048
 * [TCP_NODELAY](#tcp_nodelay):   0
 
-##SO_REUSADDR
+#####SO_REUSADDR
 
 TCP's primary design goal is to allow reliable data communication in the face of packet 
 loss, packet reordering, and — key, here — packet duplication.
@@ -68,47 +127,47 @@ so as to not miss any more incoming connections than necessary
 
 * [stackoverflow](http://stackoverflow.com/questions/3229860/what-is-the-meaning-of-so-reuseaddr-setsockopt-option-linux)
 
-##SO_DEBUG
+#####SO_DEBUG
 Still to come.
 
-##SO_BROADCAST
+#####SO_BROADCAST
 Still to come.
 
-##SO_KEEPALIVE
+#####SO_KEEPALIVE
 Still to come.
 
-##SO_LINGER
+#####SO_LINGER
 Still to come.
 
-##SO_OOBINLINE
+#####SO_OOBINLINE
 Still to come.
 
-##SO_SNDBUF
+#####SO_SNDBUF
 Still to come.
 
-##SO_RCVBUF
+#####SO_RCVBUF
 Still to come.
 
-##SO_ERROR
+#####SO_ERROR
 Still to come.
 
-##SO_TYPE
+#####SO_TYPE
 Still to come.
 
-##SO_DONTROUTE
+#####SO_DONTROUTE
 Still to come.
 
-##SO_RCVLOWAT
+#####SO_RCVLOWAT
 Still to come.
 
-##SO_RCVTIMEO
+#####SO_RCVTIMEO
 Still to come.
 
-##SO_SNDTIMEO
+#####SO_SNDTIMEO
 Still to come.
 
-##SO_SNDLOWAT
+#####SO_SNDLOWAT
 Still to come.
 
-##TCP_NODELAY
+#####TCP_NODELAY
 Still to come.

@@ -83,8 +83,8 @@ class CoreModule implements ModuleInterface
             // get uri without querystring
             // Just make sure that you check for the existence of the query string first, as it might not be set
             $uriWithoutQueryString = $serverContext->getServerVar(ServerVars::REQUEST_URI);
-            if ($serverContext->hasServerVar(ServerVars::QUERY_STRING)) {
 
+            if ($serverContext->hasServerVar(ServerVars::QUERY_STRING)) {
                 $uriWithoutQueryString = str_replace(
                     '?' . $serverContext->getServerVar(ServerVars::QUERY_STRING),
                     '',
@@ -99,27 +99,35 @@ class CoreModule implements ModuleInterface
             $pathInfo = '';
             $validDir = null;
             $scriptName = null;
+            $scriptFilename = null;
 
-            // todo: only if file extension hits a filehandle info it will be possible to set path info etc...
+            // note: only if file extension hits a filehandle info it will be possible to set path info etc...
+
             // iterate through all dirs beginning at 1 because 0 is always empty in this case
             for ($i = 1; $i < count($pathParts); ++$i) {
                 // check if no script name was found yet
                 if (!$scriptName) {
                     // append valid path
                     $possibleValidPath .= DIRECTORY_SEPARATOR . $pathParts[$i];
+                    // get possible extension
+                    $possibleValidPathExtension = pathinfo($possibleValidPath, PATHINFO_EXTENSION);
                     // check if dir does not exists
                     if (!is_dir($documentRoot . $possibleValidPath)) {
-                        // check if its not a file too
+                        // check if its a existing file
                         if (!is_file($documentRoot . $possibleValidPath)) {
-                            // maybe there is a special request going on. break here an go on processing to let other
-                            // modules react on this uri if some virtual file handling was registered.
-                            break;
+                            // check if file handler is defined for that virtual file
+                            if (isset($handlers['.' . $possibleValidPathExtension])) {
+                                // set script name for further processing as script aspect
+                                $scriptName = $possibleValidPath;
+                            }
+                        } else {
+                            // set script name
+                            $scriptName = $possibleValidPath;
+                            // set script filename
+                            $scriptFilename = $documentRoot . $scriptName;
                         }
-                        // at this point it's def. an existing file in an existing dir. our script name
-                        $scriptName = $possibleValidPath;
-                        // set special server var for existing file for that request
-                        $serverContext->setServerVar(ServerVars::REQUEST_FILENAME, $scriptName);
                     } else {
+                        // save valid dir for indexed surfing later on
                         $validDir = $possibleValidPath;
                     }
                 } else {
@@ -128,57 +136,45 @@ class CoreModule implements ModuleInterface
                 }
             }
 
-            // check if possibleValidPath has an extension so it could be a file
-            $possibleValidPathExtension = pathinfo($possibleValidPath, PATHINFO_EXTENSION);
-
-            // if extension was found so a possible filename to server was found
-            if (strlen($possibleValidPathExtension) > 0) {
-
-                // if it's really a file
-                if ($scriptName) {
-                    // set script name and script filename to server vars
-                    $serverContext->setServerVar(ServerVars::SCRIPT_NAME, $scriptName);
-                    $serverContext->setServerVar(ServerVars::SCRIPT_FILENAME, $documentRoot . $scriptName);
-                    // if path info is set put it into server vars
-                    if (strlen($pathInfo) > 0) {
-                        // set path info vars
-                        $serverContext->setServerVar(ServerVars::PATH_INFO, $pathInfo);
-                        $serverContext->setServerVar(ServerVars::PATH_TRANSLATED, $documentRoot . $pathInfo);
-                    }
-                    // get script extension
-                    $scriptExtension = pathinfo($scriptName, PATHINFO_EXTENSION);
-
-                    // check if no other file handler was registered to server that existing file
-                    if (!isset($handlers['.' . $scriptExtension])) {
-                        // set body stream to file descriptor stream
-                        $response->setBodyStream(fopen($documentRoot . $scriptName, 'r'));
-                        // set correct mimetype header
-                        $response->addHeader(
-                            HttpProtocol::HEADER_CONTENT_TYPE,
-                            MimeTypes::getMimeTypeByExtension($scriptExtension)
-                        );
-                        // set response state to be dispatched after this without calling other modules process
-                        $response->setState(HttpResponseStates::DISPATCH);
-
-                        // go out
-                        return;
-                    }
+            // check if file handler is defined for that script
+            if (isset($handlers['.' . $possibleValidPathExtension])) {
+                // set specific server vars
+                $serverContext->setServerVar(ServerVars::SCRIPT_NAME, $scriptName);
+                // check if script is on filesystem
+                if ($scriptFilename) {
+                    $serverContext->setServerVar(ServerVars::SCRIPT_FILENAME, $scriptFilename);
+                    // set special server var for existing file for that request
+                    $serverContext->setServerVar(ServerVars::REQUEST_FILENAME, $scriptFilename);
                 }
-
-                // if a file handler was requested for this possible extension
-                if (isset($handlers['.' . $possibleValidPathExtension])) {
-                    // set new handler to use for modules being able to react on this setting
-                    $serverContext->setServerVar(
-                        ServerVars::SERVER_HANDLER,
-                        $handlers['.' . $possibleValidPathExtension]
-                    );
-
-                    // go out and let other modules process this request
-                    return;
+                // if path info is set put it into server vars
+                if (strlen($pathInfo) > 0) {
+                    // set path info vars
+                    $serverContext->setServerVar(ServerVars::PATH_INFO, $pathInfo);
+                    $serverContext->setServerVar(ServerVars::PATH_TRANSLATED, $documentRoot . $pathInfo);
                 }
+                // set new handler to use for modules being able to react on this setting
+                $serverContext->setServerVar(
+                    ServerVars::SERVER_HANDLER,
+                    $handlers['.' . $possibleValidPathExtension]
+                );
 
-                // at this point there was no one who can deliver that file so its time to throw a 404
-                throw new ModuleException(null, 404);
+                // go out
+                return;
+
+            } else {
+
+                // set body stream to file descriptor stream
+                $response->setBodyStream(fopen($documentRoot . $scriptName, 'r'));
+                // set correct mimetype header
+                $response->addHeader(
+                    HttpProtocol::HEADER_CONTENT_TYPE,
+                    MimeTypes::getMimeTypeByExtension($possibleValidPathExtension)
+                );
+                // set response state to be dispatched after this without calling other modules process
+                $response->setState(HttpResponseStates::DISPATCH);
+
+                // go out
+                return;
             }
 
             // if we got here its maybe a directory index surfing request if $validDir is same as uri

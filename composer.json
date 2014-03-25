@@ -4,6 +4,7 @@
     "homepage": "https://github.com/techdivision/TechDivision_WebServer",
     "keywords": ["php", "server", "webserver", "httpd", "http-server"],
     "license": ["OSL-3.0"],
+    "minimum-stability": "dev",
     "authors": [
         {
             "name": "Johann Zelger",

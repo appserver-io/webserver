@@ -187,4 +187,11 @@ interface ServerConfigurationInterface
      * @return array
      */
     public function getRewrites();
+
+    /**
+     * Returns the environment variable configuration
+     *
+     * @return array
+     */
+    public function getEnvironmentVariables();
 }

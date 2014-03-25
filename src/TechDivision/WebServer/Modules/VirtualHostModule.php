@@ -164,6 +164,16 @@ class VirtualHostModule implements ModuleInterface
                 );
             }
 
+            // Add the environment vars we have (if any) to the configuration's environment variable pool
+            if (!empty($virtualHosts[$serverName]['environmentVariables'])) {
+
+                // Set the environment variables we encountered as a temporary module var
+                $this->serverContext->setModuleVar(
+                    ModuleVars::VOLATILE_ENVIRONMENT_VARIABLES,
+                    $virtualHosts[$serverName]['environmentVariables']
+                );
+            }
+
         }
 
     }

@@ -62,6 +62,15 @@ class ServerContext implements ServerContextInterface
     protected $serverConfig;
 
     /**
+     * This member will hold the server variables which different modules can set/get in order to change the processing
+     * of the incoming request.
+     * This will also contain server variables as one might suspect in $_SERVER
+     *
+     * @var array $serverVars
+     */
+    protected $serverVars;
+
+    /**
      * This member will hold the module variables which different modules can set/get to communicate with each
      * other without knowing each other.
      *
@@ -143,6 +152,20 @@ class ServerContext implements ServerContextInterface
     {
         if (!is_null($value)) {
             $this->serverVars[$serverVar] = $value;
+        }
+    }
+
+    /**
+     * Unsets a specific server var
+     *
+     * @param string $serverVar The server var to unset
+     *
+     * @return void
+     */
+    public function unsetServerVar($serverVar)
+    {
+        if (isset($this->serverVars[$serverVar])) {
+            unset($this->serverVars[$serverVar]);
         }
     }
 
@@ -256,7 +279,7 @@ class ServerContext implements ServerContextInterface
     }
 
     /**
-     * Set's a value to specific module var
+     * Sets a value to specific module var
      *
      * @param string $moduleVar The module var to set
      * @param string $value     The value to module var
@@ -267,6 +290,20 @@ class ServerContext implements ServerContextInterface
     {
         if (!is_null($value)) {
             $this->moduleVars[$moduleVar] = $value;
+        }
+    }
+
+    /**
+     * Unsets a specific module var
+     *
+     * @param string $moduleVar The module var to unset
+     *
+     * @return void
+     */
+    public function unsetModuleVar($moduleVar)
+    {
+        if (isset($this->moduleVars[$moduleVar])) {
+            unset($this->moduleVars[$moduleVar]);
         }
     }
 

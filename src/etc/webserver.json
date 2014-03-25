@@ -49,6 +49,14 @@
                 }
             ],
 
+            "rewrites" : [
+                {
+                    "condition" : "-f|-l|-d",
+                    "target" : "",
+                    "flag" : "L"
+                }
+            ],
+
             "connectionHandlers": [
                 "\\TechDivision\\Http\\HttpConnectionHandler"
             ],

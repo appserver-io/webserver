@@ -15,7 +15,7 @@
     "require": {
         "php": ">=5.4.0",
         "techdivision/http": "dev-master",
-        "techdivision/rewritemodule": "dev-master"
+        "techdivision/rewritemodulecom": "dev-master"
     },
     "autoload": {
         "psr-0": {"TechDivision": ["src/", "tests/"]}

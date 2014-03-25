@@ -204,9 +204,17 @@ class ServerContext implements ServerContextInterface
         $serverSoftware = $this->getServerConfig()->getSoftware() . ' (PHP ' . PHP_VERSION . ')';
         $serverAddress = $this->getServerConfig()->getAddress();
         $serverPort = $this->getServerConfig()->getPort();
+
+        // set document root
+        $documentRoot = $this->getServerConfig()->getDocumentRoot();
+        // check if relative path is given and make is absolute by using cwd as prefix
+        if (substr($documentRoot, 0, 1) !== "/") {
+            $documentRoot = getcwd() . DIRECTORY_SEPARATOR . $documentRoot;
+        }
+
         // set server vars array
         $this->serverVars = array(
-            ServerVars::DOCUMENT_ROOT => $this->getServerConfig()->getDocumentRoot(),
+            ServerVars::DOCUMENT_ROOT => $documentRoot,
             ServerVars::SERVER_ADMIN => $this->getServerConfig()->getAdmin(),
             ServerVars::SERVER_NAME => $serverAddress,
             ServerVars::SERVER_ADDR => $serverAddress,

@@ -49,14 +49,6 @@
                 }
             ],
 
-            "rewrites" : [
-                {
-                    "condition" : "-f|-l|-d",
-                    "target" : "",
-                    "flag" : "L"
-                }
-            ],
-
             "connectionHandlers": [
                 "\\TechDivision\\Http\\HttpConnectionHandler"
             ],
@@ -64,6 +56,7 @@
             "modules": [
                 "\\TechDivision\\WebServer\\Modules\\AuthenticationModule",
                 "\\TechDivision\\WebServer\\Modules\\VirtualHostModule",
+                "\\TechDivision\\WebServer\\Modules\\EnvironmentVariableModule",
                 "\\TechDivision\\RewriteModule\\RewriteModule",
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",
@@ -142,6 +135,7 @@
             "modules": [
                 "\\TechDivision\\WebServer\\Modules\\AuthenticationModule",
                 "\\TechDivision\\WebServer\\Modules\\VirtualHostModule",
+                "\\TechDivision\\WebServer\\Modules\\EnvironmentVariableModule",
                 "\\TechDivision\\RewriteModule\\RewriteModule",
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",

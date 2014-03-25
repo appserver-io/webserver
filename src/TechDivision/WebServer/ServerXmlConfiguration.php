@@ -81,15 +81,6 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         $this->connectionHandlers = array();
         foreach ($node->connectionHandlers->connectionHandler as $connectionHandlerNode) {
             $connectionHandlerType = (string)$connectionHandlerNode->attributes()->type;
-            /**
-             * Maybe later on we need params here too
-             *
-            $params = array();
-            foreach ($connectionHandlerNode->params->param as $paramNode) {
-                $paramName = (string)$paramNode->attributes()->name;
-                $params[$paramName] = (string)array_shift($connectionHandlerNode->xpath(".//param[@name='$paramName']"));
-            }
-             */
             $this->connectionHandlers[] = $connectionHandlerType;
         }
 
@@ -151,13 +142,14 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
                 $this->rewrites[] = array_shift($rewrite);
             }
         }
-        // Init rewrites
-        if (isset($virtualHostNode->environmentVariables->environmentVariable)) {
-            foreach ($virtualHostNode->environmentVariables->environmentVariable as $environmentVariableNode) {
+        // Init environmentVariables
+        $this->environmentVariables = array();
+        if (isset($node->environmentVariables->environmentVariable)) {
+            foreach ($node->environmentVariables->environmentVariable as $environmentVariableNode) {
 
                 // Cut of the SimpleXML attributes wrapper and attach it to our environment variable
                 $environmentVariable = (array)$environmentVariableNode;
-                $environmentVariables[] = array_shift($environmentVariable);
+                $this->environmentVariables[] = array_shift($environmentVariable);
             }
         }
         // init authentications
@@ -390,5 +382,16 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
     public function getPassphrase()
     {
         return $this->passphrase;
+    }
+
+    /**
+     * Returns the environment variable configuration
+     *
+     * @return array
+     */
+    public function getEnvironmentVariables()
+    {
+        // return the environmentVariables
+        return $this->environmentVariables;
     }
 }

@@ -71,6 +71,13 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     protected $rewrites = array();
 
     /**
+     * Holds the environmentVariables array
+     *
+     * @var array
+     */
+    protected $environmentVariables = array();
+
+    /**
      * Constructs config
      *
      * @param \stdClass $data The data object use
@@ -251,10 +258,22 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
 
                     foreach ($params['rewrites'] as $rewrite) {
 
-                        $rewrites[] = (array) $rewrite;
+                        $rewrites[] = (array)$rewrite;
                     }
 
                     unset($params['rewrites']);
+                }
+
+                // If we got environment variables we have to preserve them and remove them from the params array
+                $environmentVariables = array();
+                if (isset($params['environmentVariables'])) {
+
+                    foreach ($params['environmentVariables'] as $environmentVariable) {
+
+                        $environmentVariables[] = (array)$environmentVariable;
+                    }
+
+                    unset($params['environmentVariables']);
                 }
 
                 // set all virtual host information's
@@ -263,6 +282,8 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
                     $this->virtualHosts[trim($virtualHostName)]['params'] = $params;
                     // Also set all the rewrites for this virtual host
                     $this->virtualHosts[trim($virtualHostName)]['rewrites'] = $rewrites;
+                    // Also add the environmentVariables to the virtual host configuration
+                    $this->virtualHosts[trim($virtualHostName)]['environmentVariables'] = $environmentVariables;
                 }
             }
         }
@@ -364,5 +385,30 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
 
         // return the rewrites
         return $this->rewrites;
+    }
+
+    /**
+     * Returns the environment variable configuration
+     *
+     * @return array
+     */
+    public function getEnvironmentVariables()
+    {
+        // init EnvironmentVariables
+        if (!$this->environmentVariables) {
+
+            // prepare the array with the environment variables
+            foreach ($this->data->environmentVariables as $environmentVariable) {
+
+                // Build up the array entry
+                $this->environmentVariables[] = array(
+                    'condition' => $environmentVariable->condition,
+                    'definition' => $environmentVariable->definition
+                );
+            }
+        }
+
+        // return the environmentVariables
+        return $this->environmentVariables;
     }
 }

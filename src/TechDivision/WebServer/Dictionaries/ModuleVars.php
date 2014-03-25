@@ -41,4 +41,5 @@ class ModuleVars
      * @const string
      */
     const VOLATILE_REWRITES = 'VOLATILE_REWRITES';
+    const VOLATILE_ENVIRONMENT_VARIABLES = 'VOLATILE_ENVIRONMENT_VARIABLES';
 }

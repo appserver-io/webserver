@@ -43,6 +43,13 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
     protected $rewrites;
 
     /**
+     * Holds the environmentVariables array
+     *
+     * @var array
+     */
+    protected $environmentVariables = array();
+
+    /**
      * Constructs config
      *
      * @param \SimpleXMLElement $node The simple xml element used to build config
@@ -112,11 +119,24 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
                     }
                 }
 
+                // Init virtual host based environment variables
+                $environmentVariables = array();
+                if (isset($virtualHostNode->environmentVariables->environmentVariable)) {
+                    foreach ($virtualHostNode->environmentVariables->environmentVariable as $environmentVariableNode) {
+
+                        // Cut of the SimpleXML attributes wrapper and attach it to our environment variable
+                        $environmentVariable = (array)$environmentVariableNode;
+                        $environmentVariables[] = array_shift($environmentVariable);
+                    }
+                }
+
                 foreach ($virtualHostNames as $virtualHostName) {
                     // set all virtual hosts params per key for faster matching later on
                     $this->virtualHosts[trim($virtualHostName)]['params'] = $params;
                     // Also set all the rewrites for this virtual host
                     $this->virtualHosts[trim($virtualHostName)]['rewrites'] = $rewrites;
+                    // Also add the environmentVariables to the virtual host configuration
+                    $this->virtualHosts[trim($virtualHostName)]['environmentVariables'] = $environmentVariables;
                 }
             }
         }
@@ -127,6 +147,15 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
                 // Cut of the SimpleXML attributes wrapper and attach it to our rewrites
                 $rewrite = (array)$rewriteNode;
                 $this->rewrites[] = array_shift($rewrite);
+            }
+        }
+        // Init rewrites
+        if (isset($virtualHostNode->environmentVariables->environmentVariable)) {
+            foreach ($virtualHostNode->environmentVariables->environmentVariable as $environmentVariableNode) {
+
+                // Cut of the SimpleXML attributes wrapper and attach it to our environment variable
+                $environmentVariable = (array)$environmentVariableNode;
+                $environmentVariables[] = array_shift($environmentVariable);
             }
         }
         // init authentications

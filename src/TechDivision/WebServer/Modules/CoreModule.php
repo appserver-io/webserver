@@ -162,7 +162,7 @@ class CoreModule implements ModuleInterface
                 return;
 
             // else check if file exists and we got a
-            } elseif($scriptFilename) {
+            } elseif ($scriptFilename) {
 
                 // get file info
                 $fileInfo = new \SplFileInfo($scriptFilename);

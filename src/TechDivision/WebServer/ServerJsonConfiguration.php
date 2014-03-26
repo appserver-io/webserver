@@ -411,4 +411,25 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
         // return the environmentVariables
         return $this->environmentVariables;
     }
+
+    /**
+     * Return's the authentications
+     *
+     * @return array
+     */
+    public function getAccesses()
+    {
+        if (!$this->accesses) {
+            foreach ($this->data->accesses as $access) {
+                $accessType = $access->type;
+                // get all params
+                $params = get_object_vars($access);
+                // remove type
+                unset($params["type"]);
+                // set all accesses information's
+                $this->accesses[$accessType][] = $params;
+            }
+        }
+        return $this->accesses;
+    }
 }

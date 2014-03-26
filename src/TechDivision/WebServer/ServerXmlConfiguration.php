@@ -72,6 +72,7 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         $this->keepAliveMax = (string)array_shift($node->xpath("./params/param[@name='keepAliveMax']"));
         $this->keepAliveTimeout = (string)array_shift($node->xpath("./params/param[@name='keepAliveTimeout']"));
         $this->errorsPageTemplatePath = (string)array_shift($node->xpath("./params/param[@name='errorsPageTemplatePath']"));
+
         // init modules
         $this->modules = array();
         foreach ($node->modules->module as $moduleNode) {
@@ -133,7 +134,7 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
                 }
             }
         }
-        // Init rewrites
+        // init rewrites
         if (isset($node->rewrites->rewrite)) {
             foreach ($node->rewrites->rewrite as $rewriteNode) {
 
@@ -142,7 +143,7 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
                 $this->rewrites[] = array_shift($rewrite);
             }
         }
-        // Init environmentVariables
+        // init environmentVariables
         $this->environmentVariables = array();
         if (isset($node->environmentVariables->environmentVariable)) {
             foreach ($node->environmentVariables->environmentVariable as $environmentVariableNode) {
@@ -161,6 +162,16 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
                 $params[$paramName] = (string)array_shift($authenticationNode->xpath(".//param[@name='$paramName']"));
             }
             $this->authentications[(string)$authenticationNode->attributes()->uri] = $params;
+        }
+        // init accesses
+        $this->accesses = array();
+        foreach ($node->accesses->access as $accessNode) {
+            $params = array();
+            foreach ($accessNode->params->param as $paramNode) {
+                $paramName = (string)$paramNode->attributes()->name;
+                $params[$paramName] = (string)array_shift($accessNode->xpath(".//param[@name='$paramName']"));
+            }
+            $this->accesses[(string)$accessNode->attributes()->type][] = $params;
         }
     }
 
@@ -394,4 +405,15 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         // return the environmentVariables
         return $this->environmentVariables;
     }
+
+    /**
+     * Returns the access configuration.
+     *
+     * @return array
+     */
+    public function getAccesses()
+    {
+        return $this->accesses;
+    }
+
 }

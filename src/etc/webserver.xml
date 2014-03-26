@@ -45,6 +45,26 @@
             </authentication>
         </authentications>
 
+        <accesses>
+            <!-- per default allow everything for local address -->
+            <access type="allow">
+                <params>
+                    <param name="REQUEST_URI" type="string">.*</param>
+                    <param name="REMOTE_ADDR" type="string">127\.0\.0\.1</param>
+                </params>
+            </access>
+            <!-- deny errors folder by default -->
+            <access type="deny">
+                <params>
+                    <param name="REQUEST_URI" type="string">^\/errors.*</param>
+                </params>
+            </access>
+        </accesses>
+
+        <rewrites>
+            <rewrite condition="-f|-l|-d" target="" flag="L"/>
+        </rewrites>
+
         <virtualHosts>
             <virtualHost name="phpwebserver.dev phpwebserver.local phpwebserver.test">
                 <params>
@@ -70,16 +90,13 @@
             </virtualHost>
         </virtualHosts>
 
-        <rewrites>
-            <rewrite condition="-f|-l|-d" target="" flag="L"/>
-        </rewrites>
-
         <connectionHandlers>
             <connectionHandler type="\TechDivision\Http\HttpConnectionHandler" />
         </connectionHandlers>
 
         <modules>
             <module type="\TechDivision\WebServer\Modules\AuthenticationModule"/>
+            <module type="\TechDivision\WebServer\Modules\AccessModule"/>
             <module type="\TechDivision\WebServer\Modules\VirtualHostModule"/>
             <module type="\TechDivision\WebServer\Modules\EnvironmentVariableModule" />
             <module type="\TechDivision\RewriteModule\RewriteModule"/>
@@ -130,10 +147,6 @@
             </virtualHost>
         </virtualHosts>
 
-        <rewrites>
-            <rewrite condition="-f|-l|-d" target="" flag="L"/>
-        </rewrites>
-
         <authentications>
             <authentication uri="^\/auth\/basic\/phpwebserver.*">
                 <params>
@@ -157,12 +170,30 @@
             </authentication>
         </authentications>
 
+        <accesses>
+            <access type="allow">
+                <params>
+                    <param name="REQUEST_URI" type="string">.*</param>
+                </params>
+            </access>
+            <access type="deny">
+                <params>
+                    <param name="REQUEST_URI" type="string">^\/var\/.*</param>
+                </params>
+            </access>
+        </accesses>
+
+        <rewrites>
+            <rewrite condition="-f|-l|-d" target="" flag="L"/>
+        </rewrites>
+
         <connectionHandlers>
             <connectionHandler type="\TechDivision\Http\HttpConnectionHandler" />
         </connectionHandlers>
 
         <modules>
             <module type="\TechDivision\WebServer\Modules\AuthenticationModule"/>
+            <module type="\TechDivision\WebServer\Modules\AccessModule"/>
             <module type="\TechDivision\WebServer\Modules\VirtualHostModule"/>
             <module type="\TechDivision\WebServer\Modules\EnvironmentVariableModule" />
             <module type="\TechDivision\RewriteModule\RewriteModule"/>

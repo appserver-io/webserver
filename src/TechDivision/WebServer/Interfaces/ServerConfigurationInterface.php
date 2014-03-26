@@ -189,6 +189,13 @@ interface ServerConfigurationInterface
     public function getRewrites();
 
     /**
+     * Returns the access configuration.
+     *
+     * @return array
+     */
+    public function getAccesses();
+
+    /**
      * Returns the environment variable configuration
      *
      * @return array

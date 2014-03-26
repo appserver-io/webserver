@@ -18,7 +18,7 @@
  * @link      https://github.com/techdivision/TechDivision_WebServer
  */
 
-namespace TechDivision\WebServer\Workers;
+namespace TechDivision\WebServer;
 
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
 use TechDivision\WebServer\Interfaces\WorkerInterface;

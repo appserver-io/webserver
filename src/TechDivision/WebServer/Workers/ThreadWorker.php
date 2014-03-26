@@ -29,6 +29,7 @@ use TechDivision\WebServer\Interfaces\ServerInterface;
 use TechDivision\WebServer\Interfaces\WorkerInterface;
 use TechDivision\WebServer\Exceptions\ModuleNotFoundException;
 use TechDivision\WebServer\Exceptions\ConnectionHandlerNotFoundException;
+use TechDivision\WebServer\RequestHandlerThread;
 
 /**
  * Class ThreadWorker

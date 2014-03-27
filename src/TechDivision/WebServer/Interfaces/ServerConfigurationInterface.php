@@ -133,6 +133,13 @@ interface ServerConfigurationInterface
     public function getDocumentRoot();
 
     /**
+     * Return's directory index definition
+     *
+     * @return string
+     */
+    public function getDirectoryIndex();
+
+    /**
      * Return's modules
      *
      * @return array

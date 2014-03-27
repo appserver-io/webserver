@@ -17,8 +17,9 @@
             <param name="workerNumber" type="integer">128</param>
             <!-- Note: it's intended to use a relative path to get content from webservers basedir/var/www -->
             <param name="documentRoot" type="string">var/www</param>
+            <param name="directoryIndex" type="string">index.php index.html index.htm</param>
             <param name="keepAliveMax" type="integer">64</param>
-            <param name="keepAliveTimeout" type="integer">16</param>
+            <param name="keepAliveTimeout" type="integer">5</param>
             <param name="errorsPageTemplatePath" type="string"/>
         </params>
 
@@ -146,8 +147,9 @@
             <param name="passphrase" type="string">passphrase</param>
             <!-- Note: it's intended to use a relative path to get content from webservers basedir/var/www -->
             <param name="documentRoot" type="string">var/www</param>
+            <param name="directoryIndex" type="string">index.php index.html index.htm</param>
             <param name="keepAliveMax" type="integer">64</param>
-            <param name="keepAliveTimeout" type="integer">16</param>
+            <param name="keepAliveTimeout" type="integer">5</param>
             <param name="errorsPageTemplatePath" type="string"/>
         </params>
 

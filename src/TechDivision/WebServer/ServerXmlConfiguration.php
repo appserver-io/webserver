@@ -69,6 +69,7 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         $this->certPath = (string)array_shift($node->xpath("./params/param[@name='certPath']"));
         $this->passphrase = (string)array_shift($node->xpath("./params/param[@name='passphrase']"));
         $this->documentRoot = (string)array_shift($node->xpath("./params/param[@name='documentRoot']"));
+        $this->directoryIndex = (string)array_shift($node->xpath("./params/param[@name='directoryIndex']"));
         $this->admin = (string)array_shift($node->xpath("./params/param[@name='admin']"));
         $this->keepAliveMax = (string)array_shift($node->xpath("./params/param[@name='keepAliveMax']"));
         $this->keepAliveTimeout = (string)array_shift($node->xpath("./params/param[@name='keepAliveTimeout']"));
@@ -416,6 +417,16 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
     public function getDocumentRoot()
     {
         return $this->documentRoot;
+    }
+
+    /**
+     * Return's directory index definition
+     *
+     * @return string
+     */
+    public function getDirectoryIndex()
+    {
+        return $this->directoryIndex;
     }
 
     /**

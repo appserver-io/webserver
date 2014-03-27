@@ -195,7 +195,7 @@ class AccessModule implements ModuleInterface
                 }
 
                 if ($matchDeny) {
-                    // set allowed flag true
+                    // set allowed flag false
                     $allowed = false;
                     // break here cause' we found an allowed access
                     break;
@@ -203,7 +203,7 @@ class AccessModule implements ModuleInterface
             }
         }
 
-        // check if it's finally allowed
+        // check if it's finally not allowed
         if (!$allowed) {
             throw new ModuleException('This request is forbidden', 403);
         }

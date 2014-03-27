@@ -45,6 +45,12 @@
                             "target" : "",
                             "flag" : "L"
                         }
+                    ],
+                    "environmentVariables" : [
+                        {
+                            "condition" : "",
+                            "definition" : "EXAMPLE_VARIABLE=test"
+                        }
                     ]
                 }
             ],
@@ -54,6 +60,12 @@
                     "condition" : "-f|-l|-d",
                     "target" : "",
                     "flag" : "L"
+                }
+            ],
+            "environmentVariables" : [
+                {
+                    "condition" : "(\\s.*WebKit?|Gecko)@$User-Agent",
+                    "definition" : "BROWSER_ENGINE=$1"
                 }
             ],
 
@@ -124,6 +136,12 @@
                             "target" : "",
                             "flag" : "L"
                         }
+                    ],
+                    "environmentVariables" : [
+                        {
+                            "condition" : "",
+                            "definition" : "EXAMPLE_VARIABLE=test"
+                        }
                     ]
                 }
             ],
@@ -133,6 +151,12 @@
                     "condition" : "-f|-l|-d",
                     "target" : "",
                     "flag" : "L"
+                }
+            ],
+            "environmentVariables" : [
+                {
+                    "condition" : "(\\s.*WebKit?|Gecko)@$User-Agent",
+                    "definition" : "BROWSER_ENGINE=$1"
                 }
             ],
 

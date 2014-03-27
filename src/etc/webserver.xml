@@ -56,8 +56,15 @@
                 <rewrites>
                     <rewrite condition="-f|-l|-d" target="" flag="L"/>
                 </rewrites>
+                <environmentVariables>
+                    <environmentVariable condition="" definition="EXAMPLE_VARIABLE=test" />
+                </environmentVariables>
             </virtualHost>
         </virtualHosts>
+
+        <environmentVariables>
+            <environmentVariable condition="(\\s.*WebKit?|Gecko)@$User-Agent" definition="BROWSER_ENGINE=$1" />
+        </environmentVariables>
 
         <rewrites>
             <rewrite condition="-f|-l|-d" target="" flag="L"/>
@@ -116,8 +123,15 @@
                 <rewrites>
                     <rewrite condition="-f|-l|-d" target="" flag="L"/>
                 </rewrites>
+                <environmentVariables>
+                    <environmentVariable condition="" definition="EXAMPLE_VARIABLE=test" />
+                </environmentVariables>
             </virtualHost>
         </virtualHosts>
+
+        <environmentVariables>
+            <environmentVariable condition="(\\s.*WebKit?|Gecko)@$User-Agent" definition="BROWSER_ENGINE=$1" />
+        </environmentVariables>
 
         <rewrites>
             <rewrite condition="-f|-l|-d" target="" flag="L"/>

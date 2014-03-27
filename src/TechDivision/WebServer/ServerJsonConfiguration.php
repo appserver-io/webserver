@@ -242,6 +242,16 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     }
 
     /**
+     * Return's directory index definition
+     *
+     * @return string
+     */
+    public function getDirectoryIndex()
+    {
+        return $this->data->directoryIndex;
+    }
+
+    /**
      * Return's connection handlers
      *
      * @return array

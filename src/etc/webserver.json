@@ -15,7 +15,7 @@
             "port": "9080",
             "documentRoot" : "var/www",
             "keepAliveMax": 64,
-            "keepAliveTimeout": 16,
+            "keepAliveTimeout": 5,
             "errorsPageTemplatePath": "",
 
             "authentications" : [
@@ -73,6 +73,7 @@
                     "flag" : "L"
                 }
             ],
+
             "environmentVariables" : [
                 {
                     "condition" : "(\\s.*WebKit?|Gecko)@$User-Agent",
@@ -117,7 +118,7 @@
             "passphrase": "passphrase",
             "documentRoot": "var/www",
             "keepAliveMax": 64,
-            "keepAliveTimeout": 16,
+            "keepAliveTimeout": 5,
             "errorsPageTemplatePath": "",
 
             "authentications" : [
@@ -175,6 +176,7 @@
                     "flag" : "L"
                 }
             ],
+
             "environmentVariables" : [
                 {
                     "condition" : "(\\s.*WebKit?|Gecko)@$User-Agent",

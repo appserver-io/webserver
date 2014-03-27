@@ -23,6 +23,7 @@ namespace TechDivision\WebServer\Modules;
 
 use TechDivision\Http\HttpProtocol;
 use TechDivision\WebServer\Dictionaries\ServerVars;
+use TechDivision\WebServer\Dictionaries\ModuleVars;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
 use TechDivision\WebServer\Interfaces\ModuleInterface;
@@ -127,68 +128,78 @@ class AccessModule implements ModuleInterface
         // get ref to local var
         $serverContext = $this->getServerContext();
 
+        // check if there are some volatile access definitions so use them and override global accesses
+        if ($this->serverContext->hasModuleVar(ModuleVars::VOLATILE_ACCESSES)) {
+            // reset by volatile accesses
+            $this->accesses = $this->serverContext->getModuleVar(ModuleVars::VOLATILE_ACCESSES);
+        }
+
         // generally everything is not allowed
         $allowed = false;
 
-        // check allow accesses informations if something matches
-        foreach ($this->accesses['allow'] as $accessData) {
+        if ($this->accesses['allow']) {
+            // check allow accesses informations if something matches
+            foreach ($this->accesses['allow'] as $accessData) {
 
-            // we are optimistic an initial say data will match
-            $matchAllow = true;
+                // we are optimistic an initial say data will match
+                $matchAllow = true;
 
-            // check if accessData matches server vars
-            foreach ($accessData as $serverVar => $varPattern) {
+                // check if accessData matches server vars
+                foreach ($accessData as $serverVar => $varPattern) {
 
-                // check if server var exists
-                if ($serverContext->hasServerVar($serverVar)) {
-                    // check if pattern matches
-                    if (!preg_match(
-                        '/' . $varPattern . '/',
-                        $serverContext->getServerVar($serverVar)
-                    )) {
-                        $matchAllow = false;
-                        // break here if anything not matches
-                        break;
+                    // check if server var exists
+                    if ($serverContext->hasServerVar($serverVar)) {
+                        // check if pattern matches
+                        if (!preg_match(
+                            '/' . $varPattern . '/',
+                            $serverContext->getServerVar($serverVar)
+                        )) {
+                            $matchAllow = false;
+                            // break here if anything not matches
+                            break;
+                        }
                     }
                 }
-            }
 
-            if ($matchAllow) {
-                // set allowed flag true
-                $allowed = true;
-                // break here cause' we found an allowed access
-                break;
+                if ($matchAllow) {
+                    // set allowed flag true
+                    $allowed = true;
+                    // break here cause' we found an allowed access
+                    break;
+                }
             }
         }
 
-        // check deny accesses informations if something matches
-        foreach ($this->accesses['deny'] as $accessData) {
+        if (isset($this->accesses['deny'])) {
+            // check deny accesses informations if something matches
+            foreach ($this->accesses['deny'] as $accessData) {
 
-            // initial nothing denies the request
-            $matchDeny = true;
+                // initial nothing denies the request
+                $matchDeny = true;
 
-            // check if accessData matches server vars
-            foreach ($accessData as $serverVar => $varPattern) {
+                // check if accessData matches server vars
+                foreach ($accessData as $serverVar => $varPattern) {
 
-                // check if server var exists
-                if ($serverContext->hasServerVar($serverVar)) {
-                    // check if pattern matches
-                    if (!preg_match(
-                        '/' . $varPattern . '/',
-                        $serverContext->getServerVar($serverVar)
-                    )) {
-                        $matchDeny = false;
-                        // break here if anything not matches
-                        break;
+                    // check if server var exists
+                    if ($serverContext->hasServerVar($serverVar)) {
+                        // check if pattern matches
+                        if (!preg_match(
+                            '/' . $varPattern . '/',
+                            $serverContext->getServerVar($serverVar)
+                        )) {
+                            $matchDeny = false;
+                            // break here if anything not matches
+                            break;
+                        }
                     }
                 }
-            }
 
-            if ($matchDeny) {
-                // set allowed flag true
-                $allowed = false;
-                // break here cause' we found an allowed access
-                break;
+                if ($matchDeny) {
+                    // set allowed flag true
+                    $allowed = false;
+                    // break here cause' we found an allowed access
+                    break;
+                }
             }
         }
 

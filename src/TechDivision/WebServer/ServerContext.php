@@ -314,7 +314,7 @@ class ServerContext implements ServerContextInterface
      *
      * @throws \TechDivision\WebServer\Exceptions\ServerException
      *
-     * @return string The value to given module var
+     * @return mixed The value to given module var
      */
     public function getModuleVar($moduleVar)
     {

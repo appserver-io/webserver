@@ -29,6 +29,7 @@ namespace TechDivision\WebServer\Dictionaries;
  * @package    TechDivision_WebServer
  * @subpackage Dictionaries
  * @author     Bernhard Wick <b.wick@techdivision.com>
+ * @author     Johann Zelger <j.zelger@techdivision.com>
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/techdivision/TechDivision_WebServer
@@ -42,4 +43,5 @@ class ModuleVars
      */
     const VOLATILE_REWRITES = 'VOLATILE_REWRITES';
     const VOLATILE_ENVIRONMENT_VARIABLES = 'VOLATILE_ENVIRONMENT_VARIABLES';
+    const VOLATILE_ACCESSES = 'ACCESSES';
 }

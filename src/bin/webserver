@@ -9,9 +9,9 @@ require WEBSERVER_AUTOLOADER;
 chdir(WEBSERVER_BASEDIR);
 
 // read in json configuration
-$mainConfiguration = new \TechDivision\WebServer\MainJsonConfiguration(WEBSERVER_BASEDIR . 'etc/webserver.json');
+//$mainConfiguration = new \TechDivision\WebServer\MainJsonConfiguration(WEBSERVER_BASEDIR . 'etc/webserver.json');
 // read in xml configuration <- just comment this in to use xml configuration
-//$mainConfiguration = new \TechDivision\WebServer\MainXmlConfiguration(WEBSERVER_BASEDIR . 'etc/webserver.xml');
+$mainConfiguration = new \TechDivision\WebServer\MainXmlConfiguration(WEBSERVER_BASEDIR . 'etc/webserver.xml');
 
 // init server array
 $servers = array();

@@ -37,6 +37,7 @@ use TechDivision\WebServer\Interfaces\ServerContextInterface;
  * @package    TechDivision_WebServer
  * @subpackage Modules
  * @author     Johann Zelger <jz@techdivision.com>
+ * @author     Bernhard Wick <b.wick@techdivision.com>
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/techdivision/TechDivision_WebServer
@@ -174,6 +175,15 @@ class VirtualHostModule implements ModuleInterface
                 );
             }
 
+            // Add the accesses (if any) to the configuration's access pool
+            if (!empty($virtualHosts[$serverName]['accesses'])) {
+
+                // Set the environment variables we encountered as a temporary module var
+                $this->serverContext->setModuleVar(
+                    ModuleVars::VOLATILE_ACCESSES,
+                    $virtualHosts[$serverName]['accesses']
+                );
+            }
         }
 
     }

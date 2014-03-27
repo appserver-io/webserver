@@ -45,6 +45,26 @@
             </authentication>
         </authentications>
 
+        <accesses>
+            <!-- per default allow everything for local address -->
+            <access type="allow">
+                <params>
+                    <param name="REQUEST_URI" type="string">.*</param>
+                    <param name="REMOTE_ADDR" type="string">127\.0\.0\.1</param>
+                </params>
+            </access>
+            <!-- deny errors folder by default -->
+            <access type="deny">
+                <params>
+                    <param name="REQUEST_URI" type="string">^\/errors.*</param>
+                </params>
+            </access>
+        </accesses>
+
+        <rewrites>
+            <rewrite condition="-f|-l|-d" target="" flag="L"/>
+        </rewrites>
+
         <virtualHosts>
             <virtualHost name="phpwebserver.dev phpwebserver.local phpwebserver.test">
                 <params>
@@ -60,16 +80,23 @@
                     <environmentVariable condition="" definition="EXAMPLE_VARIABLE=test" />
                 </environmentVariables>
             </virtualHost>
+
             <virtualHost name="magento.local">
                 <params>
-                    <param name="admin" type="string">admin@phpwebserver.dev</param>
-                    <!-- Note: it's intended to use a relative path to get content from webservers basedir/var/www -->
+                    <param name="admin" type="string">admin@magento.local</param>
                     <param name="documentRoot" type="string">/var/www/magento</param>
                     <param name="errorsPageTemplatePath" type="string">var/www/errors/error.phtml</param>
                 </params>
                 <rewrites>
                     <rewrite condition="-f|-l|-d" target="" flag="L"/>
                 </rewrites>
+                <accesses>
+                    <access type="allow">
+                        <params>
+                            <param name="REQUEST_URI" type="string">^\/(media|skin|js|index\.php).*</param>
+                        </params>
+                    </access>
+                </accesses>
             </virtualHost>
         </virtualHosts>
 
@@ -91,6 +118,7 @@
             <module type="\TechDivision\WebServer\Modules\EnvironmentVariableModule" />
             <module type="\TechDivision\RewriteModule\RewriteModule"/>
             <module type="\TechDivision\WebServer\Modules\DirectoryModule"/>
+            <module type="\TechDivision\WebServer\Modules\AccessModule"/>
             <module type="\TechDivision\WebServer\Modules\CoreModule"/>
             <module type="\TechDivision\PhpModule\PhpModule"/>
         </modules>
@@ -171,6 +199,19 @@
             </authentication>
         </authentications>
 
+        <accesses>
+            <access type="allow">
+                <params>
+                    <param name="REQUEST_URI" type="string">.*</param>
+                </params>
+            </access>
+            <access type="deny">
+                <params>
+                    <param name="REQUEST_URI" type="string">^\/var\/.*</param>
+                </params>
+            </access>
+        </accesses>
+
         <connectionHandlers>
             <connectionHandler type="\TechDivision\Http\HttpConnectionHandler" />
         </connectionHandlers>
@@ -181,6 +222,7 @@
             <module type="\TechDivision\WebServer\Modules\EnvironmentVariableModule" />
             <module type="\TechDivision\RewriteModule\RewriteModule"/>
             <module type="\TechDivision\WebServer\Modules\DirectoryModule"/>
+            <module type="\TechDivision\WebServer\Modules\AccessModule"/>
             <module type="\TechDivision\WebServer\Modules\CoreModule"/>
             <module type="\TechDivision\PhpModule\PhpModule"/>
         </modules>

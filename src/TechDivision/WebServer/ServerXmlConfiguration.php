@@ -56,6 +56,7 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
      */
     public function __construct($node)
     {
+        // prepare properties
         $this->type = (string)$node->attributes()->type;
         $this->workerType = (string)$node->attributes()->worker;
         $this->socketType = (string)$node->attributes()->socket;
@@ -72,27 +73,91 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         $this->keepAliveMax = (string)array_shift($node->xpath("./params/param[@name='keepAliveMax']"));
         $this->keepAliveTimeout = (string)array_shift($node->xpath("./params/param[@name='keepAliveTimeout']"));
         $this->errorsPageTemplatePath = (string)array_shift($node->xpath("./params/param[@name='errorsPageTemplatePath']"));
-        // init modules
-        $this->modules = array();
-        foreach ($node->modules->module as $moduleNode) {
-            $this->modules[] = (string)$moduleNode->attributes()->type;
-        }
-        // init connection handlers
-        $this->connectionHandlers = array();
-        foreach ($node->connectionHandlers->connectionHandler as $connectionHandlerNode) {
-            $connectionHandlerType = (string)$connectionHandlerNode->attributes()->type;
-            $this->connectionHandlers[] = $connectionHandlerType;
-        }
 
-        // init handlers
-        $this->handlers = array();
-        foreach ($node->handlers->handler as $handlerNode) {
-            $this->handlers[(string)$handlerNode->attributes()->extension] = (string)$handlerNode->attributes()->name;
-        }
+        // prepare modules
+        $this->modules = $this->prepareModules($node);
+        // prepare connection handlers
+        $this->connectionHandlers = $this->prepareConnectionHandlers($node);
+        // prepare handlers
+        $this->handlers = $this->prepareHandlers($node);
+        // prepare virutalHosts
+        $this->virtualHosts = $this->prepareVirtualHosts($node);
+        // prepare rewrites
+        $this->rewrites = $this->prepareRewrites($node);
+        // prepare environmentVariables
+        $this->environmentVariables = $this->prepareEnvironmentVariables($node);
+        // prepare authentications
+        $this->authentications = $this->prepareAuthentications($node);
+        // prepare accesses
+        $this->accesses = $this->prepareAccesses($node);
+    }
 
-        // init virutalHosts
-        $this->virtualHosts = array();
-        if (isset($node->virtualHosts->virtualHost)) {
+    /**
+     * Prepares the modules array based on a simple xml elemend node
+     *
+     * @param \SimpleXMLElement $node The xml node
+     *
+     * @return array
+     */
+    public function prepareModules(\SimpleXMLElement $node)
+    {
+        $modules = array();
+        if ($node->modules) {
+            foreach ($node->modules->module as $moduleNode) {
+                $modules[] = (string)$moduleNode->attributes()->type;
+            }
+        }
+        return $modules;
+    }
+
+    /**
+     * Prepares the connectionHandlers array based on a simple xml elemend node
+     *
+     * @param \SimpleXMLElement $node The xml node
+     *
+     * @return array
+     */
+    public function prepareConnectionHandlers(\SimpleXMLElement $node)
+    {
+        $connectionHandlers = array();
+        if ($node->connectionHandlers) {
+            foreach ($node->connectionHandlers->connectionHandler as $connectionHandlerNode) {
+                $connectionHandlerType = (string)$connectionHandlerNode->attributes()->type;
+                $connectionHandlers[] = $connectionHandlerType;
+            }
+        }
+        return $connectionHandlers;
+    }
+
+    /**
+     * Prepares the handlers array based on a simple xml elemend node
+     *
+     * @param \SimpleXMLElement $node The xml node
+     *
+     * @return array
+     */
+    public function prepareHandlers(\SimpleXMLElement $node)
+    {
+        $handlers = array();
+        if ($node->handlers) {
+            foreach ($node->handlers->handler as $handlerNode) {
+                $handlers[(string)$handlerNode->attributes()->extension] = (string)$handlerNode->attributes()->name;
+            }
+        }
+        return $handlers;
+    }
+
+    /**
+     * Prepares the virtual hosts array based on a simple xml elemend node
+     *
+     * @param \SimpleXMLElement $node The xml node
+     *
+     * @return array
+     */
+    public function prepareVirtualHosts(\SimpleXMLElement $node)
+    {
+        $virutalHosts = array();
+        if ($node->virtualHosts) {
             foreach ($node->virtualHosts->virtualHost as $virtualHostNode) {
                 $virtualHostNames = explode(' ', (string)$virtualHostNode->attributes()->name);
                 $params = array();
@@ -100,68 +165,107 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
                     $paramName = (string)$paramNode->attributes()->name;
                     $params[$paramName] = (string)array_shift($virtualHostNode->xpath(".//param[@name='$paramName']"));
                 }
-
-                // Init virtual host based rewrites
-                $rewrites = array();
-                if (isset($virtualHostNode->rewrites->rewrite)) {
-                    foreach ($virtualHostNode->rewrites->rewrite as $rewriteNode) {
-
-                        // Cut of the SimpleXML attributes wrapper and attach it to our rewrites
-                        $rewrite = (array)$rewriteNode;
-                        $rewrites[] = array_shift($rewrite);
-                    }
-                }
-
-                // Init virtual host based environment variables
-                $environmentVariables = array();
-                if (isset($virtualHostNode->environmentVariables->environmentVariable)) {
-                    foreach ($virtualHostNode->environmentVariables->environmentVariable as $environmentVariableNode) {
-
-                        // Cut of the SimpleXML attributes wrapper and attach it to our environment variable
-                        $environmentVariable = (array)$environmentVariableNode;
-                        $environmentVariables[] = array_shift($environmentVariable);
-                    }
-                }
-
                 foreach ($virtualHostNames as $virtualHostName) {
                     // set all virtual hosts params per key for faster matching later on
-                    $this->virtualHosts[trim($virtualHostName)]['params'] = $params;
-                    // Also set all the rewrites for this virtual host
-                    $this->virtualHosts[trim($virtualHostName)]['rewrites'] = $rewrites;
-                    // Also add the environmentVariables to the virtual host configuration
-                    $this->virtualHosts[trim($virtualHostName)]['environmentVariables'] = $environmentVariables;
+                    $virutalHosts[trim($virtualHostName)] = array(
+                        'params' => $params,
+                        'rewrites' => $this->prepareRewrites($virtualHostNode),
+                        'environmentVariables' => $this->prepareEnvironmentVariables($virtualHostNode),
+                        'authentications' => $this->prepareAuthentications($virtualHostNode),
+                        'accesses' => $this->prepareAccesses($virtualHostNode)
+                    );
                 }
             }
         }
-        // Init rewrites
-        if (isset($node->rewrites->rewrite)) {
-            foreach ($node->rewrites->rewrite as $rewriteNode) {
+        return $virutalHosts;
+    }
 
+    /**
+     * Prepares the rewrites array based on a simple xml elemend node
+     *
+     * @param \SimpleXMLElement $node The xml node
+     *
+     * @return array
+     */
+    public function prepareRewrites(\SimpleXMLElement $node)
+    {
+        $rewrites = array();
+        if ($node->rewrites) {
+            foreach ($node->rewrites->rewrite as $rewriteNode) {
                 // Cut of the SimpleXML attributes wrapper and attach it to our rewrites
                 $rewrite = (array)$rewriteNode;
-                $this->rewrites[] = array_shift($rewrite);
+                $rewrites[] = array_shift($rewrite);
             }
         }
-        // Init environmentVariables
-        $this->environmentVariables = array();
-        if (isset($node->environmentVariables->environmentVariable)) {
+        return $rewrites;
+    }
+
+    /**
+     * Prepares the environmentVariables array based on a simple xml elemend node
+     *
+     * @param \SimpleXMLElement $node The xml node
+     *
+     * @return array
+     */
+    public function prepareEnvironmentVariables(\SimpleXMLElement $node)
+    {
+        $environmentVariables = array();
+        if ($node->environmentVariables) {
             foreach ($node->environmentVariables->environmentVariable as $environmentVariableNode) {
 
                 // Cut of the SimpleXML attributes wrapper and attach it to our environment variable
                 $environmentVariable = (array)$environmentVariableNode;
-                $this->environmentVariables[] = array_shift($environmentVariable);
+                $environmentVariables[] = array_shift($environmentVariable);
             }
         }
-        // init authentications
-        $this->authentications = array();
-        foreach ($node->authentications->authentication as $authenticationNode) {
-            $params = array();
-            foreach ($authenticationNode->params->param as $paramNode) {
-                $paramName = (string)$paramNode->attributes()->name;
-                $params[$paramName] = (string)array_shift($authenticationNode->xpath(".//param[@name='$paramName']"));
+        return $environmentVariables;
+    }
+
+    /**
+     * Prepares the authentications array based on a simple xml elemend node
+     *
+     * @param \SimpleXMLElement $node The xml node
+     *
+     * @return array
+     */
+    public function prepareAuthentications(\SimpleXMLElement $node)
+    {
+        $authentications = array();
+        if ($node->authentications) {
+            foreach ($node->authentications->authentication as $authenticationNode) {
+                $params = array();
+                foreach ($authenticationNode->params->param as $paramNode) {
+                    $paramName = (string)$paramNode->attributes()->name;
+                    $params[$paramName] = (string)array_shift($authenticationNode->xpath(".//param[@name='$paramName']"));
+                }
+                $authentications[(string)$authenticationNode->attributes()->uri] = $params;
             }
-            $this->authentications[(string)$authenticationNode->attributes()->uri] = $params;
         }
+        return $authentications;
+    }
+
+    /**
+     * Prepares the access array based on a simple xml elemend node
+     *
+     * @param \SimpleXMLElement $node The xml node
+     *
+     * @return array
+     */
+    public function prepareAccesses(\SimpleXMLElement $node)
+    {
+        // init accesses
+        $accesses = array();
+        if ($node->accesses) {
+            foreach ($node->accesses->access as $accessNode) {
+                $params = array();
+                foreach ($accessNode->params->param as $paramNode) {
+                    $paramName = (string)$paramNode->attributes()->name;
+                    $params[$paramName] = (string)array_shift($accessNode->xpath(".//param[@name='$paramName']"));
+                }
+                $accesses[(string)$accessNode->attributes()->type][] = $params;
+            }
+        }
+        return $accesses;
     }
 
     /**
@@ -393,5 +497,15 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
     {
         // return the environmentVariables
         return $this->environmentVariables;
+    }
+
+    /**
+     * Returns the access configuration.
+     *
+     * @return array
+     */
+    public function getAccesses()
+    {
+        return $this->accesses;
     }
 }

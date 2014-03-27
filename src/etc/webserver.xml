@@ -76,6 +76,9 @@
                 <rewrites>
                     <rewrite condition="-f|-l|-d" target="" flag="L"/>
                 </rewrites>
+                <environmentVariables>
+                    <environmentVariable condition="" definition="EXAMPLE_VARIABLE=test" />
+                </environmentVariables>
             </virtualHost>
 
             <virtualHost name="magento.local">
@@ -96,6 +99,14 @@
                 </accesses>
             </virtualHost>
         </virtualHosts>
+
+        <environmentVariables>
+            <environmentVariable condition="(\\s.*WebKit?|Gecko)@$User-Agent" definition="BROWSER_ENGINE=$1" />
+        </environmentVariables>
+
+        <rewrites>
+            <rewrite condition="-f|-l|-d" target="" flag="L"/>
+        </rewrites>
 
         <connectionHandlers>
             <connectionHandler type="\TechDivision\Http\HttpConnectionHandler" />
@@ -151,8 +162,19 @@
                 <rewrites>
                     <rewrite condition="-f|-l|-d" target="" flag="L"/>
                 </rewrites>
+                <environmentVariables>
+                    <environmentVariable condition="" definition="EXAMPLE_VARIABLE=test" />
+                </environmentVariables>
             </virtualHost>
         </virtualHosts>
+
+        <environmentVariables>
+            <environmentVariable condition="(\\s.*WebKit?|Gecko)@$User-Agent" definition="BROWSER_ENGINE=$1" />
+        </environmentVariables>
+
+        <rewrites>
+            <rewrite condition="-f|-l|-d" target="" flag="L"/>
+        </rewrites>
 
         <authentications>
             <authentication uri="^\/auth\/basic\/phpwebserver.*">
@@ -189,10 +211,6 @@
                 </params>
             </access>
         </accesses>
-
-        <rewrites>
-            <rewrite condition="-f|-l|-d" target="" flag="L"/>
-        </rewrites>
 
         <connectionHandlers>
             <connectionHandler type="\TechDivision\Http\HttpConnectionHandler" />

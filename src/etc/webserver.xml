@@ -50,14 +50,14 @@
             <!-- per default allow everything for local address -->
             <access type="allow">
                 <params>
-                    <param name="REQUEST_URI" type="string">.*</param>
+                    <param name="X_REQUEST_URI" type="string">.*</param>
                     <param name="REMOTE_ADDR" type="string">127\.0\.0\.1</param>
                 </params>
             </access>
             <!-- deny errors folder by default -->
             <access type="deny">
                 <params>
-                    <param name="REQUEST_URI" type="string">^\/errors.*</param>
+                    <param name="X_REQUEST_URI" type="string">^\/errors.*</param>
                 </params>
             </access>
         </accesses>
@@ -94,7 +94,7 @@
                 <accesses>
                     <access type="allow">
                         <params>
-                            <param name="REQUEST_URI" type="string">^\/(media|skin|js|index\.php).*</param>
+                            <param name="X_REQUEST_URI" type="string">^\/(media|skin|js|index\.php).*</param>
                         </params>
                     </access>
                 </accesses>
@@ -204,12 +204,12 @@
         <accesses>
             <access type="allow">
                 <params>
-                    <param name="REQUEST_URI" type="string">.*</param>
+                    <param name="X_REQUEST_URI" type="string">.*</param>
                 </params>
             </access>
             <access type="deny">
                 <params>
-                    <param name="REQUEST_URI" type="string">^\/var\/.*</param>
+                    <param name="X_REQUEST_URI" type="string">^\/var\/.*</param>
                 </params>
             </access>
         </accesses>

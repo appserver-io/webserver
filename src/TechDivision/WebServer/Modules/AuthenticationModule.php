@@ -170,7 +170,7 @@ class AuthenticationModule implements ModuleInterface
             // check if pattern matches uri
             if (preg_match(
                 '/' . $uriPattern . '/',
-                $this->getServerContext()->getServerVar(ServerVars::REQUEST_URI)
+                $this->getServerContext()->getServerVar(ServerVars::X_REQUEST_URI)
             )
             ) {
                 // set type Instance to local ref

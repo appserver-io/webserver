@@ -82,7 +82,7 @@ class CoreModule implements ModuleInterface
             $handlers = $serverContext->getServerConfig()->getHandlers();
             // get uri without querystring
             // Just make sure that you check for the existence of the query string first, as it might not be set
-            $uriWithoutQueryString = $serverContext->getServerVar(ServerVars::REQUEST_URI);
+            $uriWithoutQueryString = $serverContext->getServerVar(ServerVars::X_REQUEST_URI);
 
             if ($serverContext->hasServerVar(ServerVars::QUERY_STRING)) {
                 $uriWithoutQueryString = str_replace(

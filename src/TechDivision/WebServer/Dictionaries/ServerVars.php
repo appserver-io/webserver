@@ -114,6 +114,8 @@ class ServerVars
     const API_VERSION = 'API_VERSION';
     const THE_REQUEST = 'THE_REQUEST';
     const REQUEST_URI = 'REQUEST_URI';
+    // This special constant is used to allow inter-module communication without changing the original REQUEST_URI
+    const X_REQUEST_URI = 'X_REQUEST_URI';
     const REQUEST_FILENAME = 'REQUEST_FILENAME';
     const IS_SUBREQ = 'IS_SUBREQ';
     const HTTPS = 'HTTPS';

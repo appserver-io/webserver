@@ -15,7 +15,7 @@
             "port": "9080",
             "documentRoot" : "var/www",
             "keepAliveMax": 64,
-            "keepAliveTimeout": 5,
+            "keepAliveTimeout": 16,
             "errorsPageTemplatePath": "",
 
             "authentications" : [
@@ -30,17 +30,6 @@
                     "realm": "appserver.io Basic Authentication System",
                     "type": "\\TechDivision\\WebServer\\Authentication\\BasicAuthentication",
                     "hash": "YXBwc2VydmVyOmFwcHNlcnZlci5pMA=="
-                }
-            ],
-
-            "accesses" : [
-                {
-                    "type": "allow",
-                    "REQUEST_URI": ".*"
-                },
-                {
-                    "type": "deny",
-                    "REQUEST_URI": "^\\/var\\/.*"
                 }
             ],
 
@@ -73,7 +62,6 @@
                     "flag" : "L"
                 }
             ],
-
             "environmentVariables" : [
                 {
                     "condition" : "(\\s.*WebKit?|Gecko)@$User-Agent",
@@ -91,8 +79,9 @@
                 "\\TechDivision\\WebServer\\Modules\\EnvironmentVariableModule",
                 "\\TechDivision\\RewriteModule\\RewriteModule",
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
+                "\\TechDivision\\WebServer\\Modules\\AccessModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",
-                "\\TechDivision\\WebServer\\Modules\\PhpModule"
+                "\\TechDivision\\PhpModule\\PhpModule"
             ],
 
             "handlers": [
@@ -118,7 +107,7 @@
             "passphrase": "passphrase",
             "documentRoot": "var/www",
             "keepAliveMax": 64,
-            "keepAliveTimeout": 5,
+            "keepAliveTimeout": 16,
             "errorsPageTemplatePath": "",
 
             "authentications" : [
@@ -133,17 +122,6 @@
                     "realm": "appserver.io Basic Authentication System",
                     "type": "\\TechDivision\\WebServer\\Authentication\\BasicAuthentication",
                     "hash": "YXBwc2VydmVyOmFwcHNlcnZlci5pMA=="
-                }
-            ],
-
-            "accesses" : [
-                {
-                    "type": "allow",
-                    "REQUEST_URI": ".*"
-                },
-                {
-                    "type": "deny",
-                    "REQUEST_URI": "^\\/var\\/.*"
                 }
             ],
 
@@ -176,7 +154,6 @@
                     "flag" : "L"
                 }
             ],
-
             "environmentVariables" : [
                 {
                     "condition" : "(\\s.*WebKit?|Gecko)@$User-Agent",
@@ -194,8 +171,9 @@
                 "\\TechDivision\\WebServer\\Modules\\EnvironmentVariableModule",
                 "\\TechDivision\\RewriteModule\\RewriteModule",
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
+                "\\TechDivision\\WebServer\\Modules\\AccessModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",
-                "\\TechDivision\\WebServer\\Modules\\PhpModule"
+                "\\TechDivision\\PhpModule\\PhpModule"
             ],
 
             "handlers": [

@@ -22,6 +22,7 @@
 namespace TechDivision\WebServer\Workers;
 
 use TechDivision\Http\HttpConnectionHandler;
+use TechDivision\Http\HttpProtocol;
 use TechDivision\WebServer\Dictionaries\ServerVars;
 use TechDivision\WebServer\Interfaces\ConfigInterface;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
@@ -167,6 +168,9 @@ class ThreadWorker extends \Thread implements WorkerInterface
             // accept connections and process working connection by handlers
             if (($connection = $serverConnection->accept()) !== false) {
 
+                // set request time on accept
+                $serverContext->setServerVar(ServerVars::REQUEST_TIME, time());
+
                 /**
                  * This is for testing async request processing only.
                  *
@@ -189,8 +193,6 @@ class ThreadWorker extends \Thread implements WorkerInterface
                     }
                 }
 
-                // init server vars afterwards to avoid performance issues
-                $serverContext->initServerVars();
             }
 
             // init server vars afterwards to avoid performance issues

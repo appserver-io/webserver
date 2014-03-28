@@ -84,6 +84,8 @@ class CoreModule implements ModuleInterface
             // Just make sure that you check for the existence of the query string first, as it might not be set
             $uriWithoutQueryString = $serverContext->getServerVar(ServerVars::X_REQUEST_URI);
 
+            error_log('URI: ' . var_export($uriWithoutQueryString, true));
+
             if ($serverContext->hasServerVar(ServerVars::QUERY_STRING)) {
                 $uriWithoutQueryString = str_replace(
                     '?' . $serverContext->getServerVar(ServerVars::QUERY_STRING),

@@ -73,7 +73,6 @@
                     "flag" : "L"
                 }
             ],
-
             "environmentVariables" : [
                 {
                     "condition" : "(\\s.*WebKit?|Gecko)@$User-Agent",
@@ -91,8 +90,9 @@
                 "\\TechDivision\\WebServer\\Modules\\EnvironmentVariableModule",
                 "\\TechDivision\\RewriteModule\\RewriteModule",
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
+                "\\TechDivision\\WebServer\\Modules\\AccessModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",
-                "\\TechDivision\\WebServer\\Modules\\PhpModule"
+                "\\TechDivision\\PhpModule\\PhpModule"
             ],
 
             "handlers": [
@@ -176,7 +176,6 @@
                     "flag" : "L"
                 }
             ],
-
             "environmentVariables" : [
                 {
                     "condition" : "(\\s.*WebKit?|Gecko)@$User-Agent",
@@ -194,8 +193,9 @@
                 "\\TechDivision\\WebServer\\Modules\\EnvironmentVariableModule",
                 "\\TechDivision\\RewriteModule\\RewriteModule",
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
+                "\\TechDivision\\WebServer\\Modules\\AccessModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",
-                "\\TechDivision\\WebServer\\Modules\\PhpModule"
+                "\\TechDivision\\PhpModule\\PhpModule"
             ],
 
             "handlers": [

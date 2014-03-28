@@ -190,6 +190,7 @@ class ThreadWorker extends \Thread implements WorkerInterface
                     }
                 }
 
+
             }
 
             // init server vars afterwards to avoid performance issues

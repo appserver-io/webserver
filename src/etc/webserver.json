@@ -33,6 +33,17 @@
                 }
             ],
 
+            "accesses" : [
+                {
+                    "type": "allow",
+                    "REQUEST_URI": ".*"
+                },
+                {
+                    "type": "deny",
+                    "REQUEST_URI": "^\\/var\\/.*"
+                }
+            ],
+
             "virtualHosts" : [
                 {
                     "name": "phpwebserver.dev phpwebserver.local phpwebserver.test",
@@ -122,6 +133,17 @@
                     "realm": "appserver.io Basic Authentication System",
                     "type": "\\TechDivision\\WebServer\\Authentication\\BasicAuthentication",
                     "hash": "YXBwc2VydmVyOmFwcHNlcnZlci5pMA=="
+                }
+            ],
+
+            "accesses" : [
+                {
+                    "type": "allow",
+                    "REQUEST_URI": ".*"
+                },
+                {
+                    "type": "deny",
+                    "REQUEST_URI": "^\\/var\\/.*"
                 }
             ],
 

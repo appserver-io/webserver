@@ -168,9 +168,6 @@ class ThreadWorker extends \Thread implements WorkerInterface
             // accept connections and process working connection by handlers
             if (($connection = $serverConnection->accept()) !== false) {
 
-                // set request time on accept
-                $serverContext->setServerVar(ServerVars::REQUEST_TIME, time());
-
                 /**
                  * This is for testing async request processing only.
                  *

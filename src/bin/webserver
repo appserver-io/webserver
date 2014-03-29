@@ -1,6 +1,6 @@
 <?php
 
-require '../functions.php';
+require '../../functions.php';
 
 define('WEBSERVER_BASEDIR', __DIR__ . '/../');
 define('WEBSERVER_AUTOLOADER', WEBSERVER_BASEDIR . '../vendor/autoload.php');

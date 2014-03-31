@@ -124,11 +124,46 @@ class MultiThreadedServer extends \Thread implements ServerInterface
             $streamContext
         );
 
+        // init modules array
+        $modules = array();
+        // initiate server modules
+        $moduleTypes = $serverConfig->getModules();
+        foreach ($moduleTypes as $moduleType) {
+            // check if module type exists
+            if (!class_exists($moduleType)) {
+                throw new ModuleNotFoundException($moduleType);
+            }
+            // instantiate module type
+            $modules[$moduleType] = new $moduleType();
+            // init module with serverContext (this)
+            $modules[$moduleType]->init($serverContext);
+        }
+
+        // init connection handler array
+        $connectionHandlers = array();
+        // initiate server connection handlers
+        $connectionHandlersTypes = $serverConfig->getConnectionHandlers();
+        foreach ($connectionHandlersTypes as $connectionHandlerType) {
+            // check if conenction handler type exists
+            if (!class_exists($connectionHandlerType)) {
+                throw new ConnectionHandlerNotFoundException($connectionHandlerType);
+            }
+            // instantiate connection handler type
+            $connectionHandlers[$connectionHandlerType] = new $connectionHandlerType();
+            // init connection handler with serverContext (this)
+            $connectionHandlers[$connectionHandlerType]->init($serverContext);
+            // inject modules
+            $connectionHandlers[$connectionHandlerType]->injectModules($modules);
+        }
+
+
+
         // setup and start workers
         for ($i=1; $i <= $serverConfig->getWorkerNumber(); ++$i) {
             $workers[$i] = new $workerType(
                 $serverConnection->getConnectionResource(),
-                $serverContext
+                $serverContext,
+                $connectionHandlers
             );
         }
 
@@ -146,7 +181,8 @@ class MultiThreadedServer extends \Thread implements ServerInterface
                     // build up and start new worker instance
                     $workers[$i] = new $workerType(
                         $serverConnection->getConnectionResource(),
-                        $serverContext
+                        $serverContext,
+                        $connectionHandlers
                     );
                 }
             }

@@ -345,16 +345,16 @@ class EnvironmentVariableModule implements ModuleInterface
                     if ($value === 'null') {
 
                         // Unset the variable and continue with the next environment variable
-                        if ($this->serverContext->hasServerVar($varName)) {
+                        if ($this->serverContext->hasEnvVar($varName)) {
 
-                            $this->serverContext->unsetServerVar($varName);
+                            $this->serverContext->unsetEnvVar($varName);
                         }
 
                         continue;
                     }
 
                     // Take action according to the needed definition
-                    $this->serverContext->setServerVar($varName, $value);
+                    $this->serverContext->setEnvVar($varName, $value);
                 }
             }
 

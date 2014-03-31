@@ -52,7 +52,7 @@
                     "errorsPageTemplatePath": "var/www/errors/error.phtml",
                     "rewrites" : [
                         {
-                            "condition" : "-f|-l|-d",
+                            "condition" : "-f{OR}-l{OR}-d",
                             "target" : "",
                             "flag" : "L"
                         }
@@ -68,7 +68,7 @@
 
             "rewrites" : [
                 {
-                    "condition" : "-f|-l|-d",
+                    "condition" : "-f{OR}-l{OR}-d",
                     "target" : "",
                     "flag" : "L"
                 }
@@ -155,7 +155,7 @@
                     "errorsPageTemplatePath": "var/www/errors/error.phtml",
                     "rewrites" : [
                         {
-                            "condition" : "-f|-l|-d",
+                            "condition" : "-f{OR}-l{OR}-d",
                             "target" : "",
                             "flag" : "L"
                         }
@@ -171,7 +171,7 @@
 
             "rewrites" : [
                 {
-                    "condition" : "-f|-l|-d",
+                    "condition" : "-f{OR}-l{OR}-d",
                     "target" : "",
                     "flag" : "L"
                 }

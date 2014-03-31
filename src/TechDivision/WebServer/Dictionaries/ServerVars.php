@@ -45,7 +45,7 @@ class ServerVars
     const HTTP_FORWARDED = 'HTTP_FORWARDED';
     const HTTP_HOST = 'HTTP_HOST';
     const HTTP_PROXY_CONNECTION = 'HTTP_PROXY_CONNECTION';
-    const HTTP_HEADER_X_REQUESTED_WITH = 'HTTP_HEADER_X_REQUESTED_WITH';
+    const HTTP_X_REQUESTED_WITH = 'HTTP_X_REQUESTED_WITH';
     const HTTP_ACCEPT = 'HTTP_ACCEPT';
     const HTTP_ACCEPT_CHARSET = 'HTTP_ACCEPT_CHARSET';
     const HTTP_ACCEPT_ENCODING = 'HTTP_ACCEPT_ENCODING';
@@ -114,6 +114,8 @@ class ServerVars
     const API_VERSION = 'API_VERSION';
     const THE_REQUEST = 'THE_REQUEST';
     const REQUEST_URI = 'REQUEST_URI';
+    // This special constant is used to allow inter-module communication without changing the original REQUEST_URI
+    const X_REQUEST_URI = 'X_REQUEST_URI';
     const REQUEST_FILENAME = 'REQUEST_FILENAME';
     const IS_SUBREQ = 'IS_SUBREQ';
     const HTTPS = 'HTTPS';

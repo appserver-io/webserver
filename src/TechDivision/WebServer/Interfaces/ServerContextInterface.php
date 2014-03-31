@@ -113,7 +113,7 @@ interface ServerContextInterface
      *
      * @throws \TechDivision\WebServer\Exceptions\ServerException
      *
-     * @return string The value to given module var
+     * @return mixed The value to given module var
      */
     public function getModuleVar($moduleVar);
 
@@ -148,4 +148,57 @@ interface ServerContextInterface
      * @return void
      */
     public function setConnectionServerVars(SocketInterface $connection);
+
+    /**
+     * Sets a value to specific env var
+     *
+     * @param string $envVar The env var to set
+     * @param string $value  The value to env var
+     *
+     * @return void
+     */
+    public function setEnvVar($envVar, $value);
+
+    /**
+     * Unsets a specific env var
+     *
+     * @param string $envVar The env var to unset
+     *
+     * @return void
+     */
+    public function unsetEnvVar($envVar);
+
+    /**
+     * Return's a value for specific env var
+     *
+     * @param string $envVar The env var to get value for
+     *
+     * @throws \TechDivision\WebServer\Exceptions\ServerException
+     *
+     * @return mixed The value to given env var
+     */
+    public function getEnvVar($envVar);
+
+    /**
+     * Return's all the env vars as array key value pair format
+     *
+     * @return array The env vars as array
+     */
+    public function getEnvVars();
+
+    /**
+     * Check's if value exists for given env var
+     *
+     * @param string $envVar The env var to check
+     *
+     * @return boolean Weather it has envVar (true) or not (false)
+     */
+    public function hasEnvVar($envVar);
+
+    /**
+     * Will init the env vars, which means we will clean it completely
+     *
+     * @return void
+     */
+    public function initEnvVars();
 }

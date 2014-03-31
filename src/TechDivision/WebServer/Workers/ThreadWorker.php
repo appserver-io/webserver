@@ -22,6 +22,7 @@
 namespace TechDivision\WebServer\Workers;
 
 use TechDivision\Http\HttpConnectionHandler;
+use TechDivision\Http\HttpProtocol;
 use TechDivision\WebServer\Dictionaries\ServerVars;
 use TechDivision\WebServer\Interfaces\ConfigInterface;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
@@ -189,14 +190,14 @@ class ThreadWorker extends \Thread implements WorkerInterface
                     }
                 }
 
-                // init server vars afterwards to avoid performance issues
-                $serverContext->initServerVars();
+
             }
 
             // init server vars afterwards to avoid performance issues
             $serverContext->initServerVars();
-            // Also init the module vars to offer a clean environment for the next request
+            // Also init the module and env vars to offer a clean environment for the next request
             $serverContext->initModuleVars();
+            $serverContext->initEnvVars();
         }
 
         // call internal shutdown

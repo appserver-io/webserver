@@ -22,7 +22,6 @@ namespace TechDivision\WebServer\Modules;
 
 use TechDivision\Http\HttpProtocol;
 use TechDivision\WebServer\Exceptions\ModuleException;
-use TechDivision\WebServer\Modules\Parser\HtaccessParser;
 use TechDivision\WebServer\Dictionaries\ServerVars;
 use TechDivision\WebServer\Dictionaries\SslEnvironmentVars;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
@@ -135,13 +134,41 @@ class EnvironmentVariableModule implements ModuleInterface
 
             $this->supportedServerVars = array(
                 'headers' => array(
-                    ServerVars::HTTP_USER_AGENT,
-                    ServerVars::HTTP_REFERER,
-                    ServerVars::HTTP_COOKIE,
-                    ServerVars::HTTP_FORWARDED,
-                    ServerVars::HTTP_HOST,
-                    ServerVars::HTTP_PROXY_CONNECTION,
-                    ServerVars::HTTP_ACCEPT
+                    HttpProtocol::HEADER_STATUS,
+                    HttpProtocol::HEADER_DATE,
+                    HttpProtocol::HEADER_CONNECTION,
+                    HttpProtocol::HEADER_CONNECTION_VALUE_CLOSE,
+                    HttpProtocol::HEADER_CONNECTION_VALUE_KEEPALIVE,
+                    HttpProtocol::HEADER_CONTENT_TYPE,
+                    HttpProtocol::HEADER_CONTENT_DISPOSITION,
+                    HttpProtocol::HEADER_CONTENT_LENGTH,
+                    HttpProtocol::HEADER_CONTENT_ENCODING,
+                    HttpProtocol::HEADER_CACHE_CONTROL,
+                    HttpProtocol::HEADER_PRAGMA,
+                    HttpProtocol::HEADER_PROXY_CONNECTION,
+                    HttpProtocol::HEADER_X_FORWARD,
+                    HttpProtocol::HEADER_LAST_MODIFIED,
+                    HttpProtocol::HEADER_EXPIRES,
+                    HttpProtocol::HEADER_IF_MODIFIED_SINCE,
+                    HttpProtocol::HEADER_LOCATION,
+                    HttpProtocol::HEADER_X_POWERED_BY,
+                    HttpProtocol::HEADER_COOKIE,
+                    HttpProtocol::HEADER_SET_COOKIE,
+                    HttpProtocol::HEADER_HOST,
+                    HttpProtocol::HEADER_ACCEPT,
+                    HttpProtocol::HEADER_ACCEPT_CHARSET,
+                    HttpProtocol::HEADER_ACCEPT_LANGUAGE,
+                    HttpProtocol::HEADER_ACCEPT_ENCODING,
+                    HttpProtocol::HEADER_USER_AGENT,
+                    HttpProtocol::HEADER_REFERER,
+                    HttpProtocol::HEADER_KEEP_ALIVE,
+                    HttpProtocol::HEADER_SERVER,
+                    HttpProtocol::HEADER_WWW_AUTHENTICATE,
+                    HttpProtocol::HEADER_AUTHORIZATION,
+                    HttpProtocol::HEADER_X_REQUESTED_WITH,
+                    HttpProtocol::HEADER_ACCESS_CONTROL_ALLOW_ORIGIN,
+                    HttpProtocol::HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS,
+                    HttpProtocol::STATUS_REASONPHRASE_UNASSIGNED
                 )
             );
 
@@ -254,7 +281,7 @@ class EnvironmentVariableModule implements ModuleInterface
 
                             // Get the pieces of the condition
                             $conditionPieces = array();
-                            preg_match_all('`(.*?)@(\$[0-9a-zA-Z_]+)`', $condition, $conditionPieces);
+                            preg_match_all('`(.*?)@(\$[0-9a-zA-Z_\-]+)`', $condition, $conditionPieces);
 
                             // Check the condition and continue for the next variable if we do not match
                             if (!isset($this->serverBackreferences[$conditionPieces[2][0]])) {
@@ -262,10 +289,12 @@ class EnvironmentVariableModule implements ModuleInterface
                                 continue;
                             }
 
-                            // Do we have a match?
+                            // Do we have a match? Get the potential backreferences
+                            $conditionBackreferences = array();
                             if (preg_match(
                                 '`' . $conditionPieces[1][0] . '`',
-                                $this->serverBackreferences[$conditionPieces[2][0]]
+                                $this->serverBackreferences[$conditionPieces[2][0]],
+                                $conditionBackreferences
                             )
                                 !== 1
                             ) {
@@ -291,10 +320,24 @@ class EnvironmentVariableModule implements ModuleInterface
 
                         // Get the possible backreference (might as well be something else) and resolve it if needed
                         // TODO tell them if we do not find a backreference to resolve, might be a problem
-                        $possibleBackreference = substr(strstr($value, '$'), 1);
-                        if ($possibleBackreference = getenv($possibleBackreference)) {
+                        $possibleBackreferences = array();
+                        preg_match('`\$.+?`', $value, $possibleBackreferences);
+                        foreach ($possibleBackreferences as $possibleBackreference) {
 
-                            $value = strstr($value, '?', true) . $possibleBackreference;
+                            if ($backrefValue = getenv($possibleBackreference)) {
+                                // Do we have a backreference which is a server or env var?
+
+                                $value = str_replace($possibleBackreference, $backrefValue, $value);
+
+                            } elseif (isset($conditionBackreferences[(int) substr($possibleBackreference, 1)])) {
+                                // We got no backreference from any of the server or env vars, so maybe we got
+                                // something from the preg_match
+                                $value = str_replace(
+                                    $possibleBackreference,
+                                    $conditionBackreferences[(int) substr($possibleBackreference, 1)],
+                                    $value
+                                );
+                            }
                         }
                     }
 
@@ -302,16 +345,16 @@ class EnvironmentVariableModule implements ModuleInterface
                     if ($value === 'null') {
 
                         // Unset the variable and continue with the next environment variable
-                        if ($this->serverContext->hasServerVar($varName)) {
+                        if ($this->serverContext->hasEnvVar($varName)) {
 
-                            $this->serverContext->unsetServerVar($varName);
+                            $this->serverContext->unsetEnvVar($varName);
                         }
 
                         continue;
                     }
 
                     // Take action according to the needed definition
-                    $this->serverContext->setServerVar($varName, $value);
+                    $this->serverContext->setEnvVar($varName, $value);
                 }
             }
 
@@ -348,18 +391,11 @@ class EnvironmentVariableModule implements ModuleInterface
         foreach ($this->supportedServerVars['headers'] as $supportedServerVar) {
 
             // As we got them with another name, we have to rename them, so we will not have to do this on the fly
-            $tmp = strtoupper(str_replace('HTTP', 'HEADER', $supportedServerVar));
-            if (@isset($headerArray[constant("TechDivision\\Http\\HttpProtocol::$tmp")])) {
-                $this->serverBackreferences['$' . $supportedServerVar] = $headerArray[constant(
-                    "TechDivision\\Http\\HttpProtocol::$tmp"
-                )];
+            if (@isset($headerArray[$supportedServerVar])) {
+                $this->serverBackreferences['$' . $supportedServerVar] = $headerArray[$supportedServerVar];
 
                 // Also create for the "dynamic" substitution syntax
-                $this->serverBackreferences['$' . constant(
-                    "TechDivision\\Http\\HttpProtocol::$tmp"
-                )] = $headerArray[constant(
-                    "TechDivision\\Http\\HttpProtocol::$tmp"
-                )];
+                $this->serverBackreferences['$' . $supportedServerVar] = $headerArray[$supportedServerVar];
             }
         }
     }
@@ -377,7 +413,7 @@ class EnvironmentVariableModule implements ModuleInterface
         // Iterate over all SSL environment variables and fill them into our backreferences
         foreach ($this->supportedSslEnvironmentVars as $supportedSslEnvironmentVar) {
 
-            $this->serverBackreferences['$SSL:' . $supportedSslEnvironmentVar . ''] = '';
+            $this->serverBackreferences['$' . $supportedSslEnvironmentVar . ''] = '';
         }
     }
 
@@ -394,9 +430,6 @@ class EnvironmentVariableModule implements ModuleInterface
 
             // Prefill the value
             $this->serverBackreferences['$' . $varName] = $serverVar;
-
-            // Also create for the "dynamic" substitution syntax
-            $this->serverBackreferences['$ENV:' . $varName] = $serverVar;
         }
     }
 

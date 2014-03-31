@@ -89,6 +89,8 @@ class DirectoryModule implements ModuleInterface
     public function init(ServerContextInterface $serverContext)
     {
         $this->serverContext= $serverContext;
+        // save directory index as array got space separated from config
+        $this->directoryIndex = explode(' ', $serverContext->getServerConfig()->getDirectoryIndex());
     }
 
     /**
@@ -120,7 +122,7 @@ class DirectoryModule implements ModuleInterface
         // get document root
         $documentRoot = $serverContext->getServerVar(ServerVars::DOCUMENT_ROOT);
         // get uri
-        $uri = $serverContext->getServerVar(ServerVars::REQUEST_URI);
+        $uri = $serverContext->getServerVar(ServerVars::X_REQUEST_URI);
         // get read path to requested uri
         $realPath = $documentRoot . $uri;
 
@@ -135,24 +137,32 @@ class DirectoryModule implements ModuleInterface
                 // set response state to be dispatched after this without calling other modules process
                 $response->setState(HttpResponseStates::DISPATCH);
             } else {
-                // check if defined index files are found in directory
-                if (file_exists($realPath . 'index.php')) {
-                    // reset uri with indexed filename
-                    $this->getServerContext()->setServerVar(
-                        ServerVars::REQUEST_URI,
-                        $uri . 'index.php'
-                    );
-                }
-                if (file_exists($realPath . 'index.html')) {
-                    // reset uri with indexed filename
-                    $this->getServerContext()->setServerVar(
-                        ServerVars::REQUEST_URI,
-                        $uri . 'index.html'
-                    );
+
+                // check directory index definitions
+                foreach ($this->getDirectoryIndex() as $index) {
+
+                    // check if defined index files are found in directory
+                    if (is_file($realPath . $index)) {
+                        // reset uri with indexed filename
+                        $this->getServerContext()->setServerVar(ServerVars::X_REQUEST_URI, $uri . $index);
+                        // break out if index file was found
+                        return true;
+                    }
+
                 }
             }
         }
         return true;
+    }
+
+    /**
+     * Return's the directory index as array
+     *
+     * @return array
+     */
+    public function getDirectoryIndex()
+    {
+        return $this->directoryIndex;
     }
 
     /**

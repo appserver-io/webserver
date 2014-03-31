@@ -133,6 +133,13 @@ interface ServerConfigurationInterface
     public function getDocumentRoot();
 
     /**
+     * Return's directory index definition
+     *
+     * @return string
+     */
+    public function getDirectoryIndex();
+
+    /**
      * Return's modules
      *
      * @return array
@@ -187,6 +194,13 @@ interface ServerConfigurationInterface
      * @return array
      */
     public function getRewrites();
+
+    /**
+     * Returns the access configuration.
+     *
+     * @return array
+     */
+    public function getAccesses();
 
     /**
      * Returns the environment variable configuration

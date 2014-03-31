@@ -15,7 +15,7 @@
             "port": "9080",
             "documentRoot" : "var/www",
             "keepAliveMax": 64,
-            "keepAliveTimeout": 16,
+            "keepAliveTimeout": 5,
             "errorsPageTemplatePath": "",
 
             "authentications" : [
@@ -33,6 +33,17 @@
                 }
             ],
 
+            "accesses" : [
+                {
+                    "type": "allow",
+                    "REQUEST_URI": ".*"
+                },
+                {
+                    "type": "deny",
+                    "REQUEST_URI": "^\\/var\\/.*"
+                }
+            ],
+
             "virtualHosts" : [
                 {
                     "name": "phpwebserver.dev phpwebserver.local phpwebserver.test",
@@ -45,6 +56,12 @@
                             "target" : "",
                             "flag" : "L"
                         }
+                    ],
+                    "environmentVariables" : [
+                        {
+                            "condition" : "",
+                            "definition" : "EXAMPLE_VARIABLE=test"
+                        }
                     ]
                 }
             ],
@@ -54,6 +71,12 @@
                     "condition" : "-f|-l|-d",
                     "target" : "",
                     "flag" : "L"
+                }
+            ],
+            "environmentVariables" : [
+                {
+                    "condition" : "(\\s.*WebKit?|Gecko)@$User-Agent",
+                    "definition" : "BROWSER_ENGINE=$1"
                 }
             ],
 
@@ -67,8 +90,9 @@
                 "\\TechDivision\\WebServer\\Modules\\EnvironmentVariableModule",
                 "\\TechDivision\\RewriteModule\\RewriteModule",
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
+                "\\TechDivision\\WebServer\\Modules\\AccessModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",
-                "\\TechDivision\\WebServer\\Modules\\PhpModule"
+                "\\TechDivision\\PhpModule\\PhpModule"
             ],
 
             "handlers": [
@@ -94,7 +118,7 @@
             "passphrase": "passphrase",
             "documentRoot": "var/www",
             "keepAliveMax": 64,
-            "keepAliveTimeout": 16,
+            "keepAliveTimeout": 5,
             "errorsPageTemplatePath": "",
 
             "authentications" : [
@@ -112,6 +136,17 @@
                 }
             ],
 
+            "accesses" : [
+                {
+                    "type": "allow",
+                    "REQUEST_URI": ".*"
+                },
+                {
+                    "type": "deny",
+                    "REQUEST_URI": "^\\/var\\/.*"
+                }
+            ],
+
             "virtualHosts" : [
                 {
                     "name": "phpwebserver.dev phpwebserver.local phpwebserver.test",
@@ -124,6 +159,12 @@
                             "target" : "",
                             "flag" : "L"
                         }
+                    ],
+                    "environmentVariables" : [
+                        {
+                            "condition" : "",
+                            "definition" : "EXAMPLE_VARIABLE=test"
+                        }
                     ]
                 }
             ],
@@ -133,6 +174,12 @@
                     "condition" : "-f|-l|-d",
                     "target" : "",
                     "flag" : "L"
+                }
+            ],
+            "environmentVariables" : [
+                {
+                    "condition" : "(\\s.*WebKit?|Gecko)@$User-Agent",
+                    "definition" : "BROWSER_ENGINE=$1"
                 }
             ],
 
@@ -146,8 +193,9 @@
                 "\\TechDivision\\WebServer\\Modules\\EnvironmentVariableModule",
                 "\\TechDivision\\RewriteModule\\RewriteModule",
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
+                "\\TechDivision\\WebServer\\Modules\\AccessModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",
-                "\\TechDivision\\WebServer\\Modules\\PhpModule"
+                "\\TechDivision\\PhpModule\\PhpModule"
             ],
 
             "handlers": [

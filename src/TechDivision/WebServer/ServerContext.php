@@ -86,6 +86,14 @@ class ServerContext implements ServerContextInterface
     protected $cache;
 
     /**
+     * This member will hold the environment (env) variables which different modules can set/get to provide
+     * the context similar to $_ENV in the plain php world
+     *
+     * @var array $envVars
+     */
+    protected $envVars;
+
+    /**
      * Initialises the server context
      *
      * @param \TechDivision\WebServer\Interfaces\ServerConfigurationInterface $serverConfig The servers configuration
@@ -288,7 +296,7 @@ class ServerContext implements ServerContextInterface
     }
 
     /**
-     * Add's connection relevant informations to server vars
+     * Add's connection relevant information to server vars
      *
      * @param \TechDivision\WebServer\Sockets\SocketInterface $connection The connection
      *
@@ -343,7 +351,7 @@ class ServerContext implements ServerContextInterface
      *
      * @throws \TechDivision\WebServer\Exceptions\ServerException
      *
-     * @return string The value to given module var
+     * @return mixed The value to given module var
      */
     public function getModuleVar($moduleVar)
     {
@@ -392,5 +400,92 @@ class ServerContext implements ServerContextInterface
     {
         // set module vars array
         $this->moduleVars = array();
+    }
+
+    /**
+     * Sets a value to specific env var
+     *
+     * @param string $envVar The env var to set
+     * @param string $value  The value to env var
+     *
+     * @return void
+     */
+    public function setEnvVar($envVar, $value)
+    {
+        if (!is_null($value)) {
+            $this->envVars[$envVar] = $value;
+        }
+    }
+
+    /**
+     * Unsets a specific env var
+     *
+     * @param string $envVar The env var to unset
+     *
+     * @return void
+     */
+    public function unsetEnvVar($envVar)
+    {
+        if (isset($this->envVars[$envVar])) {
+            unset($this->envVars[$envVar]);
+        }
+    }
+
+    /**
+     * Return's a value for specific env var
+     *
+     * @param string $envVar The env var to get value for
+     *
+     * @throws \TechDivision\WebServer\Exceptions\ServerException
+     *
+     * @return mixed The value to given env var
+     */
+    public function getEnvVar($envVar)
+    {
+        // check if server var is set
+        if (isset($this->envVars[$envVar])) {
+            // return server vars value
+            return $this->envVars[$envVar];
+        }
+        // throw exception
+        throw new ServerException("Env var '$envVar'' does not exist.", 500);
+    }
+
+    /**
+     * Return's all the env vars as array key value pair format
+     *
+     * @return array The env vars as array
+     */
+    public function getEnvVars()
+    {
+        return $this->envVars;
+    }
+
+    /**
+     * Check's if value exists for given env var
+     *
+     * @param string $envVar The env var to check
+     *
+     * @return boolean Weather it has envVar (true) or not (false)
+     */
+    public function hasEnvVar($envVar)
+    {
+        // check if server var is set
+        if (!isset($this->envVars[$envVar])) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Will init the env vars, which means we will clean it completely
+     *
+     * @return void
+     */
+    public function initEnvVars()
+    {
+        // set env vars array
+        $this->envVars = array();
     }
 }

@@ -110,7 +110,7 @@
                     <rewrite condition="^/(_Resources/Persistent/[a-z0-9]+/(.+/)?[a-f0-9]{40})/.+(\..+)" target="$1$3" flag="L" />
                     <rewrite condition="^/(_Resources/Persistent/.{40})/.+(\..+)" target="$1$2" flag="L" />
                     <rewrite condition="^_Resources/.*" target="" flag="L" />
-                    <rewrite condition="(.*)" target="index.php$1" flag="L" />
+                    <rewrite condition="(.*)" target="index.php" flag="L" />
                 </rewrites>
                 <environmentVariables>
                     <environmentVariable condition="" definition="FLOW_REWRITEURLS=1" />

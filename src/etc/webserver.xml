@@ -3,10 +3,10 @@
     <description><![CDATA[This is an example of a php WebServer configuration in xml]]></description>
 
     <server
-            type="\TechDivision\WebServer\Servers\MultiThreadedServer"
-            worker="\TechDivision\WebServer\Workers\ThreadWorker"
-            socket="\TechDivision\WebServer\Sockets\StreamSocket"
-            serverContext="\TechDivision\WebServer\ServerContext">
+        type="\TechDivision\WebServer\Servers\MultiThreadedServer"
+        worker="\TechDivision\WebServer\Workers\ThreadWorker"
+        socket="\TechDivision\WebServer\Sockets\StreamSocket"
+        serverContext="\TechDivision\WebServer\ServerContext">
 
         <params>
             <param name="admin" type="string">www@localhost.localdomain</param>
@@ -150,10 +150,10 @@
     </server>
 
     <server
-            type="\TechDivision\WebServer\Servers\MultiThreadedServer"
-            worker="\TechDivision\WebServer\Workers\ThreadWorker"
-            socket="\TechDivision\WebServer\Sockets\StreamSocket"
-            serverContext="\TechDivision\WebServer\ServerContext">
+        type="\TechDivision\WebServer\Servers\MultiThreadedServer"
+        worker="\TechDivision\WebServer\Workers\ThreadWorker"
+        socket="\TechDivision\WebServer\Sockets\StreamSocket"
+        serverContext="\TechDivision\WebServer\ServerContext">
 
         <params>
             <param name="admin" type="string">www@localhost.localdomain</param>

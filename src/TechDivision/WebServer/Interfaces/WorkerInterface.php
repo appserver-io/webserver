@@ -35,6 +35,13 @@ namespace TechDivision\WebServer\Interfaces;
 interface WorkerInterface
 {
     /**
+     * Return's an array of connection handlers to use
+     *
+     * @return array
+     */
+    public function getConnectionHandlers();
+
+    /**
      * Return's the server context instance
      *
      * @return \TechDivision\WebServer\Interfaces\ServerContextInterface The server's context

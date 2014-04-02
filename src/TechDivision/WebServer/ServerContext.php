@@ -98,8 +98,10 @@ class ServerContext implements ServerContextInterface
         // set configuration
         $this->serverConfig = $serverConfig;
 
-        // init server vars
+        // init all vars
         $this->initServerVars();
+        $this->initModuleVars();
+        $this->initEnvVars();
     }
 
     /**

@@ -20,6 +20,7 @@
 
 namespace TechDivision\WebServer;
 
+use Psr\Log\LoggerInterface;
 use TechDivision\WebServer\ConnectionPool;
 use TechDivision\WebServer\Exceptions\ConnectionHandlerNotFoundException;
 use TechDivision\WebServer\Exceptions\ModuleNotFoundException;
@@ -139,6 +140,18 @@ class ServerContext implements ServerContextInterface
     }
 
     /**
+     * Injects a Psr compatible logger instance
+     *
+     * @param \Psr\Log\LoggerInterface $logger The logger instance
+     *
+     * @return void
+     */
+    public function injectLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
      * Return's the container instance
      *
      * @return mixed The container instance for third party environment
@@ -146,6 +159,16 @@ class ServerContext implements ServerContextInterface
     public function getContainer()
     {
         return $this->container;
+    }
+
+    /**
+     * Return's the logger instance
+     *
+     * @return mixed The logger instance
+     */
+    public function getLogger()
+    {
+        return $this->logger;
     }
 
     /**

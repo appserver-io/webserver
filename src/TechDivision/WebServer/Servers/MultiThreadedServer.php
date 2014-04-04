@@ -95,10 +95,13 @@ class MultiThreadedServer extends \Thread implements ServerInterface
         // init config var for shorter calls
         $serverConfig = $serverContext->getServerConfig();
 
+        $serverContext->getLogger()->debug(
+            sprintf('Starting server %s...', $serverConfig->getName())
+        );
+
         // get class names
         $socketType = $serverConfig->getSocketType();
         $workerType = $serverConfig->getWorkerType();
-
 
         // set socket backlog to 1024 for perform many concurrent connections
         $opts = array(
@@ -155,8 +158,6 @@ class MultiThreadedServer extends \Thread implements ServerInterface
             // inject modules
             $connectionHandlers[$connectionHandlerType]->injectModules($modules);
         }
-
-
 
         // setup and start workers
         for ($i=1; $i <= $serverConfig->getWorkerNumber(); ++$i) {

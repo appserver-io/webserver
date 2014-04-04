@@ -21,6 +21,7 @@
 
 namespace TechDivision\WebServer\Interfaces;
 
+use Psr\Log\LoggerInterface;
 use TechDivision\WebServer\Interfaces\ServerConfigurationInterface;
 use TechDivision\WebServer\Sockets\SocketInterface;
 
@@ -53,6 +54,13 @@ interface ServerContextInterface
      * @return \TechDivision\WebServer\Interfaces\ServerConfigurationInterface The server config instance
      */
     public function getServerConfig();
+
+    /**
+     * Return's the logger instance
+     *
+     * @return \Psr\Log\LoggerInterface The logger instance
+     */
+    public function getLogger();
 
     /**
      * Set's a value to specific server var

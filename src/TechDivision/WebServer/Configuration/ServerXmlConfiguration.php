@@ -1,6 +1,6 @@
 <?php
 /**
- * \TechDivision\WebServer\ServerXmlConfiguration
+ * \TechDivision\WebServer\Configuration\ServerXmlConfiguration
  *
  * NOTICE OF LICENSE
  *
@@ -10,27 +10,29 @@
  *
  * PHP version 5
  *
- * @category  Webserver
- * @package   TechDivision_WebServer
- * @author    Johann Zelger <jz@techdivision.com>
- * @copyright 2014 TechDivision GmbH <info@techdivision.com>
- * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link      https://github.com/techdivision/TechDivision_WebServer
+ * @category   Webserver
+ * @package    TechDivision_WebServer
+ * @subpackage Configuration
+ * @author     Johann Zelger <jz@techdivision.com>
+ * @copyright  2014 TechDivision GmbH <info@techdivision.com>
+ * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link       https://github.com/techdivision/TechDivision_WebServer
  */
 
-namespace TechDivision\WebServer;
+namespace TechDivision\WebServer\Configuration;
 
 use TechDivision\WebServer\Interfaces\ServerConfigurationInterface;
 
 /**
  * Class ServerXmlConfiguration
  *
- * @category  Webserver
- * @package   TechDivision_WebServer
- * @author    Johann Zelger <jz@techdivision.com>
- * @copyright 2014 TechDivision GmbH <info@techdivision.com>
- * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link      https://github.com/techdivision/TechDivision_WebServer
+ * @category   Webserver
+ * @package    TechDivision_WebServer
+ * @subpackage Configuration
+ * @author     Johann Zelger <jz@techdivision.com>
+ * @copyright  2014 TechDivision GmbH <info@techdivision.com>
+ * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link       https://github.com/techdivision/TechDivision_WebServer
  */
 class ServerXmlConfiguration implements ServerConfigurationInterface
 {
@@ -57,10 +59,12 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
     public function __construct($node)
     {
         // prepare properties
+        $this->name = (string)$node->attributes()->name;
         $this->type = (string)$node->attributes()->type;
         $this->workerType = (string)$node->attributes()->worker;
         $this->socketType = (string)$node->attributes()->socket;
         $this->serverContextType = (string)$node->attributes()->serverContext;
+        $this->loggerName = (string)$node->attributes()->loggerName;
         $this->transport = (string)array_shift($node->xpath("./params/param[@name='transport']"));
         $this->address = (string)array_shift($node->xpath("./params/param[@name='address']"));
         $this->port = (int)array_shift($node->xpath("./params/param[@name='port']"));
@@ -91,6 +95,11 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         $this->authentications = $this->prepareAuthentications($node);
         // prepare accesses
         $this->accesses = $this->prepareAccesses($node);
+    }
+
+    public function getLoggerConfig()
+    {
+
     }
 
     /**
@@ -270,6 +279,16 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
     }
 
     /**
+     * Return's name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
      * Return's type
      *
      * @return string
@@ -277,6 +296,16 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * Return's logger name
+     *
+     * @return string
+     */
+    public function getLoggerName()
+    {
+        return $this->loggerName;
     }
 
     /**
@@ -519,4 +548,5 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
     {
         return $this->accesses;
     }
+
 }

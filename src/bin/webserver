@@ -9,14 +9,46 @@ require WEBSERVER_AUTOLOADER;
 chdir(WEBSERVER_BASEDIR);
 
 // read in json configuration
-//$mainConfiguration = new \TechDivision\WebServer\MainJsonConfiguration(WEBSERVER_BASEDIR . 'etc/webserver.json');
+//$mainConfiguration = new \TechDivision\WebServer\Configuration\MainJsonConfiguration(WEBSERVER_BASEDIR . 'etc/webserver.json');
 // read in xml configuration <- just comment this in to use xml configuration
-$mainConfiguration = new \TechDivision\WebServer\MainXmlConfiguration(WEBSERVER_BASEDIR . 'etc/webserver.xml');
+$mainConfiguration = new \TechDivision\WebServer\Configuration\MainXmlConfiguration(WEBSERVER_BASEDIR . 'etc/webserver.xml');
 
-// init server array
+// init loggers
+$loggers = array();
+foreach ($mainConfiguration->getLoggerConfigs() as $loggerConfig) {
+    // get logger type
+    $loggerType = $loggerConfig->getType();
+    // init logger instance
+    $logger = new $loggerType($loggerConfig->getChannel());
+    // init processors
+    foreach ($loggerConfig->getProcessors() as $processorType) {
+        // create processor
+        $processor = new $processorType();
+        // push processor to logger instance
+        $logger->pushProcessor($processor);
+    }
+    // init handlers
+    foreach ($loggerConfig->getHandlers() as $handlerType => $handlerData) {
+        // create handler
+        $handlerTypeClass = new ReflectionClass($handlerType);
+        $handler = $handlerTypeClass->newInstanceArgs($handlerData["params"]);
+
+        if (isset($handlerData['formatter'])) {
+            $formatterData = $handlerData['formatter'];
+            $formatterType = $formatterData['type'];
+            // create formatter
+            $formatterClass = new ReflectionClass($formatterType);
+            $formatter = $formatterClass->newInstanceArgs($formatterData['params']);
+            // set formatter to logger
+            $handler->setFormatter($formatter);
+        }
+    }
+    // set logger by name
+    $loggers[$loggerConfig->getName()] = $logger;
+}
+
+// init servers
 $servers = array();
-
-// start servers
 foreach ($mainConfiguration->getServerConfigs() as $serverConfig) {
     // get type definitions
     $serverType = $serverConfig->getType();
@@ -25,6 +57,7 @@ foreach ($mainConfiguration->getServerConfigs() as $serverConfig) {
     // init server context
     $serverContext = new $serverContextType();
     $serverContext->init($serverConfig);
+    $serverContext->injectLogger($loggers[$serverConfig->getLoggerName()]);
 
     // init and start server
     $servers[] = new $serverType($serverContext);

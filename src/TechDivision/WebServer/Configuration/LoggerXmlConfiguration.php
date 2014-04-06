@@ -47,7 +47,9 @@ class LoggerXmlConfiguration implements LoggerConfigurationInterface
         // prepare properties
         $this->name = (string)$node->attributes()->name;
         $this->type = (string)$node->attributes()->type;
-        $this->channel = (string)$node->attributes()->channel;
+        if (isset($node->attributes()->channel)) {
+            $this->channel = (string)$node->attributes()->channel;
+        }
 
         // prepare handlers
         $this->handlers = $this->prepareHandlers($node);
@@ -119,25 +121,27 @@ class LoggerXmlConfiguration implements LoggerConfigurationInterface
             foreach ($node->handlers->handler as $handlerNode) {
                 // build up params
                 $params = array();
+                $formatterData = array();
                 foreach ($handlerNode->params->param as $paramNode) {
                     $paramName = (string)$paramNode->attributes()->name;
                     $params[$paramName] = (string)array_shift($handlerNode->xpath(".//param[@name='$paramName']"));
                 }
-                // build up formatter infos
-                $formatterType = (string)$handlerNode->formatter->attributes()->type;
-                $formatterParams = array();
-                foreach ($handlerNode->formatter->params->param as $paramNode) {
-                    $paramName = (string)$paramNode->attributes()->name;
-                    $formatterParams[$paramName] = (string)array_shift($handlerNode->xpath(".//param[@name='$paramName']"));
-                }
-                // build up handler infos
-                $handlers[(string)$handlerNode->attributes()->type] = array(
-                    'params' => $params,
-                    'formatter' => array(
+                // build up formatter infos if exists
+                if (isset($handlerNode->formatter)) {
+                    $formatterType = (string)$handlerNode->formatter->attributes()->type;
+                    $formatterParams = array();
+                    foreach ($handlerNode->formatter->params->param as $paramNode) {
+                        $paramName = (string)$paramNode->attributes()->name;
+                        $formatterParams[$paramName] = (string)array_shift($handlerNode->xpath(".//param[@name='$paramName']"));
+                    }
+                    // setup formatter info
+                    $handlers[(string)$handlerNode->attributes()->type]['formatter'] = array(
                         'type' => $formatterType,
                         'params' => $formatterParams
-                    )
-                );
+                    );
+                }
+                // set up handler infos
+                $handlers[(string)$handlerNode->attributes()->type]['params'] = $params;
             }
         }
         return $handlers;

@@ -16,23 +16,19 @@ $mainConfiguration = new \TechDivision\WebServer\Configuration\MainXmlConfigurat
 // init loggers
 $loggers = array();
 foreach ($mainConfiguration->getLoggerConfigs() as $loggerConfig) {
-    // get logger type
-    $loggerType = $loggerConfig->getType();
-    // init logger instance
-    $logger = new $loggerType($loggerConfig->getChannel());
+
     // init processors
+    $processors = array();
     foreach ($loggerConfig->getProcessors() as $processorType) {
         // create processor
-        $processor = new $processorType();
-        // push processor to logger instance
-        $logger->pushProcessor($processor);
+        $processors[] = new $processorType();
     }
     // init handlers
+    $handlers = array();
     foreach ($loggerConfig->getHandlers() as $handlerType => $handlerData) {
         // create handler
         $handlerTypeClass = new ReflectionClass($handlerType);
         $handler = $handlerTypeClass->newInstanceArgs($handlerData["params"]);
-
         if (isset($handlerData['formatter'])) {
             $formatterData = $handlerData['formatter'];
             $formatterType = $formatterData['type'];
@@ -42,7 +38,13 @@ foreach ($mainConfiguration->getLoggerConfigs() as $loggerConfig) {
             // set formatter to logger
             $handler->setFormatter($formatter);
         }
+        $handlers[] = $handler;
     }
+
+    // get logger type
+    $loggerType = $loggerConfig->getType();
+    // init logger instance
+    $logger = new $loggerType($loggerConfig->getChannel(), $handlers, $processors);
     // set logger by name
     $loggers[$loggerConfig->getName()] = $logger;
 }

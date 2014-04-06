@@ -95,7 +95,7 @@ class MultiThreadedServer extends \Thread implements ServerInterface
         // init config var for shorter calls
         $serverConfig = $serverContext->getServerConfig();
 
-        $serverContext->getLogger()->debug(
+        $serverContext->getLogger()->info(
             sprintf('Starting server %s...', $serverConfig->getName())
         );
 

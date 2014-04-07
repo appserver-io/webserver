@@ -23,6 +23,7 @@ namespace TechDivision\WebServer\Interfaces;
 
 use Psr\Log\LoggerInterface;
 use TechDivision\WebServer\Interfaces\ServerConfigurationInterface;
+use TechDivision\WebServer\Dictionaries\EnvVars;
 use TechDivision\WebServer\Sockets\SocketInterface;
 
 /**
@@ -58,9 +59,12 @@ interface ServerContextInterface
     /**
      * Return's the logger instance
      *
-     * @return \Psr\Log\LoggerInterface The logger instance
+     * @param string $loggerType the logger's type to get
+     *
+     * @return \Psr\Log\LoggerInterface|null The logger instance
+     * @throws \TechDivision\WebServer\Exceptions\ServerException
      */
-    public function getLogger();
+    public function getLogger($loggerType = EnvVars::LOGGER_SYSTEM);
 
     /**
      * Set's a value to specific server var

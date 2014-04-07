@@ -44,6 +44,11 @@
         <logger name="Access" type="\Monolog\Logger">
             <handlers>
                 <handler type="\Monolog\Handler\StreamHandler">
+                    <formatter type="\Monolog\Formatter\LineFormatter">
+                        <params>
+                            <param name="output" type="string">%message%&#xA;</param>
+                        </params>
+                    </formatter>
                     <params>
                         <param name="stream" type="string">var/log/webserver-access.log</param>
                         <param name="level" type="integer">100</param>
@@ -70,8 +75,6 @@
                 <param name="address" type="string">0.0.0.0</param>
                 <param name="port" type="integer">9080</param>
                 <param name="workerNumber" type="integer">128</param>
-                <param name="errorLogFile" type="string">var/log/phpwebserver-error.log</param>
-                <param name="accessLogFile" type="string">var/log/phpwebserver-access.log</param>
                 <!-- Note: it's intended to use a relative path to get content from webservers basedir/var/www -->
                 <param name="documentRoot" type="string">var/www</param>
                 <param name="directoryIndex" type="string">index.php index.html index.htm</param>
@@ -124,7 +127,7 @@
             </rewrites>
 
             <virtualHosts>
-                <virtualHost name="phpwebserver.dev phpwebserver.local phpwebserver.test">
+                <virtualHost name="127.0.0.1 phpwebserver.dev phpwebserver.local phpwebserver.test">
                     <params>
                         <param name="admin" type="string">admin@phpwebserver.dev</param>
                         <!-- Note: it's intended to use a relative path to get content from webservers basedir/var/www -->
@@ -134,9 +137,6 @@
                     <rewrites>
                         <rewrite condition="-f{OR}-l{OR}-d" target="" flag="L"/>
                     </rewrites>
-                    <environmentVariables>
-                        <environmentVariable condition="" definition="EXAMPLE_VARIABLE=test" />
-                    </environmentVariables>
                 </virtualHost>
 
                 <virtualHost name="magento.local">
@@ -178,6 +178,7 @@
             </virtualHosts>
 
             <environmentVariables>
+                <environmentVariable condition="" definition="LOGGER_ACCESS=Access" />
                 <environmentVariable condition="(\\s.*WebKit?|Gecko)@$User-Agent" definition="BROWSER_ENGINE=$1" />
             </environmentVariables>
 

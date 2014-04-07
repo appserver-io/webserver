@@ -105,7 +105,7 @@ foreach ($mainConfiguration->getServerConfigs() as $serverConfig) {
 
     // check if logger name exists
     if (isset($loggers[$serverConfig->getLoggerName()])) {
-        $serverContext->injectLogger($loggers[$serverConfig->getLoggerName()]);
+        $serverContext->injectLoggers($loggers);
     } else {
         throw new \Exception(sprintf('Logger %s not found.', $serverConfig->getLoggerName()));
     }

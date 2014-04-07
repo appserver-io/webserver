@@ -23,7 +23,7 @@ namespace TechDivision\WebServer\Modules;
 use TechDivision\Http\HttpProtocol;
 use TechDivision\WebServer\Exceptions\ModuleException;
 use TechDivision\WebServer\Dictionaries\ServerVars;
-use TechDivision\WebServer\Dictionaries\SslEnvironmentVars;
+use TechDivision\WebServer\Dictionaries\EnvVars;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
@@ -173,42 +173,42 @@ class EnvironmentVariableModule implements ModuleInterface
             );
 
             $this->supportedSslEnvironmentVars = array(
-                SslEnvironmentVars::HTTPS,
-                SslEnvironmentVars::SSL_PROTOCOL,
-                SslEnvironmentVars::SSL_SESSION_ID,
-                SslEnvironmentVars::SSL_CIPHER,
-                SslEnvironmentVars::SSL_CIPHER_EXPORT,
-                SslEnvironmentVars::SSL_CIPHER_USEKEYSIZE,
-                SslEnvironmentVars::SSL_CIPHER_ALGKEYSIZE,
-                SslEnvironmentVars::SSL_COMPRESS_METHOD,
-                SslEnvironmentVars::SSL_VERSION_INTERFACE,
-                SslEnvironmentVars::SSL_VERSION_LIBRARY,
-                SslEnvironmentVars::SSL_CLIENT_M_VERSION,
-                SslEnvironmentVars::SSL_CLIENT_M_SERIAL,
-                SslEnvironmentVars::SSL_CLIENT_S_DN,
-                SslEnvironmentVars::SSL_CLIENT_S_DN_X509,
-                SslEnvironmentVars::SSL_CLIENT_I_DN,
-                SslEnvironmentVars::SSL_CLIENT_I_DN_X509,
-                SslEnvironmentVars::SSL_CLIENT_V_START,
-                SslEnvironmentVars::SSL_CLIENT_V_END,
-                SslEnvironmentVars::SSL_CLIENT_V_REMAIN,
-                SslEnvironmentVars::SSL_CLIENT_A_SIG,
-                SslEnvironmentVars::SSL_CLIENT_A_KEY,
-                SslEnvironmentVars::SSL_CLIENT_CERT,
-                SslEnvironmentVars::SSL_CLIENT_CERT_CHAIN_N,
-                SslEnvironmentVars::SSL_CLIENT_VERIFY,
-                SslEnvironmentVars::SSL_SERVER_M_VERSION,
-                SslEnvironmentVars::SSL_SERVER_M_SERIAL,
-                SslEnvironmentVars::SSL_SERVER_S_DN,
-                SslEnvironmentVars::SSL_SERVER_S_DN_X509,
-                SslEnvironmentVars::SSL_SERVER_I_DN,
-                SslEnvironmentVars::SSL_SERVER_I_DN_X509,
-                SslEnvironmentVars::SSL_SERVER_V_START,
-                SslEnvironmentVars::SSL_SERVER_V_END,
-                SslEnvironmentVars::SSL_SERVER_A_SIG,
-                SslEnvironmentVars::SSL_SERVER_A_KEY,
-                SslEnvironmentVars::SSL_SERVER_CERT,
-                SslEnvironmentVars::SSL_TLS_SNI
+                EnvVars::HTTPS,
+                EnvVars::SSL_PROTOCOL,
+                EnvVars::SSL_SESSION_ID,
+                EnvVars::SSL_CIPHER,
+                EnvVars::SSL_CIPHER_EXPORT,
+                EnvVars::SSL_CIPHER_USEKEYSIZE,
+                EnvVars::SSL_CIPHER_ALGKEYSIZE,
+                EnvVars::SSL_COMPRESS_METHOD,
+                EnvVars::SSL_VERSION_INTERFACE,
+                EnvVars::SSL_VERSION_LIBRARY,
+                EnvVars::SSL_CLIENT_M_VERSION,
+                EnvVars::SSL_CLIENT_M_SERIAL,
+                EnvVars::SSL_CLIENT_S_DN,
+                EnvVars::SSL_CLIENT_S_DN_X509,
+                EnvVars::SSL_CLIENT_I_DN,
+                EnvVars::SSL_CLIENT_I_DN_X509,
+                EnvVars::SSL_CLIENT_V_START,
+                EnvVars::SSL_CLIENT_V_END,
+                EnvVars::SSL_CLIENT_V_REMAIN,
+                EnvVars::SSL_CLIENT_A_SIG,
+                EnvVars::SSL_CLIENT_A_KEY,
+                EnvVars::SSL_CLIENT_CERT,
+                EnvVars::SSL_CLIENT_CERT_CHAIN_N,
+                EnvVars::SSL_CLIENT_VERIFY,
+                EnvVars::SSL_SERVER_M_VERSION,
+                EnvVars::SSL_SERVER_M_SERIAL,
+                EnvVars::SSL_SERVER_S_DN,
+                EnvVars::SSL_SERVER_S_DN_X509,
+                EnvVars::SSL_SERVER_I_DN,
+                EnvVars::SSL_SERVER_I_DN_X509,
+                EnvVars::SSL_SERVER_V_START,
+                EnvVars::SSL_SERVER_V_END,
+                EnvVars::SSL_SERVER_A_SIG,
+                EnvVars::SSL_SERVER_A_KEY,
+                EnvVars::SSL_SERVER_CERT,
+                EnvVars::SSL_TLS_SNI
             );
 
             // Get the variables which came from our configuration. There might be more coming from preceding modules

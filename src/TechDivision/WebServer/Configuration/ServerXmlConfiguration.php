@@ -97,11 +97,6 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         $this->accesses = $this->prepareAccesses($node);
     }
 
-    public function getLoggerConfig()
-    {
-
-    }
-
     /**
      * Prepares the modules array based on a simple xml elemend node
      *

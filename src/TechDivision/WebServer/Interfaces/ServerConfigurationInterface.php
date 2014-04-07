@@ -70,6 +70,13 @@ interface ServerConfigurationInterface
     public function getPort();
 
     /**
+     * Return's logger name
+     *
+     * @return string
+     */
+    public function getLoggerName();
+
+    /**
      * Return's workerNumber
      *
      * @return int

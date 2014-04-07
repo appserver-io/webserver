@@ -133,6 +133,8 @@ class ThreadWorker extends \Thread implements WorkerInterface
         chdir(WEBSERVER_BASEDIR);
         // setup environment for worker
         require WEBSERVER_AUTOLOADER;
+        // register shutdown handler
+        register_shutdown_function(array(&$this, "shutdown"));
         // do work
         $this->work();
     }
@@ -148,57 +150,62 @@ class ThreadWorker extends \Thread implements WorkerInterface
     public function work()
     {
 
-        // set should restart initial flag
-        $this->shouldRestart = false;
+        try {
+            // set should restart initial flag
+            $this->shouldRestart = false;
 
-        // get server context
-        $serverContext = $this->getServerContext();
+            // get server context
+            $serverContext = $this->getServerContext();
 
-        // get server connection
-        $serverConnection = $serverContext->getConnectionInstance($this->serverConnectionResource);
+            // get server connection
+            $serverConnection = $serverContext->getConnectionInstance($this->serverConnectionResource);
 
-        // get connection handlers
-        $connectionHandlers = $this->getConnectionHandlers();
+            // get connection handlers
+            $connectionHandlers = $this->getConnectionHandlers();
 
-        // init connection count
-        $connectionCount = 0;
-        $connectionLimit = rand(16, 64);
+            // init connection count
+            $connectionCount = 0;
+            $connectionLimit = rand(16, 64);
 
-        // while worker not reached connection limit accept connections and process
-        while (++$connectionCount < $connectionLimit) {
+            // while worker not reached connection limit accept connections and process
+            while (++$connectionCount < $connectionLimit) {
 
-            // accept connections and process working connection by handlers
-            if (($connection = $serverConnection->accept()) !== false) {
+                // accept connections and process working connection by handlers
+                if (($connection = $serverConnection->accept()) !== false) {
 
-                /**
-                 * This is for testing async request processing only.
-                 *
-                 * It'll delegate the request handling to another thread which will be processed async.
-                 *
-                // call async request handler to handle connection
-                $requestHandler = new RequestHandlerThread(
-                    $connection->getConnectionResource(),
-                    $connectionHandlers,
-                    $serverContext,
-                    $this
-                );
-                */
+                    /**
+                     * This is for testing async request processing only.
+                     *
+                     * It'll delegate the request handling to another thread which will be processed async.
+                     *
+                    // call async request handler to handle connection
+                    $requestHandler = new RequestHandlerThread(
+                        $connection->getConnectionResource(),
+                        $connectionHandlers,
+                        $serverContext,
+                        $this
+                    );
+                    */
 
-                // iterate all connection handlers to handle connection right
-                foreach ($connectionHandlers as $connectionHandler) {
-                    // if connectionHandler handled connection than break out of foreach
-                    if ($connectionHandler->handle($connection, $this)) {
-                        break;
+                    // iterate all connection handlers to handle connection right
+                    foreach ($connectionHandlers as $connectionHandler) {
+                        // if connectionHandler handled connection than break out of foreach
+                        if ($connectionHandler->handle($connection, $this)) {
+                            break;
+                        }
                     }
+
                 }
+                // init server vars afterwards to avoid performance issues
+                $serverContext->initServerVars();
+                // Also init the module and env vars to offer a clean environment for the next request
+                $serverContext->initModuleVars();
+                $serverContext->initEnvVars();
 
             }
-
-            // init server vars afterwards to avoid performance issues
-            $serverContext->initServerVars();
-            // Also init the module and env vars to offer a clean environment for the next request
-            $serverContext->initModuleVars();
-            $serverContext->initEnvVars();
+        } catch(\Exception $e) {
+            // log error
+            $serverContext->getLogger()->error($e->__toString());
         }
 
         // call internal shutdown
@@ -215,6 +222,12 @@ class ThreadWorker extends \Thread implements WorkerInterface
      */
     public function shutdown()
     {
+        // check if there was a fatal error caused shutdown
+        $lastError = error_get_last();
+        if ($lastError['type'] === E_ERROR || $lastError['type'] === E_USER_ERROR) {
+            // log error
+            $this->getServerContext()->getLogger()->error($lastError['message']);
+        }
         $this->shouldRestart = true;
     }
 

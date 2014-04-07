@@ -164,7 +164,7 @@ class ServerContext implements ServerContextInterface
     /**
      * Return's the logger instance
      *
-     * @return mixed The logger instance
+     * @return LoggerInterface|null The logger instance
      */
     public function getLogger()
     {

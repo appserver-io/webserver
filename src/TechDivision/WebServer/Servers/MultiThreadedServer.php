@@ -95,8 +95,11 @@ class MultiThreadedServer extends \Thread implements ServerInterface
         // init config var for shorter calls
         $serverConfig = $serverContext->getServerConfig();
 
-        $serverContext->getLogger()->info(
-            sprintf('Starting server %s...', $serverConfig->getName())
+        // init server name
+        $serverName = $serverConfig->getName();
+
+        $serverContext->getLogger()->debug(
+            sprintf("starting %s (%s)", $serverName, __CLASS__)
         );
 
         // get class names
@@ -138,6 +141,11 @@ class MultiThreadedServer extends \Thread implements ServerInterface
             }
             // instantiate module type
             $modules[$moduleType] = new $moduleType();
+
+            $serverContext->getLogger()->debug(
+                sprintf("%s init %s module (%s)", $serverName, $moduleType::MODULE_NAME,  $moduleType)
+            );
+
             // init module with serverContext (this)
             $modules[$moduleType]->init($serverContext);
         }
@@ -153,11 +161,20 @@ class MultiThreadedServer extends \Thread implements ServerInterface
             }
             // instantiate connection handler type
             $connectionHandlers[$connectionHandlerType] = new $connectionHandlerType();
+
+            $serverContext->getLogger()->debug(
+                sprintf("%s init connectionHandler (%s)", $serverName, $connectionHandlerType)
+            );
+
             // init connection handler with serverContext (this)
             $connectionHandlers[$connectionHandlerType]->init($serverContext);
             // inject modules
             $connectionHandlers[$connectionHandlerType]->injectModules($modules);
         }
+
+        $serverContext->getLogger()->debug(
+            sprintf("%s starting %s workers (%s)", $serverName, $serverConfig->getWorkerNumber(), $workerType)
+        );
 
         // setup and start workers
         for ($i=1; $i <= $serverConfig->getWorkerNumber(); ++$i) {
@@ -171,12 +188,21 @@ class MultiThreadedServer extends \Thread implements ServerInterface
         // todo: switch this to any controller that maintains an server thread
         $serverUp = true;
 
+        $serverContext->getLogger()->info(
+            sprintf("%s listing on %s:%s...", $serverName, $serverConfig->getAddress(), $serverConfig->getPort())
+        );
+
         // watch dog for all workers to restart if it's needed while server is up
         while ($serverUp === true) {
             // iterate all workers
             for ($i=1; $i <= $serverConfig->getWorkerNumber(); ++$i) {
                 // check if worker should be restarted
                 if ($workers[$i]->shouldRestart()) {
+
+                    $serverContext->getLogger()->debug(
+                        sprintf("%s restarting worker #%s (%s)", $serverName, $i, $workerType)
+                    );
+
                     // unset origin worker ref
                     unset($workers[$i]);
                     // build up and start new worker instance

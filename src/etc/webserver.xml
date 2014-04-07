@@ -3,65 +3,50 @@
     <description><![CDATA[This is an example of a php WebServer configuration in xml]]></description>
 
     <loggers>
-        <logger
-            name="Default"
-            type="\Monolog\Logger"
-            channel="system">
+        <logger name="System" type="\Monolog\Logger">
+            <!-- Example for using processors -->
+            <!--
             <processors>
                 <processor type="\Monolog\Processor\IntrospectionProcessor" />
             </processors>
+            -->
             <handlers>
-                <handler type="\Monolog\Handler\ErrorLogHandler">
-                    <formatter type="\Monolog\Formatter\LineFormatter">
-                        <params>
-                            <param name="output" type="string"><![CDATA[[%datetime%] %channel%.%level_name%: %message% %context% %extra%]]></param>
-                            <param name="dateFormat" type="string"><![CDATA[Y-m-d H:i:s]]></param>
-                        </params>
-                    </formatter>
+                <!-- Default stream handler to log file -->
+                <handler type="\Monolog\Handler\StreamHandler">
                     <params>
-                        <param name="messageType" type="integer">0</param>
-                        <param name="level" type="integer">200</param>
-                        <param name="bubble" type="boolean">0</param>
+                        <param name="stream" type="string">var/log/webserver-system.log</param>
+                        <param name="level" type="integer">100</param>
+                        <param name="bubble" type="boolean">1</param>
                     </params>
                 </handler>
-            </handlers>
-        </logger>
-        <logger
-            name="HipChat"
-            type="\Monolog\Logger"
-            channel="system">
-            <processors>
-                <processor type="\Monolog\Processor\IntrospectionProcessor" />
-            </processors>
-            <handlers>
+                <!-- Example for using a hipchat handler -->
+                <!--
                 <handler type="\Monolog\Handler\HipChatHandler">
                     <formatter type="\Monolog\Formatter\LineFormatter">
                         <params>
                             <param name="output" type="string"><![CDATA[%channel%.%level_name%: %message%]]></param>
-                            <param name="dateFormat" type="string"><![CDATA[Y-m-d H:i:s]]></param>
                         </params>
                     </formatter>
                     <params>
-                        <param name="token" type="string">95d47a72c5372d4a0fef20048c3200</param>
+                        <param name="token" type="string">YOUR API KEY</param>
                         <param name="room" type="string">WebServer</param>
                         <param name="name" type="string">PhpWebServer</param>
                         <param name="notify" type="boolean">0</param>
-                        <param name="level" type="integer">0</param>
+                        <param name="level" type="integer">200</param>
                         <param name="bubble" type="boolean">1</param>
                         <param name="useSSL" type="boolean">1</param>
                         <param name="format" type="string">text</param>
                     </params>
                 </handler>
-                <handler type="\Monolog\Handler\ErrorLogHandler">
-                    <formatter type="\Monolog\Formatter\LineFormatter">
-                        <params>
-                            <param name="output" type="string"><![CDATA[[%datetime%] %channel%.%level_name%: %message% %context% %extra%]]></param>
-                            <param name="dateFormat" type="string"><![CDATA[Y-m-d H:i:s]]></param>
-                        </params>
-                    </formatter>
+                -->
+            </handlers>
+        </logger>
+        <logger name="Access" type="\Monolog\Logger">
+            <handlers>
+                <handler type="\Monolog\Handler\StreamHandler">
                     <params>
-                        <param name="messageType" type="integer">0</param>
-                        <param name="level" type="integer">0</param>
+                        <param name="stream" type="string">var/log/webserver-access.log</param>
+                        <param name="level" type="integer">100</param>
                         <param name="bubble" type="boolean">1</param>
                     </params>
                 </handler>
@@ -76,7 +61,7 @@
             worker="\TechDivision\WebServer\Workers\ThreadWorker"
             socket="\TechDivision\WebServer\Sockets\StreamSocket"
             serverContext="\TechDivision\WebServer\ServerContext"
-            loggerName="HipChat">
+            loggerName="System">
 
             <params>
                 <param name="admin" type="string">www@localhost.localdomain</param>
@@ -227,7 +212,7 @@
             worker="\TechDivision\WebServer\Workers\ThreadWorker"
             socket="\TechDivision\WebServer\Sockets\StreamSocket"
             serverContext="\TechDivision\WebServer\ServerContext"
-            loggerName="HipChat">
+            loggerName="System">
 
             <params>
                 <param name="admin" type="string">www@localhost.localdomain</param>

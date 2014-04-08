@@ -148,7 +148,7 @@ class MultiThreadedServer extends \Thread implements ServerInterface
             $modules[$moduleType] = new $moduleType();
 
             $logger->debug(
-                sprintf("%s init %s module (%s)", $serverName, $moduleType::MODULE_NAME,  $moduleType)
+                sprintf("%s init %s module (%s)", $serverName, $moduleType::MODULE_NAME, $moduleType)
             );
 
             // init module with serverContext (this)

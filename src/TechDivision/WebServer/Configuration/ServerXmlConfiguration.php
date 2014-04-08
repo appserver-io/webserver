@@ -543,5 +543,4 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
     {
         return $this->accesses;
     }
-
 }

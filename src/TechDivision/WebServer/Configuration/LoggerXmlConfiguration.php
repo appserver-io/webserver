@@ -164,5 +164,4 @@ class LoggerXmlConfiguration implements LoggerConfigurationInterface
         }
         return $processors;
     }
-
 }

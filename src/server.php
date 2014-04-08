@@ -19,7 +19,9 @@
  */
 
 /**
- * @return boolean true if PHP is thread safe
+ * Returns if php build is with thread safe options
+ *
+ * @return boolean True if PHP is thread safe
  */
 function isThreadSafe()
 {

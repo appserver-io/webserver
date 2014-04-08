@@ -149,7 +149,6 @@ class ThreadWorker extends \Thread implements WorkerInterface
      */
     public function work()
     {
-
         try {
             // set should restart initial flag
             $this->shouldRestart = false;
@@ -203,7 +202,7 @@ class ThreadWorker extends \Thread implements WorkerInterface
                 $serverContext->initEnvVars();
 
             }
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             // log error
             $serverContext->getLogger()->error($e->__toString());
         }

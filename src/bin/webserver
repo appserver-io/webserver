@@ -1,36 +1,28 @@
-<?php
+#!/bin/bash
+#
+# webserver
+#
+# NOTICE OF LICENSE
+#
+# This source file is subject to the Open Software License (OSL 3.0)
+# that is available through the world-wide-web at this URL:
+# http://opensource.org/licenses/osl-3.0.php
+#
+# PHP version 5
+#
+# @category  Webserver
+# @package   TechDivision_WebServer
+# @author    Johann Zelger <jz@techdivision.com>
+# @copyright 2014 TechDivision GmbH <info@techdivision.com>
+# @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+# @link      https://github.com/techdivision/TechDivision_WebServer
+##
 
-define('WEBSERVER_BASEDIR', __DIR__ . '/../');
-define('WEBSERVER_AUTOLOADER', WEBSERVER_BASEDIR . '../vendor/autoload.php');
+# get base dir from bash source location
+BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 
-require WEBSERVER_AUTOLOADER;
+# check if PHP_BIN was set. If not set appserver php as default.
+[ -z "$PHP_BIN" ] && PHP_BIN="/opt/appserver/bin/php";
 
-// set current dir to base dir for relative dirs
-chdir(WEBSERVER_BASEDIR);
-
-// read in json configuration
-//$mainConfiguration = new \TechDivision\WebServer\MainJsonConfiguration(WEBSERVER_BASEDIR . 'etc/webserver.json');
-// read in xml configuration <- just comment this in to use xml configuration
-$mainConfiguration = new \TechDivision\WebServer\MainXmlConfiguration(WEBSERVER_BASEDIR . 'etc/webserver.xml');
-
-// init server array
-$servers = array();
-
-// start servers
-foreach ($mainConfiguration->getServerConfigs() as $serverConfig) {
-    // get type definitions
-    $serverType = $serverConfig->getType();
-    $serverContextType = $serverConfig->getServerContextType();
-
-    // init server context
-    $serverContext = new $serverContextType();
-    $serverContext->init($serverConfig);
-
-    // init and start server
-    $servers[] = new $serverType($serverContext);
-}
-
-// wait for servers
-foreach ($servers as $server) {
-    $server->join();
-}
+# call webserver script
+$PHP_BIN -dappserver.php_sapi=webserver -ddate.timezone=Europe/Berlin -dauto_globals_jit=0 $BASE_DIR/../server.php

@@ -127,4 +127,12 @@ class ServerVars
      */
     const VALUE_HTTPS_ON = 'on';
     const VALUE_HTTPS_OFF = 'off';
+
+    /**
+     * Defines logger types
+     *
+     * @var string
+     */
+    const LOGGER_ACCESS = 'LOGGER_ACCESS';
+    const LOGGER_SYSTEM = 'LOGGER_SYSTEM';
 }

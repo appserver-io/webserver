@@ -21,6 +21,8 @@
 
 namespace TechDivision\WebServer\Servers;
 
+use TechDivision\WebServer\Dictionaries\ModuleVars;
+use TechDivision\WebServer\Dictionaries\ServerVars;
 use TechDivision\WebServer\Interfaces\ServerConfigurationInterface;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
 use TechDivision\WebServer\Interfaces\ServerInterface;
@@ -95,10 +97,19 @@ class MultiThreadedServer extends \Thread implements ServerInterface
         // init config var for shorter calls
         $serverConfig = $serverContext->getServerConfig();
 
+        // init server name
+        $serverName = $serverConfig->getName();
+
+        // init logger
+        $logger = $serverContext->getLogger();
+
+        $logger->debug(
+            sprintf("starting %s (%s)", $serverName, __CLASS__)
+        );
+
         // get class names
         $socketType = $serverConfig->getSocketType();
         $workerType = $serverConfig->getWorkerType();
-
 
         // set socket backlog to 1024 for perform many concurrent connections
         $opts = array(
@@ -135,6 +146,11 @@ class MultiThreadedServer extends \Thread implements ServerInterface
             }
             // instantiate module type
             $modules[$moduleType] = new $moduleType();
+
+            $logger->debug(
+                sprintf("%s init %s module (%s)", $serverName, $moduleType::MODULE_NAME, $moduleType)
+            );
+
             // init module with serverContext (this)
             $modules[$moduleType]->init($serverContext);
         }
@@ -150,13 +166,20 @@ class MultiThreadedServer extends \Thread implements ServerInterface
             }
             // instantiate connection handler type
             $connectionHandlers[$connectionHandlerType] = new $connectionHandlerType();
+
+            $logger->debug(
+                sprintf("%s init connectionHandler (%s)", $serverName, $connectionHandlerType)
+            );
+
             // init connection handler with serverContext (this)
             $connectionHandlers[$connectionHandlerType]->init($serverContext);
             // inject modules
             $connectionHandlers[$connectionHandlerType]->injectModules($modules);
         }
 
-
+        $logger->debug(
+            sprintf("%s starting %s workers (%s)", $serverName, $serverConfig->getWorkerNumber(), $workerType)
+        );
 
         // setup and start workers
         for ($i=1; $i <= $serverConfig->getWorkerNumber(); ++$i) {
@@ -170,12 +193,21 @@ class MultiThreadedServer extends \Thread implements ServerInterface
         // todo: switch this to any controller that maintains an server thread
         $serverUp = true;
 
+        $logger->info(
+            sprintf("%s listing on %s:%s...", $serverName, $serverConfig->getAddress(), $serverConfig->getPort())
+        );
+
         // watch dog for all workers to restart if it's needed while server is up
         while ($serverUp === true) {
             // iterate all workers
             for ($i=1; $i <= $serverConfig->getWorkerNumber(); ++$i) {
                 // check if worker should be restarted
                 if ($workers[$i]->shouldRestart()) {
+
+                    $logger->debug(
+                        sprintf("%s restarting worker #%s (%s)", $serverName, $i, $workerType)
+                    );
+
                     // unset origin worker ref
                     unset($workers[$i]);
                     // build up and start new worker instance

@@ -35,6 +35,13 @@ namespace TechDivision\WebServer\Interfaces;
 interface ServerConfigurationInterface
 {
     /**
+     * Return's name
+     *
+     * @return string
+     */
+    public function getName();
+
+    /**
      * Return's type
      *
      * @return string
@@ -61,6 +68,13 @@ interface ServerConfigurationInterface
      * @return int
      */
     public function getPort();
+
+    /**
+     * Return's logger name
+     *
+     * @return string
+     */
+    public function getLoggerName();
 
     /**
      * Return's workerNumber

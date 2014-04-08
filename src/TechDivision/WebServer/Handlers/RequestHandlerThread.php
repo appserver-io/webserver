@@ -1,6 +1,6 @@
 <?php
 /**
- * \TechDivision\WebServer\RequestHandlerThread
+ * \TechDivision\WebServer\Handlers\RequestHandlerThread
  *
  * NOTICE OF LICENSE
  *
@@ -10,15 +10,16 @@
  *
  * PHP version 5
  *
- * @category  Webserver
- * @package   TechDivision_WebServer
- * @author    Johann Zelger <jz@techdivision.com>
- * @copyright 2014 TechDivision GmbH <info@techdivision.com>
- * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link      https://github.com/techdivision/TechDivision_WebServer
+ * @category   Webserver
+ * @package    TechDivision_WebServer
+ * @subpackage Handlers
+ * @author     Johann Zelger <jz@techdivision.com>
+ * @copyright  2014 TechDivision GmbH <info@techdivision.com>
+ * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link       https://github.com/techdivision/TechDivision_WebServer
  */
 
-namespace TechDivision\WebServer;
+namespace TechDivision\WebServer\Handlers;
 
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
 use TechDivision\WebServer\Interfaces\WorkerInterface;
@@ -26,12 +27,13 @@ use TechDivision\WebServer\Interfaces\WorkerInterface;
 /**
  * This class is just for testing purpose, so please don't use it for this moment.
  *
- * @category  Webserver
- * @package   TechDivision_WebServer
- * @author    Johann Zelger <jz@techdivision.com>
- * @copyright 2014 TechDivision GmbH <info@techdivision.com>
- * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link      https://github.com/techdivision/TechDivision_WebServer
+ * @category   Webserver
+ * @package    TechDivision_WebServer
+ * @subpackage Handlers
+ * @author     Johann Zelger <jz@techdivision.com>
+ * @copyright  2014 TechDivision GmbH <info@techdivision.com>
+ * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link       https://github.com/techdivision/TechDivision_WebServer
  */
 class RequestHandlerThread extends \Thread
 {

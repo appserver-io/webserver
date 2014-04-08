@@ -22,8 +22,12 @@ Usage
 If you can satisfy the requirements it is very simple to use the webserver. Just do this:
 ```bash
 git clone https://github.com/techdivision/TechDivision_WebServer
-cd TechDivision_WebServer
-/opt/appserver/bin/php -dauto_globals_jit=0 src/bin/webserver
+PHP_BIN=/path/to/your/threadsafe/php-binary TechDivision_WebServer/src/bin/webserver
+```
+If you're using [`appserver.io`](<http://www.appserver.io>) it'll be this:
+```bash
+git clone https://github.com/techdivision/TechDivision_WebServer
+./TechDivision_WebServer/src/bin/webserver
 ```
 
 Goto http://127.0.0.1:9080 and if all went good, you will see the welcome page of the php webserver.

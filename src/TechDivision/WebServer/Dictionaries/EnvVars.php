@@ -1,6 +1,6 @@
 <?php
 /**
- * \TechDivision\WebServer\Dictionaries\SslEnvironmentVars
+ * \TechDivision\WebServer\Dictionaries\EnvVars
  *
  * NOTICE OF LICENSE
  *
@@ -22,17 +22,18 @@
 namespace TechDivision\WebServer\Dictionaries;
 
 /**
- * Class SslEnvironmentVars
+ * Class EnvVars
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
  * @subpackage Dictionaries
  * @author     Bernhard Wick <b.wick@techdivision.com>
+ * @author     Johann Zelger <jz@techdivision.com>
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/techdivision/TechDivision_WebServer
  */
-class SslEnvironmentVars
+class EnvVars
 {
     /**
      * Defines constant for HTTPS usage
@@ -109,4 +110,12 @@ class SslEnvironmentVars
     const SSL_SERVER_A_SIG = 'SSL_SERVER_A_SIG';
     const SSL_SERVER_A_KEY = 'SSL_SERVER_A_KEY';
     const SSL_SERVER_CERT = 'SSL_SERVER_CERT';
+
+    /**
+     * Defines logger constants
+     *
+     * @var string
+     */
+    const LOGGER_SYSTEM = 'LOGGER_SYSTEM';
+    const LOGGER_ACCESS = 'LOGGER_ACCESS';
 }

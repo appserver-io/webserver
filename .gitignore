@@ -1,5 +1,7 @@
 php.ini
+composer.lock
 .idea
+/src/var/log/*.log
 /target
 /reports
 /instance-src
@@ -8,4 +10,3 @@ php.ini
 /.project
 /.settings
 /.build.properties
-composer.lock

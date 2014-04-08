@@ -46,7 +46,9 @@
                 <handler type="\Monolog\Handler\StreamHandler">
                     <formatter type="\Monolog\Formatter\LineFormatter">
                         <params>
-                            <param name="output" type="string">%message%&#xA;</param>
+                            <param name="format" type="string">%message%</param>
+                            <param name="dateFormat" type="string">Y-m-d H:i:s</param>
+                            <param name="allowInlineLineBreaks" type="boolean">1</param>
                         </params>
                     </formatter>
                     <params>

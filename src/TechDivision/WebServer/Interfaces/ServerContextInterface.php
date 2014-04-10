@@ -21,7 +21,9 @@
 
 namespace TechDivision\WebServer\Interfaces;
 
+use Psr\Log\LoggerInterface;
 use TechDivision\WebServer\Interfaces\ServerConfigurationInterface;
+use TechDivision\WebServer\Dictionaries\EnvVars;
 use TechDivision\WebServer\Sockets\SocketInterface;
 
 /**
@@ -48,11 +50,39 @@ interface ServerContextInterface
     public function init(ServerConfigurationInterface $serverConfig);
 
     /**
+     * Injects a third party container
+     *
+     * @param mixed $container The container to inject
+     *
+     * @return mixed
+     */
+    public function injectContainer($container);
+
+    /**
+     * Injects a Psr compatible logger instance
+     *
+     * @param \Psr\Log\LoggerInterface[] $loggers The array of logger instances
+     *
+     * @return void
+     */
+    public function injectLoggers(array $loggers);
+
+    /**
      * Return's the server config instance
      *
      * @return \TechDivision\WebServer\Interfaces\ServerConfigurationInterface The server config instance
      */
     public function getServerConfig();
+
+    /**
+     * Return's the logger instance
+     *
+     * @param string $loggerType the logger's type to get
+     *
+     * @return \Psr\Log\LoggerInterface|null The logger instance
+     * @throws \TechDivision\WebServer\Exceptions\ServerException
+     */
+    public function getLogger($loggerType = EnvVars::LOGGER_SYSTEM);
 
     /**
      * Set's a value to specific server var

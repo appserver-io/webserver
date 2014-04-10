@@ -20,7 +20,9 @@
 
 namespace TechDivision\WebServer;
 
+use Psr\Log\LoggerInterface;
 use TechDivision\WebServer\ConnectionPool;
+use TechDivision\WebServer\Dictionaries\EnvVars;
 use TechDivision\WebServer\Exceptions\ConnectionHandlerNotFoundException;
 use TechDivision\WebServer\Exceptions\ModuleNotFoundException;
 use TechDivision\WebServer\Exceptions\ServerException;
@@ -53,6 +55,14 @@ class ServerContext implements ServerContextInterface
      * @var mixed
      */
     protected $container;
+
+    /**
+     * All logger instances will be hold here.
+     * Every logger instance has to be a PSR compatible
+     *
+     * @var LoggerInterface[]
+     */
+    protected $loggers;
 
     /**
      * Hold's the config instance
@@ -105,8 +115,13 @@ class ServerContext implements ServerContextInterface
         // set configuration
         $this->serverConfig = $serverConfig;
 
+        // init env vars
+        $this->initEnvVars();
         // init server vars
         $this->initServerVars();
+        // init module vars
+        $this->initModuleVars();
+
     }
 
     /**
@@ -146,6 +161,18 @@ class ServerContext implements ServerContextInterface
     }
 
     /**
+     * Injects a Psr compatible logger instance
+     *
+     * @param \Psr\Log\LoggerInterface[] $loggers The array of logger instances
+     *
+     * @return void
+     */
+    public function injectLoggers(array $loggers)
+    {
+        $this->loggers = $loggers;
+    }
+
+    /**
      * Return's the container instance
      *
      * @return mixed The container instance for third party environment
@@ -175,6 +202,30 @@ class ServerContext implements ServerContextInterface
     public function getCache()
     {
         return $this->cache;
+    }
+
+    /**
+     * Return's the logger instance
+     *
+     * @param string $loggerType the logger's type to get
+     *
+     * @return \Psr\Log\LoggerInterface|null The logger instance
+     * @throws \TechDivision\WebServer\Exceptions\ServerException
+     */
+    public function getLogger($loggerType = EnvVars::LOGGER_SYSTEM)
+    {
+        // check if there is information about this logger type in server vars first
+        if ($this->hasEnvVar($loggerType)) {
+            // get logger name from modulevars by type
+            $loggerName = $this->getEnvVar($loggerType);
+            // check if logger is set
+            if (isset($this->loggers[$loggerName])) {
+                // return logger
+                return $this->loggers[$loggerName];
+            }
+            // throw exception
+            throw new ServerException("Logger name '$loggerName' does not exist.", 500);
+        }
     }
 
     /**
@@ -485,7 +536,9 @@ class ServerContext implements ServerContextInterface
      */
     public function initEnvVars()
     {
-        // set env vars array
-        $this->envVars = array();
+        // init env vars array
+        $this->envVars = array(
+            EnvVars::LOGGER_SYSTEM => $this->getServerConfig()->getLoggerName(),
+        );
     }
 }

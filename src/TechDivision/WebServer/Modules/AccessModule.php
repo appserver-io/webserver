@@ -22,6 +22,7 @@
 namespace TechDivision\WebServer\Modules;
 
 use TechDivision\Http\HttpProtocol;
+use TechDivision\WebServer\Dictionaries\ModuleHooks;
 use TechDivision\WebServer\Dictionaries\ServerVars;
 use TechDivision\WebServer\Dictionaries\ModuleVars;
 use TechDivision\Http\HttpRequestInterface;
@@ -43,7 +44,6 @@ use TechDivision\WebServer\Interfaces\ServerContextInterface;
  */
 class AccessModule implements ModuleInterface
 {
-
     /**
      * Defines the module name
      *
@@ -107,20 +107,25 @@ class AccessModule implements ModuleInterface
     {
         $this->serverContext = $serverContext;
         $this->accesses = $serverContext->getServerConfig()->getAccesses();
-
     }
 
     /**
-     * Implement's module logic
+     * Implement's module logic for given hook
      *
      * @param \TechDivision\Http\HttpRequestInterface  $request  The request object
      * @param \TechDivision\Http\HttpResponseInterface $response The response object
+     * @param int                                      $hook     The current hook to process logic for
      *
      * @return bool
      * @throws \TechDivision\WebServer\Exceptions\ModuleException
      */
-    public function process(HttpRequestInterface $request, HttpResponseInterface $response)
+    public function process(HttpRequestInterface $request, HttpResponseInterface $response, $hook)
     {
+        // if false hook is comming do nothing
+        if (ModuleHooks::REQUEST_POST !== $hook) {
+            return;
+        }
+
         // set req and res object internally
         $this->request = $request;
         $this->response = $response;

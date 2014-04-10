@@ -100,7 +100,9 @@ The definition has some specialities too:
 
 Modules
 -------
-The request processing workflow is module based within the php web server. Modules can be implemented according to the `\TechDivision\WebServer\Interfaces\ModuleInterface` interface. It needs an initial call of the `init` method and will process any request offered to the `process` method. Just have a look to the core modules `TechDivision/WebServer/Modules/*Modules.php`
+The request processing workflow is module based within the php web server. Modules can be implemented according to the `\TechDivision\WebServer\Interfaces\ModuleInterface` interface. It needs an initial call of the `init` method and will process any request offered to the `process` method.
+Just have a look to the core modules `TechDivision/WebServer/Modules/*Modules.php`
+
 Every module can use various points of executing it's logic by checking the current hook which comes to every process call
 
 ```php

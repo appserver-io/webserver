@@ -193,6 +193,7 @@
             </connectionHandlers>
 
             <modules>
+                <!-- REQUEST_POST hook -->
                 <module type="\TechDivision\WebServer\Modules\AuthenticationModule"/>
                 <module type="\TechDivision\WebServer\Modules\VirtualHostModule"/>
                 <module type="\TechDivision\WebServer\Modules\EnvironmentVariableModule" />
@@ -201,6 +202,8 @@
                 <module type="\TechDivision\WebServer\Modules\AccessModule"/>
                 <module type="\TechDivision\WebServer\Modules\CoreModule"/>
                 <module type="\TechDivision\PhpModule\PhpModule"/>
+                <!-- RESPONSE_PRE hook -->
+                <module type="\TechDivision\WebServer\Modules\DeflateModule"/>
             </modules>
             <handlers>
                 <handler name="php" extension=".php"/>
@@ -337,6 +340,7 @@
             </connectionHandlers>
 
             <modules>
+                <!-- REQUEST_POST hook -->
                 <module type="\TechDivision\WebServer\Modules\AuthenticationModule"/>
                 <module type="\TechDivision\WebServer\Modules\VirtualHostModule"/>
                 <module type="\TechDivision\WebServer\Modules\EnvironmentVariableModule" />
@@ -345,6 +349,8 @@
                 <module type="\TechDivision\WebServer\Modules\AccessModule"/>
                 <module type="\TechDivision\WebServer\Modules\CoreModule"/>
                 <module type="\TechDivision\PhpModule\PhpModule"/>
+                <!-- RESPONSE_PRE hook -->
+                <module type="\TechDivision\WebServer\Modules\DeflateModule"/>
             </modules>
             <handlers>
                 <handler name="php" extension=".php"/>

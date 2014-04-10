@@ -40,15 +40,16 @@ interface ModuleInterface
 {
 
     /**
-     * Implement's module logic
+     * Implement's module logic for given hook
      *
-     * @param \TechDivision\Http\HttpRequestInterface  $request  The request instance
-     * @param \TechDivision\Http\HttpResponseInterface $response The response instance
+     * @param \TechDivision\Http\HttpRequestInterface  $request  The request object
+     * @param \TechDivision\Http\HttpResponseInterface $response The response object
+     * @param int                                      $hook     The current hook to process logic for
      *
      * @return bool
      * @throws \TechDivision\WebServer\Exceptions\ModuleException
      */
-    public function process(HttpRequestInterface $request, HttpResponseInterface $response);
+    public function process(HttpRequestInterface $request, HttpResponseInterface $response, $hook);
 
     /**
      * Return's an array of module names which should be executed first

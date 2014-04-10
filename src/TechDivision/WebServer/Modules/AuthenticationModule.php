@@ -22,8 +22,8 @@
 namespace TechDivision\WebServer\Modules;
 
 use TechDivision\Http\HttpProtocol;
-use TechDivision\Http\HttpResponseStates;
 use TechDivision\WebServer\Authentication\BasicAuthentication;
+use TechDivision\WebServer\Dictionaries\ModuleHooks;
 use TechDivision\WebServer\Dictionaries\ServerVars;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
@@ -45,7 +45,6 @@ use TechDivision\WebServer\Interfaces\ServerContextInterface;
  */
 class AuthenticationModule implements ModuleInterface
 {
-
     /**
      * Defines the module name
      *
@@ -151,16 +150,22 @@ class AuthenticationModule implements ModuleInterface
     }
 
     /**
-     * Implement's module logic
+     * Implement's module logic for given hook
      *
      * @param \TechDivision\Http\HttpRequestInterface  $request  The request object
      * @param \TechDivision\Http\HttpResponseInterface $response The response object
+     * @param int                                      $hook     The current hook to process logic for
      *
      * @return bool
      * @throws \TechDivision\WebServer\Exceptions\ModuleException
      */
-    public function process(HttpRequestInterface $request, HttpResponseInterface $response)
+    public function process(HttpRequestInterface $request, HttpResponseInterface $response, $hook)
     {
+        // if false hook is comming do nothing
+        if (ModuleHooks::REQUEST_POST !== $hook) {
+            return;
+        }
+
         // set req and res object internally
         $this->request = $request;
         $this->response = $response;

@@ -24,6 +24,7 @@ namespace TechDivision\WebServer\Modules;
 use TechDivision\Http\HttpProtocol;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
+use TechDivision\WebServer\Dictionaries\ModuleHooks;
 use TechDivision\WebServer\Interfaces\ModuleInterface;
 use TechDivision\WebServer\Modules\ModuleException;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
@@ -41,7 +42,6 @@ use TechDivision\WebServer\Interfaces\ServerContextInterface;
  */
 class DeflateModule implements ModuleInterface
 {
-
     /**
      * Defines the module name
      *
@@ -63,27 +63,58 @@ class DeflateModule implements ModuleInterface
     }
 
     /**
-     * Implement's module logic
+     * Implement's module logic for given hook
      *
      * @param \TechDivision\Http\HttpRequestInterface  $request  The request object
      * @param \TechDivision\Http\HttpResponseInterface $response The response object
+     * @param int                                      $hook     The current hook to process logic for
      *
      * @return bool
      * @throws \TechDivision\WebServer\Exceptions\ModuleException
      */
-    public function process(HttpRequestInterface $request, HttpResponseInterface $response)
+    public function process(HttpRequestInterface $request, HttpResponseInterface $response, $hook)
     {
+        // if false hook is comming do nothing
+        if (ModuleHooks::RESPONSE_PRE !== $hook) {
+            return;
+        }
         // check if no accept encoding headers are sent
         if (!$request->hasHeader(HttpProtocol::HEADER_ACCEPT_ENCODING)) {
-            return true;
+            return;
+        }
+        // check if response was encoded before and exit than
+        if ($response->hasHeader(HttpProtocol::HEADER_CONTENT_ENCODING)) {
+            return;
         }
         // check if request accepts deflate
         if (strpos($request->getHeader(HttpProtocol::HEADER_ACCEPT_ENCODING), 'deflate') !== false) {
-            // apply encoding filter to response body stream
-            stream_filter_append($response->getBodyStream(), 'zlib.deflate');
-            // set encoding header info
-            $response->addHeader(HttpProtocol::HEADER_CONTENT_ENCODING, 'deflate');
-            return true;
+
+            // get stream meta data
+            $streamMetaData = stream_get_meta_data($response->getBodyStream());
+
+            /**
+             * Currently it's not possible to apply zlib.deflate filter on memory (php://memory) or
+             * temp (php://temp) streams due to a bug in that zlib library.,
+             *
+             * So for now we'll check if stream type is not MEMORY in case of static files and add
+             * deflate filter just for static files served via core module.
+             *
+             * @link https://bugs.php.net/bug.php?id=48725
+             */
+            if ($streamMetaData['stream_type'] !== 'MEMORY') {
+                // apply encoding filter to response body stream
+                stream_filter_append($response->getBodyStream(), 'zlib.deflate', STREAM_FILTER_READ);
+                // rewind current body stream
+                rewind($response->getBodyStream());
+                // copy body stream to make use of filter in read mode
+                $deflateBodyStream = fopen('php://memory', 'w+b');
+                // copy stream with appended filter to new deflate body stream
+                stream_copy_to_stream($response->getBodyStream(), $deflateBodyStream);
+                // reset body stream on response
+                $response->setBodyStream($deflateBodyStream);
+                // set encoding header info
+                $response->addHeader(HttpProtocol::HEADER_CONTENT_ENCODING, 'deflate');
+            }
         }
     }
 

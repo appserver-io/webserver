@@ -100,7 +100,41 @@ The definition has some specialities too:
 
 Modules
 -------
-The request processing workflow is module based within the php web server. Modules can be implemented according to the `\TechDivision\WebServer\Interfaces\ModuleInterface` interface. It needs an initial call of the `init` method and will process any request offered to the `process` method. Just have a look to the core modules `TechDivision/WebServer/Modules/*Modules.php`
+The request processing workflow is module based within the php web server. Modules can be implemented according to the `\TechDivision\WebServer\Interfaces\ModuleInterface` interface. It needs an initial call of the `init` method and will process any request offered to the `process` method.
+Just have a look to the core modules `TechDivision/WebServer/Modules/*Modules.php`
+
+Every module can use various points of executing it's logic by checking the current hook which comes to every process call
+
+```php
+public function process(HttpRequestInterface $request, HttpResponseInterface $response, $hook)
+{
+    // if false hook is comming do nothing
+    if (ModuleHooks::REQUEST_POST !== $hook) {
+        return;
+    }
+
+    // do modules logic
+}
+```
+
+### Module Hooks
+
+##### ModuleHooks::REQUEST_PRE
+The request pre hook should be used to do something before the request will be parsed.
+So if there is a keep-alive loop going on this will be triggered every request loop.
+
+##### ModuleHooks::REQUEST_POST
+The request post hook should be used to do something after the request has been parsed.
+Most modules such as CoreModule will use this hook to do their job.
+
+##### ModuleHooks::RESPONSE_PRE
+The response pre hook will be triggered at the point before the response will be prepared.
+For sending it to the to the connection endpoint.
+
+##### ModuleHooks::RESPONSE_POST
+The response post hook is the last hook triggered within a keep-alive loop and will execute
+the modules logic when the response is well prepared and ready to dispatch
+
 
 Have a look at some of the core modules and their configuration here:
 

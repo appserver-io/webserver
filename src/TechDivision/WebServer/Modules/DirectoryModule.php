@@ -24,6 +24,7 @@ namespace TechDivision\WebServer\Modules;
 use TechDivision\Http\HttpProtocol;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
+use TechDivision\Http\HttpResponseStates;
 use TechDivision\WebServer\Dictionaries\ModuleHooks;
 use TechDivision\WebServer\Interfaces\ModuleInterface;
 use TechDivision\WebServer\Modules\ModuleException;

@@ -133,18 +133,21 @@ class AccessModule implements ModuleInterface
         // get ref to local var
         $serverContext = $this->getServerContext();
 
+        // get default access definitions
+        $accesses = $this->accesses;
+
         // check if there are some volatile access definitions so use them and override global accesses
         if ($this->serverContext->hasModuleVar(ModuleVars::VOLATILE_ACCESSES)) {
             // reset by volatile accesses
-            $this->accesses = $this->serverContext->getModuleVar(ModuleVars::VOLATILE_ACCESSES);
+            $accesses = $this->serverContext->getModuleVar(ModuleVars::VOLATILE_ACCESSES);
         }
 
         // generally everything is not allowed
         $allowed = false;
 
-        if ($this->accesses['allow']) {
+        if ($accesses['allow']) {
             // check allow accesses informations if something matches
-            foreach ($this->accesses['allow'] as $accessData) {
+            foreach ($accesses['allow'] as $accessData) {
 
                 // we are optimistic an initial say data will match
                 $matchAllow = true;
@@ -175,9 +178,9 @@ class AccessModule implements ModuleInterface
             }
         }
 
-        if (isset($this->accesses['deny'])) {
+        if (isset($accesses['deny'])) {
             // check deny accesses informations if something matches
-            foreach ($this->accesses['deny'] as $accessData) {
+            foreach ($accesses['deny'] as $accessData) {
 
                 // initial nothing denies the request
                 $matchDeny = true;

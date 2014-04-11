@@ -195,12 +195,8 @@ class ThreadWorker extends \Thread implements WorkerInterface
                     }
 
                 }
-                // init server vars afterwards to avoid performance issues
-                $serverContext->initServerVars();
-                // Also init the module and env vars to offer a clean environment for the next request
-                $serverContext->initModuleVars();
-                $serverContext->initEnvVars();
-
+                // init context vars afterwards to avoid performance issues
+                $serverContext->initVars();
             }
         } catch (\Exception $e) {
             // log error

@@ -231,4 +231,11 @@ interface ServerContextInterface
      * @return void
      */
     public function initEnvVars();
+
+    /**
+     * Resets all var used in server context
+     *
+     * @return void
+     */
+    public function initVars();
 }

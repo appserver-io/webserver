@@ -156,7 +156,7 @@ class ServerContext implements ServerContextInterface
     /**
      * Injects a Psr compatible logger instance
      *
-     * @param \Psr\Log\LoggerInterface[] $loggers The array of logger instances
+     * @param array<\Psr\Log\LoggerInterface> $loggers The array of logger instances
      *
      * @return void
      */

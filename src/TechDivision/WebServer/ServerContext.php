@@ -323,11 +323,11 @@ class ServerContext implements ServerContextInterface
         $serverAddress = $this->getServerConfig()->getAddress();
         $serverPort = $this->getServerConfig()->getPort();
 
-        // set document root
-        $documentRoot = $this->getServerConfig()->getDocumentRoot();
-        // check if relative path is given and make is absolute by using cwd as prefix
-        if (substr($documentRoot, 0, 1) !== "/") {
-            $documentRoot = getcwd() . DIRECTORY_SEPARATOR . $documentRoot;
+        // set document root check if relative path is given and make is absolute by using getcwd() as prefix
+        if (!is_dir($documentRoot = $this->getServerConfig()->getDocumentRoot())) {
+            if (!is_dir($documentRoot = getcwd() . DIRECTORY_SEPARATOR . $documentRoot)) {
+                throw new \Exception("Specified document root $documentRoot is not a valid directory");
+            }
         }
 
         // set server vars array

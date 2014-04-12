@@ -87,13 +87,6 @@ class ServerContext implements ServerContextInterface
      * @var array $moduleVars
      */
     protected $moduleVars;
-    
-    /**
-     * The servers cache API instance.
-     * 
-     * @var \TechDivision\CacheServer\Cache
-     */
-    protected $cache;
 
     /**
      * This member will hold the environment (env) variables which different modules can set/get to provide
@@ -175,28 +168,6 @@ class ServerContext implements ServerContextInterface
     public function getContainer()
     {
         return $this->container;
-    }
-    
-    /**
-     * Injects the cache API to use.
-     * 
-     * @param \TechDivision\CacheServer\Cache $cache
-     * 
-     * @return void
-     */
-    public function injectCache($cache)
-    {
-        $this->cache = $cache;
-    }
-    
-    /**
-     * Returns the servers cache API to use, e. g. a Memcache API.
-     * 
-     * @return \TechDivision\CacheServer\Cache The requested cache API
-     */
-    public function getCache()
-    {
-        return $this->cache;
     }
 
     /**

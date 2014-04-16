@@ -11,6 +11,12 @@
             "email": "jz@techdivision.com",
             "homepage": "http://www.techdivision.com",
             "role": "Developer"
+        },
+        {
+            "name": "Tim Wagner",
+            "email": "tw@techdivision.com",
+            "homepage": "http://www.techdivision.com",
+            "role": "Developer"
         }
     ],
     "require": {
@@ -19,7 +25,8 @@
         "techdivision/rewritemodule": "dev-master",
         "techdivision/phpmodule": "dev-master",
         "monolog/monolog": "*",
-        "psr/log": "*"
+        "psr/log": "*",
+        "crunch/fastcgi": "dev-master"
     },
     "autoload": {
         "psr-0": {"TechDivision": ["src/", "tests/"]}

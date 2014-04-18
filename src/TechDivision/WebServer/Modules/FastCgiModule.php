@@ -31,7 +31,8 @@ use TechDivision\WebServer\Interfaces\ModuleInterface;
 use TechDivision\WebServer\Exceptions\ModuleException;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
 
-use Crunch\FastCGI\Client;
+use EBernhardson\FastCGI\Client;
+use EBernhardson\FastCGI\CommunicationException;
 
 /**
  * Class CoreModule
@@ -82,112 +83,78 @@ class FastCgiModule implements ModuleInterface
         // check if server handler sais php modules should react on this request as file handler
         if ($serverContext->getServerVar(ServerVars::SERVER_HANDLER) === self::MODULE_NAME) {
 
-            // check if file does not exist
-            if (!$serverContext->hasServerVar(ServerVars::SCRIPT_FILENAME)) {
-                // send 404
-                $response->setStatusCode(404);
-                throw new ModuleException(null, 404);
-            }
-        
-            $fastCgi = new Client('127.0.0.1', 9000);
-            $connection = $fastCgi->connect();
-            
-            $fastCgiRequest = $connection->newRequest();
-            
-            $fastCgiRequest->parameters = array(
-                ServerVars::GATEWAY_INTERFACE => 'FastCGI/1.0',
-                ServerVars::REQUEST_METHOD    => $serverContext->getServerVar(ServerVars::REQUEST_METHOD),
-                ServerVars::SCRIPT_FILENAME   => $serverContext->getServerVar(ServerVars::SCRIPT_FILENAME),
-                ServerVars::QUERY_STRING      => $serverContext->getServerVar(ServerVars::QUERY_STRING),
-                ServerVars::SCRIPT_NAME       => $serverContext->getServerVar(ServerVars::SCRIPT_NAME),
-                ServerVars::REQUEST_URI       => $serverContext->getServerVar(ServerVars::REQUEST_URI),
-                ServerVars::DOCUMENT_ROOT     => $serverContext->getServerVar(ServerVars::DOCUMENT_ROOT),
-                ServerVars::SERVER_PROTOCOL   => $serverContext->getServerVar(ServerVars::SERVER_PROTOCOL),
-                ServerVars::HTTPS             => $serverContext->getServerVar(ServerVars::HTTPS),
-                ServerVars::SERVER_SOFTWARE   => $serverContext->getServerVar(ServerVars::SERVER_SOFTWARE),
-                ServerVars::REMOTE_ADDR       => $serverContext->getServerVar(ServerVars::REMOTE_ADDR),
-                ServerVars::REMOTE_PORT       => $serverContext->getServerVar(ServerVars::REMOTE_PORT),
-                ServerVars::SERVER_ADDR       => $serverContext->getServerVar(ServerVars::SERVER_ADDR),
-                ServerVars::SERVER_PORT       => $serverContext->getServerVar(ServerVars::SERVER_PORT),
-                ServerVars::SERVER_NAME       => $serverContext->getServerVar(ServerVars::SERVER_NAME),
-                'CONTENT_TYPE'                => $request->getHeader(HttpProtocol::HEADER_CONTENT_TYPE),
-                'DOCUMENT_URI'                => ''
-            );
-            
-            if ($serverContext->hasServerVar(ServerVars::REDIRECT_STATUS)) {
-                $fastCgiRequest->parameters[ServerVars::REDIRECT_STATUS] = $serverContext->getServerVar(ServerVars::REDIRECT_STATUS);
-            }
-            
-            if ($request->hasHeader(HttpProtocol::HEADER_CONTENT_LENGTH)) {
-                $fastCgiRequest->parameters['CONTENT_LENGTH'] = strlen($bodyContent = $request->getBodyContent());
-                $fastCgiRequest->stdin = $bodyContent;
-            }
-            
-            foreach ($request->getHeaders() as $key => $value) {
-                $fastCgiRequest->parameters['HTTP_' . str_replace('-', '_', strtoupper($key))] = $value;
-            }
-            
-            $fastCgiResponse = $connection->request($fastCgiRequest);
-            
-            $separator = "\r\n";
-            $exploded = explode($separator, $fastCgiResponse->content);
-            
-            if ($firstLine = reset($exploded)) {
+            try {
 
-                // extract header info
-                $extractedHeaderInfo = explode(': ', trim($firstLine));
-                if (!$extractedHeaderInfo) {
-                    throw new HttpException('Wrong header format');
+                // check if file does not exist
+                if (!$serverContext->hasServerVar(ServerVars::SCRIPT_FILENAME)) {
+                    // send 404
+                    $response->setStatusCode(404);
+                    throw new ModuleException(null, 404);
                 }
                 
-                // split name and value
-                list ($headerName, $headerValue) = $extractedHeaderInfo;
+                $environment = array(
+                    ServerVars::GATEWAY_INTERFACE => 'FastCGI/1.0',
+                    ServerVars::REQUEST_METHOD    => $serverContext->getServerVar(ServerVars::REQUEST_METHOD),
+                    ServerVars::SCRIPT_FILENAME   => $serverContext->getServerVar(ServerVars::SCRIPT_FILENAME),
+                    ServerVars::QUERY_STRING      => $serverContext->getServerVar(ServerVars::QUERY_STRING),
+                    ServerVars::SCRIPT_NAME       => $serverContext->getServerVar(ServerVars::SCRIPT_NAME),
+                    ServerVars::REQUEST_URI       => $serverContext->getServerVar(ServerVars::REQUEST_URI),
+                    ServerVars::DOCUMENT_ROOT     => $serverContext->getServerVar(ServerVars::DOCUMENT_ROOT),
+                    ServerVars::SERVER_PROTOCOL   => $serverContext->getServerVar(ServerVars::SERVER_PROTOCOL),
+                    ServerVars::HTTPS             => $serverContext->getServerVar(ServerVars::HTTPS),
+                    ServerVars::SERVER_SOFTWARE   => $serverContext->getServerVar(ServerVars::SERVER_SOFTWARE),
+                    ServerVars::REMOTE_ADDR       => $serverContext->getServerVar(ServerVars::REMOTE_ADDR),
+                    ServerVars::REMOTE_PORT       => $serverContext->getServerVar(ServerVars::REMOTE_PORT),
+                    ServerVars::SERVER_ADDR       => $serverContext->getServerVar(ServerVars::SERVER_ADDR),
+                    ServerVars::SERVER_PORT       => $serverContext->getServerVar(ServerVars::SERVER_PORT),
+                    ServerVars::SERVER_NAME       => $serverContext->getServerVar(ServerVars::SERVER_NAME),
+                    'DOCUMENT_URI'                => ''
+                );
                 
-                // normalize header names in case of 'Content-type' into 'Content-Type'
-                $headerName = str_replace(' ', '-', ucwords(str_replace('-', ' ', $headerName)));
+                if ($serverContext->hasServerVar(ServerVars::REDIRECT_STATUS)) {
+                    $environment[ServerVars::REDIRECT_STATUS] = $serverContext->getServerVar(ServerVars::REDIRECT_STATUS);
+                }
                 
-                if ($headerName === HttpProtocol::HEADER_STATUS) {
-                    $response->setStatus($headerValue);
+                if ($request->hasHeader(HttpProtocol::HEADER_CONTENT_TYPE)) {
+                    $environment['CONTENT_TYPE'] = $request->getHeader(HttpProtocol::HEADER_CONTENT_TYPE);
+                }
+                
+                if ($request->hasHeader(HttpProtocol::HEADER_CONTENT_LENGTH)) {
+                    $environment['CONTENT_LENGTH'] = $request->getHeader(HttpProtocol::HEADER_CONTENT_LENGTH);
+                }
+                
+                foreach ($request->getHeaders() as $key => $value) {
+                    $environment['HTTP_' . str_replace('-', '_', strtoupper($key))] = $value;
+                }
+                
+                $client = new Client('127.0.0.1', 9000);
+                
+                if ($request->hasHeader(HttpProtocol::HEADER_CONTENT_LENGTH) && $bodyContent = $request->getBodyContent()) {
+                    $client->request($environment, $bodyContent);
                 } else {
-                    $response->addHeader($headerName, $headerValue);
+                    $client->request($environment, '');
                 }
+                
+                $fastCgiResponse = $client->response();
+                
+                $response->setStatusCode($fastCgiResponse['statusCode']);
+                
+                $response->appendBodyStream($fastCgiResponse['body']);
 
-                while ($line = next($exploded)) {
+                if (array_key_exists('headers', $fastCgiResponse)) {
                 
-                    if ($line == $separator) {
-                        break;
-                    }
-                
-                    // extract header info
-                    $extractedHeaderInfo = explode(': ', trim($line));
-                    if (!$extractedHeaderInfo) {
-                        throw new HttpException('Wrong header format');
-                    }
-                
-                    // split name and value
-                    list ($headerName, $headerValue) = $extractedHeaderInfo;
-                
-                    // normalize header names in case of 'Content-type' into 'Content-Type'
-                    $headerName = str_replace(' ', '-', ucwords(str_replace('-', ' ', $headerName)));
-                
-                    if ($headerName === HttpProtocol::HEADER_STATUS) {
-                        $response->setStatus($headerValue);
-                    } else {
+                    foreach ($fastCgiResponse['headers'] as $header) {
+                        list ($headerName, $headerValue) = each($header);
                         $response->addHeader($headerName, $headerValue);
                     }
                 }
-                
-                $messageBody = '';
-                while ($line = next($exploded)) {
-                    $messageBody .= $line;
-                }
-                
-                $response->appendBodyStream($messageBody);
-                
-            }
 
-            // set response state to be dispatched after this without calling other modules process
-            $response->setState(HttpResponseStates::DISPATCH);
+                // set response state to be dispatched after this without calling other modules process
+                $response->setState(HttpResponseStates::DISPATCH);
+                
+            } catch (CommunicationException $ce) {
+                throw new ModuleException($ce);
+            }
         }
     }
 

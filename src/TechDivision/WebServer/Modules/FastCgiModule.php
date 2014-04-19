@@ -92,6 +92,7 @@ class FastCgiModule implements ModuleInterface
                     throw new ModuleException(null, 404);
                 }
                 
+                // prepare the Fast-CGI environment variables
                 $environment = array(
                     ServerVars::GATEWAY_INTERFACE => 'FastCGI/1.0',
                     ServerVars::REQUEST_METHOD    => $serverContext->getServerVar(ServerVars::REQUEST_METHOD),
@@ -111,38 +112,41 @@ class FastCgiModule implements ModuleInterface
                     'DOCUMENT_URI'                => ''
                 );
                 
+                // if we found a redirect status, add it to the environment variables
                 if ($serverContext->hasServerVar(ServerVars::REDIRECT_STATUS)) {
                     $environment[ServerVars::REDIRECT_STATUS] = $serverContext->getServerVar(ServerVars::REDIRECT_STATUS);
                 }
                 
+                // if we found a Content-Type header, add it to the environment variables
                 if ($request->hasHeader(HttpProtocol::HEADER_CONTENT_TYPE)) {
                     $environment['CONTENT_TYPE'] = $request->getHeader(HttpProtocol::HEADER_CONTENT_TYPE);
                 }
                 
+                // if we found a Content-Length header, add it to the environment variables
                 if ($request->hasHeader(HttpProtocol::HEADER_CONTENT_LENGTH)) {
                     $environment['CONTENT_LENGTH'] = $request->getHeader(HttpProtocol::HEADER_CONTENT_LENGTH);
                 }
                 
+                // create an HTTP_ environment variable for each header
                 foreach ($request->getHeaders() as $key => $value) {
                     $environment['HTTP_' . str_replace('-', '_', strtoupper($key))] = $value;
                 }
                 
+                // create a new Fast-CGI client and process the request
                 $client = new Client('127.0.0.1', 9000);
-                
-                if ($request->hasHeader(HttpProtocol::HEADER_CONTENT_LENGTH) && $bodyContent = $request->getBodyContent()) {
-                    $client->request($environment, $bodyContent);
+                if ($request->hasHeader(HttpProtocol::HEADER_CONTENT_LENGTH)) {
+                    $client->request($environment, $bodyContent = $request->getBodyContent());
                 } else {
                     $client->request($environment, '');
                 }
                 
+                // process the response
                 $fastCgiResponse = $client->response();
-                
                 $response->setStatusCode($fastCgiResponse['statusCode']);
-                
                 $response->appendBodyStream($fastCgiResponse['body']);
 
+                // set the headers found in the Fast-CGI response
                 if (array_key_exists('headers', $fastCgiResponse)) {
-                
                     foreach ($fastCgiResponse['headers'] as $header) {
                         list ($headerName, $headerValue) = each($header);
                         $response->addHeader($headerName, $headerValue);

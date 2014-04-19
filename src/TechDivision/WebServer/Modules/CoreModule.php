@@ -141,6 +141,14 @@ class CoreModule implements ModuleInterface
                     $pathInfo .= DIRECTORY_SEPARATOR . $pathParts[$i];
                 }
             }
+            
+            // @todo Load virtual host specific locations if available
+            $locations = $serverContext->getServerConfig()->getLocations();
+            foreach ($locations as $location) {
+                if (preg_match('/' . $location['condition'] . '/', $uriWithoutQueryString)) {
+                    // @todo set handler here if specified 
+                }
+            }
 
             // check if file handler is defined for that script
             if (isset($handlers['.' . $possibleValidPathExtension])) {

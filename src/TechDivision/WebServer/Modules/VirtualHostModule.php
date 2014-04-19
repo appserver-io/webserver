@@ -190,6 +190,16 @@ class VirtualHostModule implements ModuleInterface
                     $virtualHosts[$serverName]['accesses']
                 );
             }
+
+            // Add the locations we have (if any) to the configuration's location pool
+            if (!empty($virtualHosts[$serverName]['locations'])) {
+
+                // Set the locations we encountered as a temporary module var
+                $this->serverContext->setModuleVar(
+                    ModuleVars::VOLATILE_LOCATIONS,
+                    $virtualHosts[$serverName]['locations']
+                );
+            }
         }
 
     }

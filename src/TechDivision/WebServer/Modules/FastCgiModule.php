@@ -1,4 +1,5 @@
 <?php
+
 /**
  * \TechDivision\WebServer\Modules\FastCgiModule
  *
@@ -17,10 +18,13 @@
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/techdivision/TechDivision_WebServer
+ * @link       https://github.com/ebernhardson/fastcgi
  */
 
 namespace TechDivision\WebServer\Modules;
 
+use EBernhardson\FastCGI\Client;
+use EBernhardson\FastCGI\CommunicationException;
 use TechDivision\Http\HttpProtocol;
 use TechDivision\Http\HttpResponseStates;
 use TechDivision\Http\HttpRequestInterface;
@@ -31,11 +35,9 @@ use TechDivision\WebServer\Interfaces\ModuleInterface;
 use TechDivision\WebServer\Exceptions\ModuleException;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
 
-use EBernhardson\FastCGI\Client;
-use EBernhardson\FastCGI\CommunicationException;
-
 /**
- * Class CoreModule
+ * This module allows us to let requests be handled by Fast-CGI client 
+ * that has been configured in the web servers configuration. 
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
@@ -44,25 +46,39 @@ use EBernhardson\FastCGI\CommunicationException;
  * @copyright  2014 TechDivision GmbH <info@techdivision.com>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/techdivision/TechDivision_WebServer
+ * @link       https://github.com/ebernhardson/fastcgi
  */
-class FastCgiModule implements ModuleInterface
+class FastCgiModule extends Client implements ModuleInterface
 {
+    
     /**
-     * Defines the module name
+     * Defines the module name.
      *
      * @var string
      */
     const MODULE_NAME = 'fastcgi';
 
     /**
-     * Hold's the server context instance
+     * Holds the servers context instance.
      *
      * @var \TechDivision\WebServer\Interfaces\ServerContextInterface
      */
     protected $serverContext;
-
+    
     /**
-     * Implement's module logic for given hook
+     * Overwrite default constructor and initialize the module
+     * with the default values for a Fast-CGI connection.
+     * 
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct('127.0.0.1', 9000);
+    }
+    
+    /**
+     * Implements module logic for given hook, in this case passing the Fast-CGI request
+     * through to the configured Fast-CGI server.
      *
      * @param \TechDivision\Http\HttpRequestInterface  $request  The request object
      * @param \TechDivision\Http\HttpResponseInterface $response The response object
@@ -78,6 +94,7 @@ class FastCgiModule implements ModuleInterface
             return;
         }
         
+        // make the server context locally available
         $serverContext = $this->getServerContext();
 
         // check if server handler sais php modules should react on this request as file handler
@@ -132,16 +149,20 @@ class FastCgiModule implements ModuleInterface
                     $environment['HTTP_' . str_replace('-', '_', strtoupper($key))] = $value;
                 }
                 
-                // create a new Fast-CGI client and process the request
-                $client = new Client('127.0.0.1', 9000);
+                // create a new Fast-CGI connection and process the request
                 if ($request->hasHeader(HttpProtocol::HEADER_CONTENT_LENGTH)) {
-                    $client->request($environment, $bodyContent = $request->getBodyContent());
+                    $this->request($environment, $bodyContent = $request->getBodyContent());
                 } else {
-                    $client->request($environment, '');
+                    $this->request($environment, '');
                 }
                 
                 // process the response
-                $fastCgiResponse = $client->response();
+                $fastCgiResponse = $this->response();
+                
+                // close the Fast-CGI connection
+                $this->close();
+                
+                // set the Fast-CGI response value in the WebServer response
                 $response->setStatusCode($fastCgiResponse['statusCode']);
                 $response->appendBodyStream($fastCgiResponse['body']);
 
@@ -155,9 +176,9 @@ class FastCgiModule implements ModuleInterface
 
                 // set response state to be dispatched after this without calling other modules process
                 $response->setState(HttpResponseStates::DISPATCH);
-                
-            } catch (CommunicationException $ce) {
-                throw new ModuleException($ce);
+            
+            } catch (\Exception $e) { // catch all exceptions
+                throw new ModuleException($e);
             }
         }
     }

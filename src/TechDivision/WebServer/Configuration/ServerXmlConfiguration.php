@@ -40,9 +40,16 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
     /**
      * The configured rewrite rules
      *
-     * @var array $rewrites
+     * @var array
      */
     protected $rewrites;
+
+    /**
+     * The configured locations.
+     *
+     * @var array
+     */
+    protected $locations;
 
     /**
      * Holds the environmentVariables array
@@ -95,6 +102,8 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         $this->authentications = $this->prepareAuthentications($node);
         // prepare accesses
         $this->accesses = $this->prepareAccesses($node);
+        // prepare locations
+        $this->locations = $this->prepareLocations($node);
     }
 
     /**
@@ -175,6 +184,7 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
                     $virutalHosts[trim($virtualHostName)] = array(
                         'params' => $params,
                         'rewrites' => $this->prepareRewrites($virtualHostNode),
+                        'locations' => $this->prepareLocations($virtualHostNode),
                         'environmentVariables' => $this->prepareEnvironmentVariables($virtualHostNode),
                         'authentications' => $this->prepareAuthentications($virtualHostNode),
                         'accesses' => $this->prepareAccesses($virtualHostNode)
@@ -203,6 +213,26 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
             }
         }
         return $rewrites;
+    }
+
+    /**
+     * Prepares the locations array based on a simple xml elemend node
+     *
+     * @param \SimpleXMLElement $node The xml node
+     *
+     * @return array
+     */
+    public function prepareLocations(\SimpleXMLElement $node)
+    {
+        $locations = array();
+        if ($node->locations) {
+            foreach ($node->locations->location as $locationNode) {
+                // Cut of the SimpleXML attributes wrapper and attach it to our locations
+                $location = (array)$locationNode;
+                $locations[] = array_shift($location);
+            }
+        }
+        return $locations;
     }
 
     /**
@@ -530,7 +560,6 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
      */
     public function getEnvironmentVariables()
     {
-        // return the environmentVariables
         return $this->environmentVariables;
     }
 
@@ -542,5 +571,15 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
     public function getAccesses()
     {
         return $this->accesses;
+    }
+
+    /**
+     * Returns the locations.
+     *
+     * @return array
+     */
+    public function getLocations()
+    {
+        return $this->locations;
     }
 }

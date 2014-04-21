@@ -63,6 +63,39 @@
                             "definition" : "EXAMPLE_VARIABLE=test"
                         }
                     ]
+                },
+                {
+                    "name": "phpwebserver-fcgi.dev phpwebserver-fcgi.local phpwebserver-fcgi.test",
+                    "admin": "admin@phpwebserver.dev",
+                    "documentRoot": "var/www/cgi",
+                    "errorsPageTemplatePath": "var/www/errors/error.phtml",
+                    "rewrites" : [
+                        {
+                            "condition" : "-f{OR}-l{OR}-d",
+                            "target" : "",
+                            "flag" : "L"
+                        }
+                    ],
+                    "environmentVariables" : [
+                        {
+                            "condition" : "",
+                            "definition" : "EXAMPLE_VARIABLE=fastcgi"
+                        }
+                    ],
+                    "locations" : [
+                        {
+                            "condition" : "~*\\.php(\\\/|\\?|$",
+                            "handlers" : [
+                            	{ 
+                            		"name": "fastcgi", 
+                            		"extension": ".php",
+                            		"params" : [
+                            			{ "host": "127.0.0.1", "port": 9000 }
+                            		]	
+                            	}
+                            ]
+                        }
+                    ]
                 }
             ],
 
@@ -92,7 +125,8 @@
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
                 "\\TechDivision\\WebServer\\Modules\\AccessModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",
-                "\\TechDivision\\PhpModule\\PhpModule"
+                "\\TechDivision\\PhpModule\\PhpModule",
+                "\\TechDivision\\WebServer\\Modules\\FastCgiModule"
             ],
 
             "handlers": [
@@ -166,6 +200,39 @@
                             "definition" : "EXAMPLE_VARIABLE=test"
                         }
                     ]
+                },
+                {
+                    "name": "phpwebserver-fcgi.dev phpwebserver-fcgi.local phpwebserver-fcgi.test",
+                    "admin": "admin@phpwebserver.dev",
+                    "documentRoot": "var/www/cgi",
+                    "errorsPageTemplatePath": "var/www/errors/error.phtml",
+                    "rewrites" : [
+                        {
+                            "condition" : "-f{OR}-l{OR}-d",
+                            "target" : "",
+                            "flag" : "L"
+                        }
+                    ],
+                    "environmentVariables" : [
+                        {
+                            "condition" : "",
+                            "definition" : "EXAMPLE_VARIABLE=fastcgi"
+                        }
+                    ],
+                    "locations" : [
+                        {
+                            "condition" : "~*\\.php(\\\/|\\?|$",
+                            "handlers" : [
+                            	{ 
+                            		"name": "fastcgi", 
+                            		"extension": ".php",
+                            		"params": [ 
+                            			{ "host": "127.0.0.1", "port": 9000 }
+                            		]	
+                            	}
+                            ]
+                        }
+                    ]
                 }
             ],
 
@@ -195,7 +262,8 @@
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
                 "\\TechDivision\\WebServer\\Modules\\AccessModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",
-                "\\TechDivision\\PhpModule\\PhpModule"
+                "\\TechDivision\\PhpModule\\PhpModule",
+                "\\TechDivision\\WebServer\\Modules\\FastCgiModule"
             ],
 
             "handlers": [

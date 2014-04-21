@@ -161,6 +161,7 @@ class CoreModule implements ModuleInterface
             // process the locations for this request
             foreach ($locations as $location) {
                 if (preg_match('/' . $location['condition'] . '/', $uriWithoutQueryString)) {
+                    // if we find a configured file handler responsible for the path extension of this request
                     if (isset($location['handlers']['.' . $possibleValidPathExtension])) { 
                         // set/overwrite the default handler
                         $handlers['.' . $possibleValidPathExtension] = $location['handlers']['.' . $possibleValidPathExtension];
@@ -171,6 +172,7 @@ class CoreModule implements ModuleInterface
 
             // check if file handler is defined for that script
             if (isset($handlers['.' . $possibleValidPathExtension])) {
+                
                 // set specific server vars
                 $serverContext->setServerVar(ServerVars::SCRIPT_NAME, $scriptName);
                 // check if script is on filesystem
@@ -186,11 +188,19 @@ class CoreModule implements ModuleInterface
                     $serverContext->setServerVar(ServerVars::PATH_TRANSLATED, $documentRoot . $pathInfo);
                 }
                 
-                // set new handler to use for modules being able to react on this setting
+                // set the file handler to use for modules being able to react on this setting
                 $serverContext->setServerVar(
                     ServerVars::SERVER_HANDLER,
-                    $handlers['.' . $possibleValidPathExtension]
+                    $handlers['.' . $possibleValidPathExtension]['name']
                 );
+                
+                // if file handler params are given, set them as module var
+                if (isset($handlers['.' . $possibleValidPathExtension]['params'])) {
+                    $serverContext->setModuleVar(
+                        ModuleVars::VOLATILE_FILE_HANDLER_VARIABLES,
+                        $handlers['.' . $possibleValidPathExtension]['params']
+                    );
+                }
                 
                 // go out
                 return;

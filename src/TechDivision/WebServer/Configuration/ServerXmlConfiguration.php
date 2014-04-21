@@ -155,7 +155,15 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         $handlers = array();
         if ($node->handlers) {
             foreach ($node->handlers->handler as $handlerNode) {
-                $handlers[(string)$handlerNode->attributes()->extension] = (string)$handlerNode->attributes()->name;
+                $params = array();
+                foreach ($handlerNode->params->param as $paramNode) {
+                    $paramName = (string)$paramNode->attributes()->name;
+                    $params[$paramName] = (string)array_shift($handlerNode->xpath(".//param[@name='$paramName']"));
+                }
+                $handlers[(string)$handlerNode->attributes()->extension] = array(
+                    'name' => (string)$handlerNode->attributes()->name,
+                    'params' => $params
+                );
             }
         }
         return $handlers;
@@ -228,7 +236,10 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         if ($node->locations) {
             foreach ($node->locations->location as $locationNode) {
                 // Cut of the SimpleXML attributes wrapper and attach it to our locations
-                $location = (array)$locationNode;
+                $location = array(
+                    'condition' => $locationNode->attributes()->condition,
+                    'handlers' => $this->prepareHandlers($locationNode)
+                );
                 $locations[] = array_shift($location);
             }
         }

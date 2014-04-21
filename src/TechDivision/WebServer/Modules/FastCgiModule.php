@@ -125,8 +125,7 @@ class FastCgiModule extends Client implements ModuleInterface
                     ServerVars::REMOTE_PORT       => $serverContext->getServerVar(ServerVars::REMOTE_PORT),
                     ServerVars::SERVER_ADDR       => $serverContext->getServerVar(ServerVars::SERVER_ADDR),
                     ServerVars::SERVER_PORT       => $serverContext->getServerVar(ServerVars::SERVER_PORT),
-                    ServerVars::SERVER_NAME       => $serverContext->getServerVar(ServerVars::SERVER_NAME),
-                    'DOCUMENT_URI'                => ''
+                    ServerVars::SERVER_NAME       => $serverContext->getServerVar(ServerVars::SERVER_NAME)
                 );
                 
                 // if we found a redirect status, add it to the environment variables
@@ -168,11 +167,20 @@ class FastCgiModule extends Client implements ModuleInterface
 
                 // set the headers found in the Fast-CGI response
                 if (array_key_exists('headers', $fastCgiResponse)) {
-                    foreach ($fastCgiResponse['headers'] as $header) {
-                        list ($headerName, $headerValue) = each($header);
-                        $response->addHeader($headerName, $headerValue);
+                    foreach ($fastCgiResponse['headers'] as $headerName => $headerValue) {
+                        // if found an array, e. g. for the Set-Cookie header, we add each value
+                        if (is_array($headerValue)) {
+                            foreach ($headerValue as $value) {
+                                $response->addHeader($headerName, $value);
+                            }
+                        } else {
+                            $response->addHeader($headerName, $headerValue);
+                        }
                     }
                 }
+
+                // add the X-Powered-By header
+                $response->addHeader(HttpProtocol::HEADER_X_POWERED_BY, __CLASS__);
 
                 // set response state to be dispatched after this without calling other modules process
                 $response->setState(HttpResponseStates::DISPATCH);

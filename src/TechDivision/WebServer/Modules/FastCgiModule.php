@@ -23,8 +23,6 @@
 
 namespace TechDivision\WebServer\Modules;
 
-use EBernhardson\FastCGI\Client;
-use EBernhardson\FastCGI\CommunicationException;
 use TechDivision\Http\HttpProtocol;
 use TechDivision\Http\HttpResponseStates;
 use TechDivision\Http\HttpRequestInterface;
@@ -49,7 +47,7 @@ use TechDivision\WebServer\Interfaces\ServerContextInterface;
  * @link       https://github.com/techdivision/TechDivision_WebServer
  * @link       https://github.com/ebernhardson/fastcgi
  */
-class FastCgiModule extends Client implements ModuleInterface
+class FastCgiModule extends FastCgiClient implements ModuleInterface
 {
     
     /**

@@ -19,33 +19,17 @@
             "role": "Developer"
         }
     ],
-    "repositories": [
-	    {
-	    	"type": "package",
-	    	"package": {
-	        	"name": "wagnert/fastcgi",
-	        	"version": "master",
-	        	"source": {
-	        		"url": "https://github.com/wagnert/fastcgi.git",
-	            	"type": "git",
-	        		"reference": "master"
-	        	}
-	        }
-	    }	
-    ],
     "require": {
         "php": ">=5.4.0",
         "techdivision/http": "dev-master",
         "techdivision/rewritemodule": "dev-master",
         "techdivision/phpmodule": "dev-master",
         "monolog/monolog": "*",
-        "psr/log": "*",
-        "wagnert/fastcgi" : "dev-master"
+        "psr/log": "*"
     },
     "autoload": {
         "psr-0": {
- 			"TechDivision": [ "src/", "tests/" ], 
- 			"EBernhardson\\FastCGI": [ "vendor/wagnert/fastcgi/lib/" ]        	
+ 			"TechDivision": [ "src/", "tests/" ]      	
         }
     }
 }

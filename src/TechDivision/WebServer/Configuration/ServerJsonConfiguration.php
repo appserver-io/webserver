@@ -587,7 +587,7 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
                 'handlers' => $this->prepareHandlers($location);
             );
         }
-        return $environmentVariables;
+        return $locations;
     }
 
     /**

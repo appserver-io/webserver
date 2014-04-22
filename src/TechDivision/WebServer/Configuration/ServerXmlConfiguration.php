@@ -99,7 +99,7 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         $this->keepAliveMax = (string)array_shift($node->xpath("./params/param[@name='keepAliveMax']"));
         $this->keepAliveTimeout = (string)array_shift($node->xpath("./params/param[@name='keepAliveTimeout']"));
         $this->errorsPageTemplatePath = (string)array_shift($node->xpath("./params/param[@name='errorsPageTemplatePath']"));
-        $this->user = (string)array_shift($node->xpath("./params/param[@name='admin']"));
+        $this->user = (string)array_shift($node->xpath("./params/param[@name='user']"));
         $this->group = (string)array_shift($node->xpath("./params/param[@name='group']"));
 
         // prepare modules
@@ -172,9 +172,11 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         if ($node->handlers) {
             foreach ($node->handlers->handler as $handlerNode) {
                 $params = array();
-                foreach ($handlerNode->params->param as $paramNode) {
-                    $paramName = (string)$paramNode->attributes()->name;
-                    $params[$paramName] = (string)array_shift($handlerNode->xpath(".//param[@name='$paramName']"));
+                if (is_array($handlerNode->params->param)) {
+                    foreach ($handlerNode->params->param as $paramNode) {
+                        $paramName = (string)$paramNode->attributes()->name;
+                        $params[$paramName] = (string)array_shift($handlerNode->xpath(".//param[@name='$paramName']"));
+                    }
                 }
                 $handlers[(string)$handlerNode->attributes()->extension] = array(
                     'name' => (string)$handlerNode->attributes()->name,
@@ -253,10 +255,10 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
             foreach ($node->locations->location as $locationNode) {
                 // Cut of the SimpleXML attributes wrapper and attach it to our locations
                 $location = array(
-                    'condition' => $locationNode->attributes()->condition,
+                    'condition' => (string) $locationNode->attributes()->condition,
                     'handlers' => $this->prepareHandlers($locationNode)
                 );
-                $locations[] = array_shift($location);
+                $locations[] = $location;
             }
         }
         return $locations;

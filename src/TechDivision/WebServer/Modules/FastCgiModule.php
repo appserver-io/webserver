@@ -185,7 +185,7 @@ class FastCgiModule extends Client implements ModuleInterface
                     // if found an array, e. g. for the Set-Cookie header, we add each value
                     if (is_array($headerValue)) {
                         foreach ($headerValue as $value) {
-                            $response->addHeader($headerName, $value);
+                            $response->addHeader($headerName, $value, true);
                         }
                     } else {
                         $response->addHeader($headerName, $headerValue);

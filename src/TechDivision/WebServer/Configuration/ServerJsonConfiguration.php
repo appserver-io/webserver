@@ -589,4 +589,24 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
         }
         return $environmentVariables;
     }
+
+    /**
+     * Returns the groupname to run the processes under.
+     *
+     * @return string
+     */
+    public function getUser()
+    {
+        return $this->data->user;
+    }
+
+    /**
+     * Returns the username to run the processes under.
+     *
+     * @return string
+     */
+    public function getGroup()
+    {
+        return $this->data->group;
+    }
 }

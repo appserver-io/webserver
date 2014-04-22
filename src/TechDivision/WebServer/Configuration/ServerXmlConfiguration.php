@@ -57,6 +57,20 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
      * @var array
      */
     protected $environmentVariables = array();
+    
+    /**
+     * The username to run the processes under.
+     * 
+     * @var string
+     */
+    protected $user;
+    
+    /**
+     * The groupname to run the processes under.
+     * 
+     * @var string
+     */
+    protected $group;
 
     /**
      * Constructs config
@@ -85,6 +99,8 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         $this->keepAliveMax = (string)array_shift($node->xpath("./params/param[@name='keepAliveMax']"));
         $this->keepAliveTimeout = (string)array_shift($node->xpath("./params/param[@name='keepAliveTimeout']"));
         $this->errorsPageTemplatePath = (string)array_shift($node->xpath("./params/param[@name='errorsPageTemplatePath']"));
+        $this->user = (string)array_shift($node->xpath("./params/param[@name='admin']"));
+        $this->group = (string)array_shift($node->xpath("./params/param[@name='group']"));
 
         // prepare modules
         $this->modules = $this->prepareModules($node);
@@ -592,5 +608,25 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
     public function getLocations()
     {
         return $this->locations;
+    }
+
+    /**
+     * Returns the user to run the processes with.
+     *
+     * @return string
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * Returns the group to run the processes with.
+     *
+     * @return string
+     */
+    public function getGroup()
+    {
+        return $this->group;
     }
 }

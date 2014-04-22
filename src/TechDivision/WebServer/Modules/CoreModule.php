@@ -27,6 +27,7 @@ use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
 use TechDivision\WebServer\Dictionaries\ModuleHooks;
 use TechDivision\WebServer\Dictionaries\ServerVars;
+use TechDivision\WebServer\Dictionaries\ModuleVars;
 use TechDivision\WebServer\Interfaces\ModuleInterface;
 use TechDivision\WebServer\Interfaces\ServerContextInterface;
 use TechDivision\WebServer\Exceptions\ModuleException;
@@ -46,18 +47,25 @@ use TechDivision\WebServer\Dictionaries\MimeTypes;
 class CoreModule implements ModuleInterface
 {
     /**
-     * Defines the module name
+     * Defines the module name.
      *
      * @var string
      */
     const MODULE_NAME = 'core';
 
     /**
-     * Hold's the server context instance
+     * Holds the server context instance
      *
      * @var \TechDivision\WebServer\Interfaces\ServerContextInterface
      */
     protected $serverContext;
+
+    /**
+     * Holds an array of all locations.
+     *
+     * @var array
+     */
+    protected $locations;
 
     /**
      * Implement's module logic for given hook
@@ -141,9 +149,30 @@ class CoreModule implements ModuleInterface
                     $pathInfo .= DIRECTORY_SEPARATOR . $pathParts[$i];
                 }
             }
+                
+            // load the locations
+            $locations = $this->locations;
+            
+            // check if there are some volatile location definitions so use them and override global locations
+            if ($this->serverContext->hasModuleVar(ModuleVars::VOLATILE_LOCATIONS)) {
+                $locations = $this->serverContext->getModuleVar(ModuleVars::VOLATILE_LOCATIONS);
+            }
+            
+            // process the locations for this request
+            foreach ($locations as $location) {
+                if (preg_match('/' . $location['condition'] . '/', $uriWithoutQueryString)) {
+                    // if we find a configured file handler responsible for the path extension of this request
+                    if (isset($location['handlers']['.' . $possibleValidPathExtension])) { 
+                        // set/overwrite the default handler
+                        $handlers['.' . $possibleValidPathExtension] = $location['handlers']['.' . $possibleValidPathExtension];
+                        break;
+                    }
+                }
+            }
 
             // check if file handler is defined for that script
             if (isset($handlers['.' . $possibleValidPathExtension])) {
+                
                 // set specific server vars
                 $serverContext->setServerVar(ServerVars::SCRIPT_NAME, $scriptName);
                 // check if script is on filesystem
@@ -158,12 +187,21 @@ class CoreModule implements ModuleInterface
                     $serverContext->setServerVar(ServerVars::PATH_INFO, $pathInfo);
                     $serverContext->setServerVar(ServerVars::PATH_TRANSLATED, $documentRoot . $pathInfo);
                 }
-                // set new handler to use for modules being able to react on this setting
+                
+                // set the file handler to use for modules being able to react on this setting
                 $serverContext->setServerVar(
                     ServerVars::SERVER_HANDLER,
-                    $handlers['.' . $possibleValidPathExtension]
+                    $handlers['.' . $possibleValidPathExtension]['name']
                 );
-
+                
+                // if file handler params are given, set them as module var
+                if (isset($handlers['.' . $possibleValidPathExtension]['params'])) {
+                    $serverContext->setModuleVar(
+                        ModuleVars::VOLATILE_FILE_HANDLER_VARIABLES,
+                        $handlers['.' . $possibleValidPathExtension]['params']
+                    );
+                }
+                
                 // go out
                 return;
 
@@ -244,6 +282,7 @@ class CoreModule implements ModuleInterface
     public function init(ServerContextInterface $serverContext)
     {
         $this->serverContext = $serverContext;
+        $this->locations = $serverContext->getServerConfig()->getLocations();
     }
 
     /**

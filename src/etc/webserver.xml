@@ -129,6 +129,7 @@
             </rewrites>
 
             <virtualHosts>
+            
                 <virtualHost name="127.0.0.1 phpwebserver.dev phpwebserver.local phpwebserver.test">
                     <params>
                         <param name="admin" type="string">admin@phpwebserver.dev</param>
@@ -139,6 +140,42 @@
                     <rewrites>
                         <rewrite condition="-f{OR}-l{OR}-d" target="" flag="L"/>
                     </rewrites>
+                    <locations>
+	                    <location condition="~*\.php(\/|\?|$)">
+	                    	<fileHandlers>
+						        <fileHandler name="php" extension=".php" />
+	                    	</fileHandlers>
+					    </location>
+                    </locations>
+                </virtualHost>
+                
+                <virtualHost name="phpwebserver-fcgi.dev phpwebserver-fcgi.local phpwebserver-fcgi.test">
+                    <params>
+                        <param name="admin" type="string">admin@phpwebserver.dev</param>
+                        <!-- Note: it's intended to use a relative path to get content from webservers basedir/var/www -->
+                        <param name="documentRoot" type="string">var/www/cgi</param>
+                        <param name="errorsPageTemplatePath" type="string">var/www/errors/error.phtml</param>
+                    </params>
+                    <rewrites>
+                        <rewrite condition="-f{OR}-l{OR}-d" target="" flag="L"/>
+                    </rewrites>
+                    <environmentVariables>
+                        <environmentVariable condition="" definition="EXAMPLE_VARIABLE=fastcgi" />
+                    </environmentVariables>
+                    <locations>
+	                    <location condition="~*\.php(\/|\?|$)">
+	                    	<handlers>
+						        <handler name="fastcgi" extension=".php">
+		                        	<!--
+		                        	<params>
+		                        		<param name="host" type="string">127.0.0.1</param>
+		                        		<param name="port" type="integer">9000</param>
+		                        	</params>
+		                        	 -->
+						        </handler>
+	                    	</handlers>
+					    </location>
+                    </locations>
                 </virtualHost>
 
                 <virtualHost name="magento.local">
@@ -202,6 +239,7 @@
                 <module type="\TechDivision\WebServer\Modules\AccessModule"/>
                 <module type="\TechDivision\WebServer\Modules\CoreModule"/>
                 <module type="\TechDivision\PhpModule\PhpModule"/>
+                <module type="\TechDivision\PhpModule\FastCgiModule"/>
                 <!-- RESPONSE_PRE hook -->
                 <module type="\TechDivision\WebServer\Modules\DeflateModule"/>
             </modules>
@@ -238,6 +276,7 @@
             </params>
 
             <virtualHosts>
+            
                 <virtualHost name="phpwebserver.dev phpwebserver.local phpwebserver.test">
                     <params>
                         <param name="admin" type="string">admin@phpwebserver.dev</param>
@@ -251,6 +290,35 @@
                     <environmentVariables>
                         <environmentVariable condition="" definition="EXAMPLE_VARIABLE=test" />
                     </environmentVariables>
+                </virtualHost>
+                
+                <virtualHost name="phpwebserver-fcgi.dev phpwebserver-fcgi.local phpwebserver-fcgi.test">
+                    <params>
+                        <param name="admin" type="string">admin@phpwebserver.dev</param>
+                        <!-- Note: it's intended to use a relative path to get content from webservers basedir/var/www -->
+                        <param name="documentRoot" type="string">var/www/cgi</param>
+                        <param name="errorsPageTemplatePath" type="string">var/www/errors/error.phtml</param>
+                    </params>
+                    <rewrites>
+                        <rewrite condition="-f{OR}-l{OR}-d" target="" flag="L"/>
+                    </rewrites>
+                    <environmentVariables>
+                        <environmentVariable condition="" definition="EXAMPLE_VARIABLE=fastcgi" />
+                    </environmentVariables>
+                    <locations>
+	                    <location condition="~*\.php(\/|\?|$)">
+	                    	<handlers>
+						        <handler name="fastcgi" extension=".php">
+		                        	<!--
+		                        	<params>
+		                        		<param name="host" type="string">127.0.0.1</param>
+		                        		<param name="port" type="integer">9000</param>
+		                        	</params>
+		                        	 -->
+						        </handler>
+	                    	</handlers>
+					    </location>
+                    </locations>
                 </virtualHost>
 
                 <virtualHost name="magento.local">
@@ -289,6 +357,7 @@
                         <environmentVariable condition="Basic ([a-zA-Z0-9\+/=]+)@$Authorization" definition="REMOTE_AUTHORIZATION=$1" />
                     </environmentVariables>
                 </virtualHost>
+                
             </virtualHosts>
 
             <environmentVariables>
@@ -349,6 +418,7 @@
                 <module type="\TechDivision\WebServer\Modules\AccessModule"/>
                 <module type="\TechDivision\WebServer\Modules\CoreModule"/>
                 <module type="\TechDivision\PhpModule\PhpModule"/>
+                <module type="\TechDivision\PhpModule\FastCgiModule"/>
                 <!-- RESPONSE_PRE hook -->
                 <module type="\TechDivision\WebServer\Modules\DeflateModule"/>
             </modules>

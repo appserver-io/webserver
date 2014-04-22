@@ -108,13 +108,8 @@ class ServerContext implements ServerContextInterface
         // set configuration
         $this->serverConfig = $serverConfig;
 
-        // init env vars
-        $this->initEnvVars();
-        // init server vars
-        $this->initServerVars();
-        // init module vars
-        $this->initModuleVars();
-
+        // init vars
+        $this->initVars();
     }
 
     /**
@@ -197,6 +192,18 @@ class ServerContext implements ServerContextInterface
             // throw exception
             throw new ServerException("Logger name '$loggerName' does not exist.", 500);
         }
+    }
+
+    /**
+     * Resets all var used in server context
+     *
+     * @return void
+     */
+    public function initVars()
+    {
+        $this->initServerVars();
+        $this->initModuleVars();
+        $this->initEnvVars();
     }
 
     /**
@@ -289,8 +296,9 @@ class ServerContext implements ServerContextInterface
 
         // set document root
         $documentRoot = $this->getServerConfig()->getDocumentRoot();
-        // check if relative path is given and make is absolute by using cwd as prefix
-        if (substr($documentRoot, 0, 1) !== "/") {
+
+        // check if relative path is given and make is absolute by using getcwd() as prefix
+        if (!preg_match("/^([a-zA-Z]:|\/)/", $documentRoot)) {
             $documentRoot = getcwd() . DIRECTORY_SEPARATOR . $documentRoot;
         }
 

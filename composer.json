@@ -40,7 +40,7 @@
         "techdivision/phpmodule": "dev-master",
         "monolog/monolog": "*",
         "psr/log": "*",
-        "wagnert/fastcgi" : "master"
+        "wagnert/fastcgi" : "dev-master"
     },
     "autoload": {
         "psr-0": {

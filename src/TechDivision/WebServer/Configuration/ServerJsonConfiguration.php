@@ -94,6 +94,13 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     protected $accesses;
 
     /**
+     * The configured locations.
+     *
+     * @var array
+     */
+    protected $locations;
+
+    /**
      * Constructs config
      *
      * @param \stdClass $data The data object use
@@ -379,6 +386,19 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     }
 
     /**
+     * Returns the locations.
+     *
+     * @return array
+     */
+    public function getLocations()
+    {
+        if (!$this->locations) {
+            $this->locations = $this->prepareLocations($this->data);
+        }
+        return $this->locations;
+    }
+
+    /**
      * Prepares the modules array based on a data object
      *
      * @param \stdClass $data The data object
@@ -417,7 +437,12 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     {
         $handlers = array();
         foreach ($data->handlers as $handler) {
-            $handlers[$handler->extension] = $handler->name;
+            // get all params
+            $params = get_object_vars($handler);
+            // remove name
+            unset($params["name"]);
+            // set the handler information
+            $handlers[$handler->extension] = array($handler->name, $params);
         }
         return $handlers;
     }
@@ -431,7 +456,7 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
      */
     public function prepareVirtualHosts(\stdClass $data)
     {
-        $virutalHosts = array();
+        $virtualHosts = array();
         foreach ($data->virtualHosts as $virtualHost) {
             // explode virtuaHost names
             $virtualHostNames = explode(' ', $virtualHost->name);
@@ -442,16 +467,17 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
             // set all virtual host information's
             foreach ($virtualHostNames as $virtualHostName) {
                 // add all virtual hosts params per key for faster matching later on
-                $virutalHosts[trim($virtualHostName)] = array(
+                $virtualHosts[trim($virtualHostName)] = array(
                     'params' => $params,
                     'rewrites' => $this->prepareRewrites($virtualHost->rewrites),
+                    'locations' => $this->prepareLocations($virtualHost->locations),
                     'environmentVariables' => $this->prepareEnvironmentVariables($virtualHost->environmentVariables),
                     'authentication' => $this->prepareAuthentications($virtualHost->authentication),
                     'accesses' => $this->prepareAccesses($virtualHost->accesses)
                 );
             }
         }
-        return $virutalHosts;
+        return $virtualHosts;
     }
 
     /**
@@ -540,5 +566,47 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
             $accesses[$accessType][] = $params;
         }
         return $accesses;
+    }
+
+    /**
+     * Prepares the locations array based on a data object
+     *
+     * @param \stdClass $data The data object
+     *
+     * @return array
+     */
+    public function prepareLocations(\stdClass $data)
+    {
+        $locations = array();
+        // prepare the array with the location variables
+        foreach ($data->locations as $location) {
+
+            // Build up the array entry
+            $locations[] = array(
+                'condition' => $location->condition,
+                'handlers' => $this->prepareHandlers($location);
+            );
+        }
+        return $environmentVariables;
+    }
+
+    /**
+     * Returns the groupname to run the processes under.
+     *
+     * @return string
+     */
+    public function getUser()
+    {
+        return $this->data->user;
+    }
+
+    /**
+     * Returns the username to run the processes under.
+     *
+     * @return string
+     */
+    public function getGroup()
+    {
+        return $this->data->group;
     }
 }

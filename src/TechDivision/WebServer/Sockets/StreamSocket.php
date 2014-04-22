@@ -134,7 +134,7 @@ class StreamSocket implements SocketInterface
      * @param int $readLength     The max length to read for a line.
      * @param int $receiveTimeout The max time to wait for read the next line
      *
-     * @return string;
+     * @return string
      * @throws \TechDivision\WebServer\Sockets\SocketReadTimeoutException
      */
     public function readLine($readLength = 1024, $receiveTimeout = null)
@@ -157,7 +157,7 @@ class StreamSocket implements SocketInterface
      * @param int $readLength     The max length to read for a line.
      * @param int $receiveTimeout The max time to wait for read the next line
      *
-     * @return string;
+     * @return string
      * @throws \TechDivision\WebServer\Sockets\SocketReadTimeoutException
      */
     public function read($readLength = 1024, $receiveTimeout = null)

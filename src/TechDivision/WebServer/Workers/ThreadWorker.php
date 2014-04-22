@@ -132,10 +132,10 @@ class ThreadWorker extends \Thread implements WorkerInterface
         // if we're on a OS (not Windows) that supports
         // POSIX we change the configured user/group
         if (extension_loaded('posix')) {
-        
+
             // get server context
-            $serverConfig = $this->getServerContext()->getServerConfig();;
-            
+            $serverConfig = $this->getServerContext()->getServerConfig();
+
             // set the UID to run the thread with
             if ($serverConfig->getUser()) {
                 // this will also extract a GID that will be used if no group has been configured
@@ -151,7 +151,7 @@ class ThreadWorker extends \Thread implements WorkerInterface
                 posix_setgid($gid);
             }
         }
-        
+
         // set current dir to base dir for relative dirs
         chdir(WEBSERVER_BASEDIR);
         // setup environment for worker
@@ -172,9 +172,9 @@ class ThreadWorker extends \Thread implements WorkerInterface
      */
     public function work()
     {
-        
+
         try {
-            
+
             // set should restart initial flag
             $this->shouldRestart = false;
 

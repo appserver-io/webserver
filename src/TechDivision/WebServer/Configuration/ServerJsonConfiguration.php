@@ -584,7 +584,7 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
             // Build up the array entry
             $locations[] = array(
                 'condition' => $location->condition,
-                'handlers' => $this->prepareHandlers($location);
+                'handlers' => $this->prepareHandlers($location)
             );
         }
         return $locations;

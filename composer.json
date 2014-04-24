@@ -24,6 +24,7 @@
         "techdivision/http": "dev-master",
         "techdivision/rewritemodule": "dev-master",
         "techdivision/phpmodule": "dev-master",
+        "techdivision/fastcgimodule": "dev-master",
         "monolog/monolog": "*",
         "psr/log": "*"
     },

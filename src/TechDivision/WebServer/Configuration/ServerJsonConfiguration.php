@@ -584,29 +584,9 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
             // Build up the array entry
             $locations[] = array(
                 'condition' => $location->condition,
-                'handlers' => $this->prepareHandlers($location);
+                'handlers' => $this->prepareHandlers($location)
             );
         }
         return $locations;
-    }
-
-    /**
-     * Returns the groupname to run the processes under.
-     *
-     * @return string
-     */
-    public function getUser()
-    {
-        return $this->data->user;
-    }
-
-    /**
-     * Returns the username to run the processes under.
-     *
-     * @return string
-     */
-    public function getGroup()
-    {
-        return $this->data->group;
     }
 }

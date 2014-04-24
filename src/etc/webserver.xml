@@ -83,8 +83,6 @@
                 <param name="keepAliveMax" type="integer">64</param>
                 <param name="keepAliveTimeout" type="integer">5</param>
                 <param name="errorsPageTemplatePath" type="string"/>
-                <param name="user" type="string">nobody</param>
-                <param name="group" type="string">nobody</param>
             </params>
 
             <authentications>
@@ -142,13 +140,6 @@
                     <rewrites>
                         <rewrite condition="-f{OR}-l{OR}-d" target="" flag="L"/>
                     </rewrites>
-                    <locations>
-	                    <location condition="~*\.php(\/|\?|$)">
-	                    	<fileHandlers>
-						        <fileHandler name="php" extension=".php" />
-	                    	</fileHandlers>
-					    </location>
-                    </locations>
                 </virtualHost>
                 
                 <virtualHost name="phpwebserver-fcgi.dev phpwebserver-fcgi.local phpwebserver-fcgi.test">
@@ -241,7 +232,7 @@
                 <module type="\TechDivision\WebServer\Modules\AccessModule"/>
                 <module type="\TechDivision\WebServer\Modules\CoreModule"/>
                 <module type="\TechDivision\PhpModule\PhpModule"/>
-                <module type="\TechDivision\WebServer\Modules\FastCgiModule"/>
+                <module type="\TechDivision\FastCgiModule\FastCgiModule"/>
                 <!-- RESPONSE_PRE hook -->
                 <module type="\TechDivision\WebServer\Modules\DeflateModule"/>
             </modules>
@@ -275,8 +266,6 @@
                 <param name="keepAliveMax" type="integer">64</param>
                 <param name="keepAliveTimeout" type="integer">5</param>
                 <param name="errorsPageTemplatePath" type="string"/>
-                <param name="user" type="string">nobody</param>
-                <param name="group" type="string">nobody</param>
             </params>
 
             <virtualHosts>
@@ -422,7 +411,7 @@
                 <module type="\TechDivision\WebServer\Modules\AccessModule"/>
                 <module type="\TechDivision\WebServer\Modules\CoreModule"/>
                 <module type="\TechDivision\PhpModule\PhpModule"/>
-                <module type="\TechDivision\WebServer\Modules\FastCgiModule"/>
+                <module type="\TechDivision\FastCgiModule\FastCgiModule"/>
                 <!-- RESPONSE_PRE hook -->
                 <module type="\TechDivision\WebServer\Modules\DeflateModule"/>
             </modules>

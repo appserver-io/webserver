@@ -128,7 +128,7 @@ class ThreadWorker extends \Thread implements WorkerInterface
      * @return void
      */
     public function run()
-    {   
+    {
         // set current dir to base dir for relative dirs
         chdir(WEBSERVER_BASEDIR);
         // setup environment for worker
@@ -149,9 +149,9 @@ class ThreadWorker extends \Thread implements WorkerInterface
      */
     public function work()
     {
-        
+
         try {
-            
+
             // set should restart initial flag
             $this->shouldRestart = false;
 

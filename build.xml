@@ -55,7 +55,7 @@
 
     <!-- ==================================================================== -->
     <!-- Generates the API documentation                                      -->
-    <!-- ==================================================================== -->   
+    <!-- ==================================================================== -->
     <target name="apidoc" description="Generates the API documentation.">
          <exec executable="phpdoc">
             <arg line="-t ${php-target.dir}/docs -d ${php-src.dir}"/>
@@ -68,7 +68,7 @@
     <target name="phpcs" description="Runs the code sniffer and generates a report.">
         <exec executable="phpcs" failonerror="true">
             <!-- call phpcs without report-file to get error message on build console -->
-            <arg line="-n --extensions=php --standard=phpcs.xml ./"/>
+            <arg line="-n --extensions=php --standard=phpcs.xml --ignore=src/TechDivision/WebServer/Modules/FastCgiClient.php --ignore=src/TechDivision/WebServer/Modules/CommunicationException.php ./"/>
         </exec>
     </target>
 

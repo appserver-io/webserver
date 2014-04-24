@@ -149,20 +149,20 @@ class CoreModule implements ModuleInterface
                     $pathInfo .= DIRECTORY_SEPARATOR . $pathParts[$i];
                 }
             }
-                
+
             // load the locations
             $locations = $this->locations;
-            
+
             // check if there are some volatile location definitions so use them and override global locations
             if ($this->serverContext->hasModuleVar(ModuleVars::VOLATILE_LOCATIONS)) {
                 $locations = $this->serverContext->getModuleVar(ModuleVars::VOLATILE_LOCATIONS);
             }
-            
+
             // process the locations for this request
             foreach ($locations as $location) {
                 if (preg_match('/' . $location['condition'] . '/', $uriWithoutQueryString)) {
                     // if we find a configured file handler responsible for the path extension of this request
-                    if (isset($location['handlers']['.' . $possibleValidPathExtension])) { 
+                    if (isset($location['handlers']['.' . $possibleValidPathExtension])) {
                         // set/overwrite the default handler
                         $handlers['.' . $possibleValidPathExtension] = $location['handlers']['.' . $possibleValidPathExtension];
                         break;
@@ -172,7 +172,7 @@ class CoreModule implements ModuleInterface
 
             // check if file handler is defined for that script
             if (isset($handlers['.' . $possibleValidPathExtension])) {
-                
+
                 // set specific server vars
                 $serverContext->setServerVar(ServerVars::SCRIPT_NAME, $scriptName);
                 // check if script is on filesystem
@@ -187,13 +187,13 @@ class CoreModule implements ModuleInterface
                     $serverContext->setServerVar(ServerVars::PATH_INFO, $pathInfo);
                     $serverContext->setServerVar(ServerVars::PATH_TRANSLATED, $documentRoot . $pathInfo);
                 }
-                
+
                 // set the file handler to use for modules being able to react on this setting
                 $serverContext->setServerVar(
                     ServerVars::SERVER_HANDLER,
                     $handlers['.' . $possibleValidPathExtension]['name']
                 );
-                
+
                 // if file handler params are given, set them as module var
                 if (isset($handlers['.' . $possibleValidPathExtension]['params'])) {
                     $serverContext->setModuleVar(
@@ -201,7 +201,7 @@ class CoreModule implements ModuleInterface
                         $handlers['.' . $possibleValidPathExtension]['params']
                     );
                 }
-                
+
                 // go out
                 return;
 

@@ -179,11 +179,14 @@ class AccessModule implements ModuleInterface
         }
 
         if (isset($accesses['deny'])) {
+
+            var_dump($accesses['deny']);
+
             // check deny accesses informations if something matches
             foreach ($accesses['deny'] as $accessData) {
 
                 // initial nothing denies the request
-                $matchDeny = true;
+                $matchDeny = false;
 
                 // check if accessData matches server vars
                 foreach ($accessData as $serverVar => $varPattern) {
@@ -191,12 +194,12 @@ class AccessModule implements ModuleInterface
                     // check if server var exists
                     if ($serverContext->hasServerVar($serverVar)) {
                         // check if pattern matches
-                        if (!preg_match(
+                        if (preg_match(
                             '/' . $varPattern . '/',
                             $serverContext->getServerVar($serverVar)
                         )) {
-                            $matchDeny = false;
-                            // break here if anything not matches
+                            $matchDeny = true;
+                            // break here if anything matches
                             break;
                         }
                     }

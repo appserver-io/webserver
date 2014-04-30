@@ -23,7 +23,7 @@ namespace TechDivision\WebServer\Configuration\Extension;
 /**
  * TechDivision\WebServer\Configuration\Extension\InjectorInterface
  *
- * <TODO CLASS DESCRIPTION>
+ * Interface for injector classes
  *
  * @category   Appserver
  * @package    TechDivision_WebServer

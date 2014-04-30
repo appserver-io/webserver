@@ -23,7 +23,7 @@ namespace TechDivision\WebServer\Configuration\Extension;
 /**
  * TechDivision\WebServer\Configuration\Extension\StringInjector
  *
- * <TODO CLASS DESCRIPTION>
+ * This class will get create a string from a single-column DB table called "virtualHost"
  *
  * @category   Appserver
  * @package    TechDivision_WebServer
@@ -37,7 +37,7 @@ namespace TechDivision\WebServer\Configuration\Extension;
 class StringInjector extends AbstractInjector
 {
     /**
-     * @var  $data <TODO FIELD COMMENT>
+     * @var array $data The data collected from the DB
      */
     protected $data;
 

@@ -23,7 +23,7 @@ namespace TechDivision\WebServer\Configuration\Extension;
 /**
  * TechDivision\WebServer\Configuration\Extension\ArrayInjector
  *
- * <TODO CLASS DESCRIPTION>
+ * Will inject data in the form of an array of the structure "key" => "value" (DB must look accordingly)
  *
  * @category   Appserver
  * @package    TechDivision_WebServer
@@ -37,7 +37,7 @@ namespace TechDivision\WebServer\Configuration\Extension;
 class ArrayInjector extends AbstractInjector
 {
     /**
-     * @var  $data <TODO FIELD COMMENT>
+     * @var array $data The data collected from the DB
      */
     protected $data;
 

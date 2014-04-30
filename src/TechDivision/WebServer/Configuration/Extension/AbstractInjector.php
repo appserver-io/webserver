@@ -23,7 +23,7 @@ namespace TechDivision\WebServer\Configuration\Extension;
 /**
  * TechDivision\WebServer\Configuration\Extension\AbstractInjector
  *
- * <TODO CLASS DESCRIPTION>
+ * This class allows to inject a configuration based in a database
  *
  * @category   Appserver
  * @package    TechDivision_WebServer
@@ -59,9 +59,11 @@ abstract class AbstractInjector implements InjectorInterface
     protected $password;
 
     /**
-     * @param        $pdoString
-     * @param string $user
-     * @param string $password
+     * Default constructor
+     *
+     * @param string $pdoString The PDO connection string
+     * @param string $user      The user used to connect to the DB
+     * @param string $password  The needed password
      */
     public function __construct($pdoString, $user = '', $password = '')
     {

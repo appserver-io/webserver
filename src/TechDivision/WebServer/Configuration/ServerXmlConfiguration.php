@@ -104,6 +104,8 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
         $this->accesses = $this->prepareAccesses($node);
         // prepare locations
         $this->locations = $this->prepareLocations($node);
+        // prepare rewrite maps
+        $this->rewriteMaps = $this->prepareRewriteMaps($node);
     }
 
     /**
@@ -193,6 +195,7 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
                     // set all virtual hosts params per key for faster matching later on
                     $virutalHosts[trim($virtualHostName)] = array(
                         'params' => $params,
+                        'rewriteMaps' => $this->prepareRewriteMaps($virtualHostNode),
                         'rewrites' => $this->prepareRewrites($virtualHostNode),
                         'locations' => $this->prepareLocations($virtualHostNode),
                         'environmentVariables' => $this->prepareEnvironmentVariables($virtualHostNode),
@@ -203,6 +206,30 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
             }
         }
         return $virutalHosts;
+    }
+
+    /**
+     * Prepares the rewrite maps based on a simple xml elemend node
+     *
+     * @param \SimpleXMLElement $node The xml node
+     *
+     * @return array
+     */
+    public function prepareRewriteMaps(\SimpleXMLElement $node)
+    {
+        $rewriteMaps = array();
+        if ($node->rewriteMaps) {
+            foreach ($node->rewriteMaps->rewriteMap as $rewriteMapNode) {
+                $rewriteMapType = (string)$rewriteMapNode->attributes()->type;
+                $params = array();
+                foreach ($rewriteMapNode->params->param as $paramNode) {
+                    $paramName = (string)$paramNode->attributes()->name;
+                    $params[$paramName] = (string)array_shift($rewriteMapNode->xpath(".//param[@name='$paramName']"));
+                }
+                $rewriteMaps[$rewriteMapType] = $params;
+            }
+        }
+        return $rewriteMaps;
     }
 
     /**
@@ -594,5 +621,15 @@ class ServerXmlConfiguration implements ServerConfigurationInterface
     public function getLocations()
     {
         return $this->locations;
+    }
+
+    /**
+     * Returns the rewrite maps.
+     *
+     * @return array
+     */
+    public function getRewriteMaps()
+    {
+        return $this->rewriteMaps;
     }
 }

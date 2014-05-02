@@ -180,8 +180,6 @@ class AccessModule implements ModuleInterface
 
         if (isset($accesses['deny'])) {
 
-            var_dump($accesses['deny']);
-
             // check deny accesses informations if something matches
             foreach ($accesses['deny'] as $accessData) {
 

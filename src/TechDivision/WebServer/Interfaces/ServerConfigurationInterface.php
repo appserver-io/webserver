@@ -222,4 +222,18 @@ interface ServerConfigurationInterface
      * @return array
      */
     public function getEnvironmentVariables();
+
+    /**
+     * Returns the rewrite maps.
+     *
+     * @return array
+     */
+    public function getRewriteMaps();
+
+    /**
+     * Returns the locations.
+     *
+     * @return array
+     */
+    public function getLocations();
 }

@@ -62,20 +62,11 @@ class MagentoRewriteMapper implements RewriteMapperInterface
         $base = $this->params['base'];
 
         // check if request path matches to base. if not we don't need to do anything.
-        if (!preg_match('/^\/' . preg_quote($base, '/') . '/', $requestUrl)) {
-            return $targetUrl;
-        };
-
         // find store code from magento.
         // important: be sure that magento is configured to add store codes to url!
-        $storeCode = null;
-        preg_match('/^\/' . preg_quote($base, '/') . '\/([^\/]+)/', $requestUrl, $matches);
-        if (isset($matches[1])) {
+        if (preg_match('/^\/' . preg_quote($base, '/') . '\/([a-z0-9_]+)/', $requestUrl, $matches)) {
+            // get store code
             $storeCode = $matches[1];
-        }
-
-        // check if storeCode was found in request path
-        if ($storeCode) {
 
             // connect to db
             $db = new \PDO($this->params['dsn'], $this->params['username'], $this->params['password']);

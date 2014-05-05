@@ -163,7 +163,6 @@ class VirtualHostModule implements ModuleInterface
 
             // Add the rewrites we have (if any) to the configuration's rewrite pool
             if (!empty($virtualHosts[$serverName]['rewrites'])) {
-
                 // Set the rewrites we encountered as a temporary module var
                 $this->serverContext->setModuleVar(
                     ModuleVars::VOLATILE_REWRITES,
@@ -173,7 +172,6 @@ class VirtualHostModule implements ModuleInterface
 
             // Add the environment vars we have (if any) to the configuration's environment variable pool
             if (!empty($virtualHosts[$serverName]['environmentVariables'])) {
-
                 // Set the environment variables we encountered as a temporary module var
                 $this->serverContext->setModuleVar(
                     ModuleVars::VOLATILE_ENVIRONMENT_VARIABLES,
@@ -183,7 +181,6 @@ class VirtualHostModule implements ModuleInterface
 
             // Add the accesses (if any) to the configuration's access pool
             if (!empty($virtualHosts[$serverName]['accesses'])) {
-
                 // Set the environment variables we encountered as a temporary module var
                 $this->serverContext->setModuleVar(
                     ModuleVars::VOLATILE_ACCESSES,
@@ -193,11 +190,19 @@ class VirtualHostModule implements ModuleInterface
 
             // Add the locations we have (if any) to the configuration's location pool
             if (!empty($virtualHosts[$serverName]['locations'])) {
-
                 // Set the locations we encountered as a temporary module var
                 $this->serverContext->setModuleVar(
                     ModuleVars::VOLATILE_LOCATIONS,
                     $virtualHosts[$serverName]['locations']
+                );
+            }
+
+            // Add the rewriteMaps we have (if any) to the configuration's rewriteMaps pool
+            if (!empty($virtualHosts[$serverName]['rewriteMaps'])) {
+                // Set the rewriteMaps we encountered as a temporary module var
+                $this->serverContext->setModuleVar(
+                    ModuleVars::VOLATILE_REWRITE_MAPS,
+                    $virtualHosts[$serverName]['rewriteMaps']
                 );
             }
         }

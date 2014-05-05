@@ -156,18 +156,18 @@
                         <environmentVariable condition="" definition="EXAMPLE_VARIABLE=fastcgi" />
                     </environmentVariables>
                     <locations>
-	                    <location condition="~*\.php(\/|\?|$)">
-	                    	<handlers>
-						        <handler name="fastcgi" extension=".php">
-		                        	<!--
-		                        	<params>
-		                        		<param name="host" type="string">127.0.0.1</param>
-		                        		<param name="port" type="integer">9000</param>
-		                        	</params>
-		                        	 -->
-						        </handler>
-	                    	</handlers>
-					    </location>
+                        <location condition="~*\.php(\/|\?|$)">
+                            <handlers>
+                                <handler name="fastcgi" extension=".php">
+                                    <!--
+                                    <params>
+                                        <param name="host" type="string">127.0.0.1</param>
+                                        <param name="port" type="integer">9000</param>
+                                    </params>
+                                     -->
+                                </handler>
+                            </handlers>
+                        </location>
                     </locations>
                 </virtualHost>
 
@@ -177,6 +177,20 @@
                         <param name="documentRoot" type="string">/var/www/magento</param>
                         <param name="errorsPageTemplatePath" type="string">var/www/errors/error.phtml</param>
                     </params>
+                    <rewriteMaps>
+                        <rewriteMap type="\TechDivision\WebServer\Modules\MagentoRewriteMapper">
+                            <params>
+                                <param name="base" type="string">instance-subdir</param>
+                                <param name="dsn" type="string">mysql:host=127.0.0.1;dbname=magento;charset=utf8</param>
+                                <param name="username" type="string">user</param>
+                                <param name="password" type="string">pass</param>
+                                <!-- this is optionally
+                                <param name="rewriteTableName">table-prefix.core_url_rewrite</param>
+                                <param name="storeTableName">table-prefix.core_store</param>
+                                -->
+                            </params>
+                        </rewriteMap>
+                    </rewriteMaps>
                     <rewrites>
                         <rewrite condition="-f{OR}-l{OR}-d" target="" flag="L"/>
                     </rewrites>
@@ -227,6 +241,7 @@
                 <module type="\TechDivision\WebServer\Modules\AuthenticationModule"/>
                 <module type="\TechDivision\WebServer\Modules\VirtualHostModule"/>
                 <module type="\TechDivision\WebServer\Modules\EnvironmentVariableModule" />
+                <module type="\TechDivision\WebServer\Modules\RewriteMapModule"/>
                 <module type="\TechDivision\RewriteModule\RewriteModule"/>
                 <module type="\TechDivision\WebServer\Modules\DirectoryModule"/>
                 <module type="\TechDivision\WebServer\Modules\AccessModule"/>
@@ -299,18 +314,18 @@
                         <environmentVariable condition="" definition="EXAMPLE_VARIABLE=fastcgi" />
                     </environmentVariables>
                     <locations>
-	                    <location condition="~*\.php(\/|\?|$)">
-	                    	<handlers>
-						        <handler name="fastcgi" extension=".php">
-		                        	<!--
-		                        	<params>
-		                        		<param name="host" type="string">127.0.0.1</param>
-		                        		<param name="port" type="integer">9000</param>
-		                        	</params>
-		                        	 -->
-						        </handler>
-	                    	</handlers>
-					    </location>
+                        <location condition="~*\.php(\/|\?|$)">
+                            <handlers>
+                                <handler name="fastcgi" extension=".php">
+                                    <!--
+                                    <params>
+                                        <param name="host" type="string">127.0.0.1</param>
+                                        <param name="port" type="integer">9000</param>
+                                    </params>
+                                     -->
+                                </handler>
+                            </handlers>
+                        </location>
                     </locations>
                 </virtualHost>
 
@@ -320,6 +335,20 @@
                         <param name="documentRoot" type="string">/var/www/magento</param>
                         <param name="errorsPageTemplatePath" type="string">var/www/errors/error.phtml</param>
                     </params>
+                    <rewriteMaps>
+                        <rewriteMap type="\TechDivision\WebServer\Modules\MagentoRewriteMapper">
+                            <params>
+                                <param name="base" type="string">instance-subdir</param>
+                                <param name="dsn" type="string">mysql:host=127.0.0.1;dbname=magento;charset=utf8</param>
+                                <param name="username" type="string">user</param>
+                                <param name="password" type="string">pass</param>
+                                <!-- this is optionally
+                                <param name="rewriteTableName">table-prefix.core_url_rewrite</param>
+                                <param name="storeTableName">table-prefix.core_store</param>
+                                -->
+                            </params>
+                        </rewriteMap>
+                    </rewriteMaps>
                     <rewrites>
                         <rewrite condition="-f{OR}-l{OR}-d" target="" flag="L"/>
                     </rewrites>

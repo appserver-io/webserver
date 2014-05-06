@@ -96,15 +96,7 @@ class CoreModule implements ModuleInterface
             $handlers = $serverContext->getServerConfig()->getHandlers();
             // get uri without querystring
             // Just make sure that you check for the existence of the query string first, as it might not be set
-            $uriWithoutQueryString = $serverContext->getServerVar(ServerVars::X_REQUEST_URI);
-
-            if ($serverContext->hasServerVar(ServerVars::QUERY_STRING)) {
-                $uriWithoutQueryString = str_replace(
-                    '?' . $serverContext->getServerVar(ServerVars::QUERY_STRING),
-                    '',
-                    $uriWithoutQueryString
-                );
-            }
+            $uriWithoutQueryString = parse_url($serverContext->getServerVar(ServerVars::X_REQUEST_URI), PHP_URL_PATH);
 
             // split all path parts got from uri without query string
             $pathParts = explode('/', $uriWithoutQueryString);

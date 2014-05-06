@@ -125,19 +125,23 @@ class DirectoryModule implements ModuleInterface
         $this->response = $response;
         // get server context ref to local func
         $serverContext = $this->getServerContext();
+
         // get document root
         $documentRoot = $serverContext->getServerVar(ServerVars::DOCUMENT_ROOT);
-        // get uri
-        $uri = $serverContext->getServerVar(ServerVars::X_REQUEST_URI);
+        // get url
+        $url = parse_url($serverContext->getServerVar(ServerVars::X_REQUEST_URI), PHP_URL_PATH);
+        // get query string with asterisk
+        $queryString = strstr($serverContext->getServerVar(ServerVars::X_REQUEST_URI), '?');
+
         // get read path to requested uri
-        $realPath = $documentRoot . $uri;
+        $realPath = $documentRoot . $url;
 
         // check if it's a dir
-        if (is_dir($realPath)|| $uri === '/') {
+        if (is_dir($realPath)|| $url === '/') {
             // check if uri has trailing slash
-            if (substr($uri, -1) !== '/') {
+            if (substr($url, -1) !== '/') {
                 // set enhance uri with trailing slash to response
-                $response->addHeader(HttpProtocol::HEADER_LOCATION, $uri . '/');
+                $response->addHeader(HttpProtocol::HEADER_LOCATION, $url . '/' . $queryString);
                 // send redirect status
                 $response->setStatusCode(301);
                 // set response state to be dispatched after this without calling other modules process
@@ -146,15 +150,13 @@ class DirectoryModule implements ModuleInterface
 
                 // check directory index definitions
                 foreach ($this->getDirectoryIndex() as $index) {
-
                     // check if defined index files are found in directory
                     if (is_file($realPath . $index)) {
                         // reset uri with indexed filename
-                        $this->getServerContext()->setServerVar(ServerVars::X_REQUEST_URI, $uri . $index);
+                        $this->getServerContext()->setServerVar(ServerVars::X_REQUEST_URI, $url . $index . $queryString);
                         // break out if index file was found
                         return true;
                     }
-
                 }
             }
         }

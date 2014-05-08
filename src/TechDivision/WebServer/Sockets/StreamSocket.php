@@ -92,6 +92,41 @@ class StreamSocket implements SocketInterface
     }
 
     /**
+     * Creates a stream socket client and returns a instance of Stream implementation with client socket in it.
+     *
+     * @param string   $socket  The address incl. transport the server should be listening to. For example 0.0.0.0:8080
+     * @param string   $flags   The flags to be set on client create
+     * @param resource $context The context to be set on stream create
+     *
+     * @return \TechDivision\WebServer\Sockets\Stream The Stream instance with a client socket created.
+     */
+    public static function getClientInstance($socket, $flags = null, $context = null)
+    {
+        // init flags if none were given
+        if (is_null($flags)) {
+            $flags = STREAM_CLIENT_CONNECT;
+        }
+
+        // init context if none was given
+        if (is_null($context)) {
+            $context = @stream_context_create();
+        }
+
+    	// create a stream socket client resource
+    	$clientResource = @stream_socket_client($socket, $errno, $errstr, ini_get('default_socket_timeout'), $flags, $context);
+
+        // throw exception if it was not possible to create server socket binding
+        if (!$clientResource) {
+            throw new SocketServerException($errstr, $errno);
+        }
+
+    	// set blocking mode
+    	@stream_set_blocking($clientResource, 1);
+    	// create instance and return it
+    	return self::getInstance($clientResource);
+    }
+
+    /**
      * Return's an instance of Stream with preset resource in it.
      *
      * @param resource $connectionResource The resource to use

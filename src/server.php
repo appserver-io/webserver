@@ -56,10 +56,10 @@ if (isset($argv[1])) {
 }
 
 // check which config format should be used based on file extension
-if ($configType = str_replace('.','',strrchr(WEBSERVER_CONFIGFILE, '.'))) {
+if ($configType = str_replace('.', '', strrchr(WEBSERVER_CONFIGFILE, '.'))) {
     $mainConfigurationType = '\TechDivision\WebServer\Configuration\Main' . ucfirst($configType) . 'Configuration';
     // try to instantiate configuration type based on file
-    if (class_exists($mainConfigurationType))  {
+    if (class_exists($mainConfigurationType)) {
         $mainConfiguration = new $mainConfigurationType(WEBSERVER_CONFIGFILE);
     } else {
         die("Configuration file '$configType' is not valid or not found.". PHP_EOL);

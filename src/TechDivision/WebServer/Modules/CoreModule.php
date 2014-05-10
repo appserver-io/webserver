@@ -94,6 +94,7 @@ class CoreModule implements ModuleInterface
             $documentRoot = $serverContext->getServerVar(ServerVars::DOCUMENT_ROOT);
             // get handlers
             $handlers = $serverContext->getServerConfig()->getHandlers();
+
             // get uri without querystring
             // Just make sure that you check for the existence of the query string first, as it might not be set
             $uriWithoutQueryString = parse_url($serverContext->getServerVar(ServerVars::X_REQUEST_URI), PHP_URL_PATH);

@@ -45,6 +45,13 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     protected $data;
 
     /**
+     * Hold's the modules to be used
+     *
+     * @var array
+     */
+    protected $modules;
+
+    /**
      * Hold's the handlers array
      *
      * @var array
@@ -101,6 +108,13 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     protected $locations;
 
     /**
+     * The rewrite maps
+     *
+     * @var array
+     */
+    protected $rewriteMaps;
+
+    /**
      * Constructs config
      *
      * @param \stdClass $data The data object use
@@ -108,6 +122,26 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     public function __construct($data)
     {
         $this->data = $data;
+    }
+
+    /**
+     * Return's name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->data->name;
+    }
+
+    /**
+     * Return's logger name
+     *
+     * @return string
+     */
+    public function getLoggerName()
+    {
+        return $this->data->loggerName;
     }
 
     /**
@@ -306,7 +340,10 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
      */
     public function getModules()
     {
-        return $this->data->modules;
+        if (!$this->modules) {
+            $this->modules = $this->prepareModules($this->data);
+        }
+        return $this->modules;
     }
 
     /**
@@ -398,6 +435,20 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
         return $this->locations;
     }
 
+
+    /**
+     * Returns the rewrite maps.
+     *
+     * @return array
+     */
+    public function getRewriteMaps()
+    {
+        if (!$this->rewriteMaps) {
+            $this->rewriteMaps = $this->prepareRewriteMaps($this->data);
+        }
+        return $this->rewriteMaps;
+    }
+
     /**
      * Prepares the modules array based on a data object
      *
@@ -408,7 +459,9 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     public function prepareModules(\stdClass $data)
     {
         $modules = array();
-
+        if (isset($data->modules)) {
+            $modules = $data->modules;
+        }
         return $modules;
     }
 
@@ -422,7 +475,9 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     public function prepareConnectionHandlers(\stdClass $data)
     {
         $connectionHandlers = array();
-
+        if (isset($data->connectionHandlers)) {
+            $connectionHandlers = $data->connectionHandlers;
+        }
         return $connectionHandlers;
     }
 
@@ -436,13 +491,19 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     public function prepareHandlers(\stdClass $data)
     {
         $handlers = array();
-        foreach ($data->handlers as $handler) {
-            // get all params
-            $params = get_object_vars($handler);
-            // remove name
-            unset($params["name"]);
-            // set the handler information
-            $handlers[$handler->extension] = array($handler->name, $params);
+        if (isset($data->handlers)) {
+            foreach ($data->handlers as $handler) {
+                // get all params
+                $params = array();
+                if (isset($handler->params)) {
+                    $params = (array)$handler->params;
+                }
+                // set the handler information
+                $handlers[$handler->extension] = array(
+                    "name" => $handler->name,
+                    "params" => $params
+                );
+            }
         }
         return $handlers;
     }
@@ -457,24 +518,27 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     public function prepareVirtualHosts(\stdClass $data)
     {
         $virtualHosts = array();
-        foreach ($data->virtualHosts as $virtualHost) {
-            // explode virtuaHost names
-            $virtualHostNames = explode(' ', $virtualHost->name);
-            // get all params
-            $params = get_object_vars($virtualHost);
-            // remove name
-            unset($params["name"]);
-            // set all virtual host information's
-            foreach ($virtualHostNames as $virtualHostName) {
-                // add all virtual hosts params per key for faster matching later on
-                $virtualHosts[trim($virtualHostName)] = array(
-                    'params' => $params,
-                    'rewrites' => $this->prepareRewrites($virtualHost->rewrites),
-                    'locations' => $this->prepareLocations($virtualHost->locations),
-                    'environmentVariables' => $this->prepareEnvironmentVariables($virtualHost->environmentVariables),
-                    'authentication' => $this->prepareAuthentications($virtualHost->authentication),
-                    'accesses' => $this->prepareAccesses($virtualHost->accesses)
-                );
+        if (isset($data->virtualHosts)) {
+            foreach ($data->virtualHosts as $virtualHost) {
+                // explode virtuaHost names
+                $virtualHostNames = explode(' ', $virtualHost->name);
+                // get all params
+                $params = get_object_vars($virtualHost);
+                // remove name
+                unset($params["name"]);
+                // set all virtual host information's
+                foreach ($virtualHostNames as $virtualHostName) {
+                    // add all virtual hosts params per key for faster matching later on
+                    $virtualHosts[trim($virtualHostName)] = array(
+                        'params' => $params,
+                        'rewriteMaps' => $this->prepareRewriteMaps($virtualHost),
+                        'rewrites' => $this->prepareRewrites($virtualHost),
+                        'locations' => $this->prepareLocations($virtualHost),
+                        'environmentVariables' => $this->prepareEnvironmentVariables($virtualHost),
+                        'authentication' => $this->prepareAuthentications($virtualHost),
+                        'accesses' => $this->prepareAccesses($virtualHost)
+                    );
+                }
             }
         }
         return $virtualHosts;
@@ -490,14 +554,16 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     public function prepareRewrites(\stdClass $data)
     {
         $rewrites = array();
-        // prepare the array with the rewrite rules
-        foreach ($data->rewrites as $rewrite) {
-            // Build up the array entry
-            $rewrites[] = array(
-                'condition' => $rewrite->condition,
-                'target' => $rewrite->target,
-                'flag' => $rewrite->flag
-            );
+        if (isset($data->rewrites)) {
+            // prepare the array with the rewrite rules
+            foreach ($data->rewrites as $rewrite) {
+                // Build up the array entry
+                $rewrites[] = array(
+                    'condition' => $rewrite->condition,
+                    'target' => $rewrite->target,
+                    'flag' => $rewrite->flag
+                );
+            }
         }
         return $rewrites;
     }
@@ -512,14 +578,16 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     public function prepareEnvironmentVariables(\stdClass $data)
     {
         $environmentVariables = array();
-        // prepare the array with the environment variables
-        foreach ($data->environmentVariables as $environmentVariable) {
+        if (isset($data->environmentVariables)) {
+            // prepare the array with the environment variables
+            foreach ($data->environmentVariables as $environmentVariable) {
 
-            // Build up the array entry
-            $environmentVariables[] = array(
-                'condition' => $environmentVariable->condition,
-                'definition' => $environmentVariable->definition
-            );
+                // Build up the array entry
+                $environmentVariables[] = array(
+                    'condition' => $environmentVariable->condition,
+                    'definition' => $environmentVariable->definition
+                );
+            }
         }
         return $environmentVariables;
     }
@@ -534,14 +602,16 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     public function prepareAuthentications(\stdClass $data)
     {
         $authentications = array();
-        foreach ($data->authentications as $authentication) {
-            $authenticationType = $authentication->uri;
-            // get all params
-            $params = get_object_vars($authentication);
-            // remove type
-            unset($params["uri"]);
-            // set all authentication information's
-            $authentications[$authenticationType] = $params;
+        if (isset($data->authentications)) {
+            foreach ($data->authentications as $authentication) {
+                $authenticationType = $authentication->uri;
+                // get all params
+                $params = get_object_vars($authentication);
+                // remove type
+                unset($params["uri"]);
+                // set all authentication information's
+                $authentications[$authenticationType] = $params;
+            }
         }
         return $authentications;
     }
@@ -556,14 +626,16 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     public function prepareAccesses(\stdClass $data)
     {
         $accesses = array();
-        foreach ($data->accesses as $access) {
-            $accessType = $access->type;
-            // get all params
-            $params = get_object_vars($access);
-            // remove type
-            unset($params["type"]);
-            // set all accesses information's
-            $accesses[$accessType][] = $params;
+        if (isset($data->accesses)) {
+            foreach ($data->accesses as $access) {
+                $accessType = $access->type;
+                // get all params
+                $params = get_object_vars($access);
+                // remove type
+                unset($params["type"]);
+                // set all accesses information's
+                $accesses[$accessType][] = $params;
+            }
         }
         return $accesses;
     }
@@ -578,15 +650,38 @@ class ServerJsonConfiguration implements ServerConfigurationInterface
     public function prepareLocations(\stdClass $data)
     {
         $locations = array();
-        // prepare the array with the location variables
-        foreach ($data->locations as $location) {
-
-            // Build up the array entry
-            $locations[] = array(
-                'condition' => $location->condition,
-                'handlers' => $this->prepareHandlers($location)
-            );
+        if (isset($data->locations)) {
+            // prepare the array with the location variables
+            foreach ($data->locations as $location) {
+                // Build up the array entry
+                $locations[] = array(
+                    'condition' => $location->condition,
+                    'handlers' => $this->prepareHandlers($location)
+                );
+            }
         }
         return $locations;
+    }
+
+    /**
+     * Prepares the rewrite maps array based on a data object
+     *
+     * @param \stdClass $data The data object
+     *
+     * @return array
+     */
+    public function prepareRewriteMaps(\stdClass $data)
+    {
+        $rewriteMaps = array();
+        if (isset($data->rewriteMaps)) {
+            // prepare the array with the rewrite maps variables
+            foreach ($data->rewriteMaps as $rewriteMap) {
+                // Build up the array entry
+                $rewriteMaps[$rewriteMap->type] = array(
+                    'params' => (array)$rewriteMap->params
+                );
+            }
+        }
+        return $rewriteMaps;
     }
 }

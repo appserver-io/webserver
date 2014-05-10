@@ -1,12 +1,53 @@
 {
     "description": "This is an example of a php WebServer configuration in json",
+
+    "loggers": [
+        {
+            "name": "System",
+            "type": "\\Monolog\\Logger",
+            "handlers": [
+                {
+                    "type": "\\Monolog\\Handler\\StreamHandler",
+                    "params": {
+                        "stream": "var/log/webserver-system.log",
+                        "level": 100,
+                        "bubble": 1
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Access",
+            "type": "\\Monolog\\Logger",
+            "handlers": [
+                {
+                    "type": "\\Monolog\\Handler\\StreamHandler",
+                    "formatter": {
+                        "type": "\\Monolog\\Formatter\\LineFormatter",
+                        "params": {
+                            "format": "%message%",
+                            "dateFormat": "Y-m-d H:i:s",
+                            "allowInlineLineBreaks": 1
+                        }
+                    },
+                    "params": {
+                        "stream": "var/log/webserver-access.log",
+                        "level": 100,
+                        "bubble": 1
+                    }
+                }
+            ]
+        }
+    ],
     "servers": [
         {
+            "name": "httpServer",
             "type": "\\TechDivision\\WebServer\\Servers\\MultiThreadedServer",
             "worker": "\\TechDivision\\WebServer\\Workers\\ThreadWorker",
             "socket": "\\TechDivision\\WebServer\\Sockets\\StreamSocket",
-            "serverContext" : "\\TechDivision\\WebServer\\ServerContext",
-            "workerNumber": 32,
+            "serverContext": "\\TechDivision\\WebServer\\ServerContext",
+            "loggerName": "System",
+            "workerNumber": 128,
 
             "admin": "www@localhost.localdomain",
             "software": "phpWebServer/0.1.0",
@@ -14,6 +55,7 @@
             "address": "0.0.0.0",
             "port": "9080",
             "documentRoot" : "var/www",
+            "directoryIndex": "index.php index.html index.htm",
             "keepAliveMax": 64,
             "keepAliveTimeout": 5,
             "errorsPageTemplatePath": "",
@@ -36,11 +78,20 @@
             "accesses" : [
                 {
                     "type": "allow",
-                    "REQUEST_URI": ".*"
+                    "REQUEST_URI": ".*",
+                    "REMOTE_ADDR": "127\\.0\\.0\\.1"
                 },
                 {
                     "type": "deny",
-                    "REQUEST_URI": "^\\/var\\/.*"
+                    "REQUEST_URI": "^\\/errors.*"
+                }
+            ],
+
+            "rewrites" : [
+                {
+                    "condition" : "-f{OR}-l{OR}-d",
+                    "target" : "",
+                    "flag" : "L"
                 }
             ],
 
@@ -86,26 +137,50 @@
                         {
                             "condition" : "~*\\.php(\\\/|\\?|$",
                             "handlers" : [
-                            	{ 
-                            		"name": "fastcgi", 
-                            		"extension": ".php",
-                            		"params" : [
-                            			{ "host": "127.0.0.1", "port": 9000 }
-                            		]	
-                            	}
+                                {
+                                    "name": "fastcgi",
+                                    "extension": ".php",
+                                    "params" : {
+                                        "host": "127.0.0.1",
+                                        "port": 9000
+                                    }
+                                }
                             ]
+                        }
+                    ]
+                },
+                {
+                    "name": "magento.local",
+                    "admin": "admin@magento.local",
+                    "documentRoot": "/var/www/magento",
+                    "errorsPageTemplatePath": "var/www/errors/error.phtml",
+                    "rewriteMaps": [
+                        {
+                            "type": "\\TechDivision\\WebServer\\Modules\\MagentoRewriteMapper",
+                            "params": {
+                                "base": "instance-subdir",
+                                "dsn": "mysql:host=127.0.0.1;dbname=magento;charset=utf8",
+                                "username": "user",
+                                "password": "pass"
+                            }
+                        }
+                    ],
+                    "rewrites" : [
+                        {
+                            "condition" : "-f{OR}-l{OR}-d",
+                            "target" : "",
+                            "flag" : "L"
+                        }
+                    ],
+                    "accesses" : [
+                        {
+                            "type": "allow",
+                            "REQUEST_URI": "^\\/(media|skin|js|index\\.php).*"
                         }
                     ]
                 }
             ],
 
-            "rewrites" : [
-                {
-                    "condition" : "-f{OR}-l{OR}-d",
-                    "target" : "",
-                    "flag" : "L"
-                }
-            ],
             "environmentVariables" : [
                 {
                     "condition" : "(\\s.*WebKit?|Gecko)@$User-Agent",
@@ -121,12 +196,14 @@
                 "\\TechDivision\\WebServer\\Modules\\AuthenticationModule",
                 "\\TechDivision\\WebServer\\Modules\\VirtualHostModule",
                 "\\TechDivision\\WebServer\\Modules\\EnvironmentVariableModule",
+                "\\TechDivision\\WebServer\\Modules\\RewriteMapModule",
                 "\\TechDivision\\RewriteModule\\RewriteModule",
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
                 "\\TechDivision\\WebServer\\Modules\\AccessModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",
                 "\\TechDivision\\PhpModule\\PhpModule",
-                "\\TechDivision\\WebServer\\Modules\\FastCgiModule"
+                "\\TechDivision\\FastCgiModule\\FastCgiModule",
+                "\\TechDivision\\WebServer\\Modules\\DeflateModule"
             ],
 
             "handlers": [
@@ -135,22 +212,24 @@
                 { "name": "servlet", "extension": ".do" }
             ]
         },
-
         {
+            "name": "httpsServer",
             "type": "\\TechDivision\\WebServer\\Servers\\MultiThreadedServer",
             "worker": "\\TechDivision\\WebServer\\Workers\\ThreadWorker",
             "socket": "\\TechDivision\\WebServer\\Sockets\\StreamSocket",
             "serverContext" : "\\TechDivision\\WebServer\\ServerContext",
-            "workerNumber": 32,
+            "loggerName": "System",
+            "workerNumber": 128,
 
             "admin": "www@localhost.localdomain",
             "software": "phpWebServer/0.1.0",
             "transport": "ssl",
             "address": "0.0.0.0",
             "port": "9443",
-            "certPath": "etc/webserver.pem",
+            "certPath": "etc/phpwebserver.pem",
             "passphrase": "passphrase",
-            "documentRoot": "var/www",
+            "documentRoot" : "var/www",
+            "directoryIndex": "index.php index.html index.htm",
             "keepAliveMax": 64,
             "keepAliveTimeout": 5,
             "errorsPageTemplatePath": "",
@@ -173,17 +252,26 @@
             "accesses" : [
                 {
                     "type": "allow",
-                    "REQUEST_URI": ".*"
+                    "REQUEST_URI": ".*",
+                    "REMOTE_ADDR": "127\\.0\\.0\\.1"
                 },
                 {
                     "type": "deny",
-                    "REQUEST_URI": "^\\/var\\/.*"
+                    "REQUEST_URI": "^\\/errors.*"
+                }
+            ],
+
+            "rewrites" : [
+                {
+                    "condition" : "-f{OR}-l{OR}-d",
+                    "target" : "",
+                    "flag" : "L"
                 }
             ],
 
             "virtualHosts" : [
                 {
-                    "name": "phpwebserver.dev phpwebserver.local phpwebserver.test",
+                    "name": "127.0.0.1 localhost phpwebserver.dev phpwebserver.local phpwebserver.test",
                     "admin": "admin@phpwebserver.dev",
                     "documentRoot": "var/www",
                     "errorsPageTemplatePath": "var/www/errors/error.phtml",
@@ -223,26 +311,48 @@
                         {
                             "condition" : "~*\\.php(\\\/|\\?|$",
                             "handlers" : [
-                            	{ 
-                            		"name": "fastcgi", 
-                            		"extension": ".php",
-                            		"params": [ 
-                            			{ "host": "127.0.0.1", "port": 9000 }
-                            		]	
-                            	}
+                                {
+                                    "name": "fastcgi",
+                                    "extension": ".php",
+                                    "params" : {
+                                        "host": "127.0.0.1",
+                                        "port": 9000
+                                    }
+                                }
                             ]
+                        }
+                    ]
+                },
+                {
+                    "name": "magento.local",
+                    "admin": "admin@magento.local",
+                    "documentRoot": "/var/www/magento",
+                    "errorsPageTemplatePath": "var/www/errors/error.phtml",
+                    "rewriteMaps": [
+                        {
+                            "type": "\\TechDivision\\WebServer\\Modules\\MagentoRewriteMapper",
+                            "base": "instance-subdir",
+                            "dsn": "mysql:host=127.0.0.1;dbname=magento;charset=utf8",
+                            "username": "user",
+                            "password": "pass"
+                        }
+                    ],
+                    "rewrites" : [
+                        {
+                            "condition" : "-f{OR}-l{OR}-d",
+                            "target" : "",
+                            "flag" : "L"
+                        }
+                    ],
+                    "accesses" : [
+                        {
+                            "type": "allow",
+                            "REQUEST_URI": "^\\/(media|skin|js|index\\.php).*"
                         }
                     ]
                 }
             ],
 
-            "rewrites" : [
-                {
-                    "condition" : "-f{OR}-l{OR}-d",
-                    "target" : "",
-                    "flag" : "L"
-                }
-            ],
             "environmentVariables" : [
                 {
                     "condition" : "(\\s.*WebKit?|Gecko)@$User-Agent",
@@ -258,12 +368,14 @@
                 "\\TechDivision\\WebServer\\Modules\\AuthenticationModule",
                 "\\TechDivision\\WebServer\\Modules\\VirtualHostModule",
                 "\\TechDivision\\WebServer\\Modules\\EnvironmentVariableModule",
+                "\\TechDivision\\WebServer\\Modules\\RewriteMapModule",
                 "\\TechDivision\\RewriteModule\\RewriteModule",
                 "\\TechDivision\\WebServer\\Modules\\DirectoryModule",
                 "\\TechDivision\\WebServer\\Modules\\AccessModule",
                 "\\TechDivision\\WebServer\\Modules\\CoreModule",
                 "\\TechDivision\\PhpModule\\PhpModule",
-                "\\TechDivision\\WebServer\\Modules\\FastCgiModule"
+                "\\TechDivision\\FastCgiModule\\FastCgiModule",
+                "\\TechDivision\\WebServer\\Modules\\DeflateModule"
             ],
 
             "handlers": [

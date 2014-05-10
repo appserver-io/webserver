@@ -41,19 +41,32 @@ if (!extension_loaded('pthreads')) {
 }
 
 define('WEBSERVER_BASEDIR', __DIR__ . DIRECTORY_SEPARATOR);
-define('WEBSERVER_AUTOLOADER', WEBSERVER_BASEDIR . '..' . DIRECTORY_SEPARATOR . 'vendor/autoload.php');
+define('WEBSERVER_AUTOLOADER', WEBSERVER_BASEDIR . '..' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
 
 require WEBSERVER_AUTOLOADER;
 
 // set current dir to base dir for relative dirs
 chdir(WEBSERVER_BASEDIR);
 
-// read in json configuration
-//$mainConfiguration = new \TechDivision\WebServer\Configuration\MainJsonConfiguration(WEBSERVER_BASEDIR . 'etc/webserver.json');
-// read in xml configuration <- just comment this in to use xml configuration
-$mainConfiguration = new \TechDivision\WebServer\Configuration\MainXmlConfiguration(
-    WEBSERVER_BASEDIR . 'etc' . DIRECTORY_SEPARATOR . 'webserver.xml'
-);
+// check if user defined configuration is passed via argv
+if (isset($argv[1])) {
+    define('WEBSERVER_CONFIGFILE', $argv[1]);
+} else {
+    define('WEBSERVER_CONFIGFILE', WEBSERVER_BASEDIR . 'etc' . DIRECTORY_SEPARATOR . 'phpwebserver.xml');
+}
+
+// check which config format should be used based on file extension
+if ($configType = str_replace('.', '', strrchr(WEBSERVER_CONFIGFILE, '.'))) {
+    $mainConfigurationType = '\TechDivision\WebServer\Configuration\Main' . ucfirst($configType) . 'Configuration';
+    // try to instantiate configuration type based on file
+    if (class_exists($mainConfigurationType)) {
+        $mainConfiguration = new $mainConfigurationType(WEBSERVER_CONFIGFILE);
+    } else {
+        die("Configuration file '$configType' is not valid or not found.". PHP_EOL);
+    }
+} else {
+    die("No valid configuration file given." . PHP_EOL);
+}
 
 // init loggers
 $loggers = array();
@@ -97,6 +110,7 @@ foreach ($mainConfiguration->getLoggerConfigs() as $loggerConfig) {
 // init servers
 $servers = array();
 foreach ($mainConfiguration->getServerConfigs() as $serverConfig) {
+
     // get type definitions
     $serverType = $serverConfig->getType();
     $serverContextType = $serverConfig->getServerContextType();

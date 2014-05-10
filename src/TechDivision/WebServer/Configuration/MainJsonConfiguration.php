@@ -48,7 +48,7 @@ class MainJsonConfiguration
      */
     public function __construct($filename)
     {
-        $this->data = json_decode(file_get_contents($filename));
+        $this->data = json_decode(file_get_contents($filename, FILE_USE_INCLUDE_PATH));
     }
 
     /**
@@ -63,5 +63,19 @@ class MainJsonConfiguration
             $serverConfigurations[] = new ServerJsonConfiguration($serverConfig);
         }
         return $serverConfigurations;
+    }
+
+    /**
+     * Return's an array of logger configs
+     *
+     * @return array
+     */
+    public function getLoggerConfigs()
+    {
+        $loggerConfigurations = array();
+        foreach ($this->data->loggers as $loggerConfig) {
+            $loggerConfigurations[] = new LoggerJsonConfiguration($loggerConfig);
+        }
+        return $loggerConfigurations;
     }
 }

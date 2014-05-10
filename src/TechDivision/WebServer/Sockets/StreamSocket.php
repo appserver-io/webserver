@@ -112,18 +112,18 @@ class StreamSocket implements SocketInterface
             $context = @stream_context_create();
         }
 
-    	// create a stream socket client resource
-    	$clientResource = @stream_socket_client($socket, $errno, $errstr, ini_get('default_socket_timeout'), $flags, $context);
+        // create a stream socket client resource
+        $clientResource = @stream_socket_client($socket, $errno, $errstr, ini_get('default_socket_timeout'), $flags, $context);
 
         // throw exception if it was not possible to create server socket binding
         if (!$clientResource) {
             throw new SocketServerException($errstr, $errno);
         }
 
-    	// set blocking mode
-    	@stream_set_blocking($clientResource, 1);
-    	// create instance and return it
-    	return self::getInstance($clientResource);
+        // set blocking mode
+        @stream_set_blocking($clientResource, 1);
+        // create instance and return it
+        return self::getInstance($clientResource);
     }
 
     /**

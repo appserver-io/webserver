@@ -1,6 +1,6 @@
 <?php
 /**
- * \TechDivision\WebServer\Configuration\LoggerXmlConfiguration
+ * \TechDivision\WebServer\Configuration\LoggerJsonConfiguration
  *
  * NOTICE OF LICENSE
  *
@@ -24,7 +24,7 @@ namespace TechDivision\WebServer\Configuration;
 use TechDivision\WebServer\Interfaces\LoggerConfigurationInterface;
 
 /**
- * Class LoggerXmlConfiguration
+ * Class LoggerJsonConfiguration
  *
  * @category   Webserver
  * @package    TechDivision_WebServer
@@ -34,27 +34,44 @@ use TechDivision\WebServer\Interfaces\LoggerConfigurationInterface;
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/techdivision/TechDivision_WebServer
  */
-class LoggerXmlConfiguration implements LoggerConfigurationInterface
+class LoggerJsonConfiguration implements LoggerConfigurationInterface
 {
+
+    /**
+     * Hold's the data instance read by json file
+     *
+     * @var \stdClass
+     */
+    protected $data;
+
+    /**
+     * Hold's the handlers data
+     *
+     * @var array
+     */
+    protected $handlers;
+
+    /**
+     * Hold's the processors data
+     *
+     * @var array
+     */
+    protected $processors;
 
     /**
      * Constructs config
      *
-     * @param \SimpleXMLElement $node The simple xml element used to build config
+     * @param \stdClass $data The data object
      */
-    public function __construct(\SimpleXMLElement $node)
+    public function __construct(\stdClass $data)
     {
-        // prepare properties
-        $this->name = (string)$node->attributes()->name;
-        $this->type = (string)$node->attributes()->type;
-        if (isset($node->attributes()->channel)) {
-            $this->channel = (string)$node->attributes()->channel;
-        }
+        // set data
+        $this->data = $data;
 
         // prepare handlers
-        $this->handlers = $this->prepareHandlers($node);
+        $this->handlers = $this->prepareHandlers($data);
         // prepare processors
-        $this->processors = $this->prepareProcessors($node);
+        $this->processors = $this->prepareProcessors($data);
     }
 
     /**
@@ -64,7 +81,7 @@ class LoggerXmlConfiguration implements LoggerConfigurationInterface
      */
     public function getName()
     {
-        return $this->name;
+        return $this->data->name;
     }
 
     /**
@@ -74,17 +91,20 @@ class LoggerXmlConfiguration implements LoggerConfigurationInterface
      */
     public function getType()
     {
-        return $this->type;
+        return $this->data->type;
     }
 
     /**
      * Return's channel
      *
-     * @return string
+     * @return string|null
      */
     public function getChannel()
     {
-        return $this->channel;
+        // check if channel is given
+        if (isset($this->data->channel)) {
+            return $this->data->channel;
+        }
     }
 
     /**
@@ -110,38 +130,29 @@ class LoggerXmlConfiguration implements LoggerConfigurationInterface
     /**
      * Prepares handlers array for config
      *
-     * @param \SimpleXMLElement $node The xml node to prepare for
+     * @param \stdClass $data The data object get information from
      *
      * @return array
      */
-    public function prepareHandlers($node)
+    public function prepareHandlers(\stdClass $data)
     {
         $handlers = array();
-        if ($node->handlers) {
-            foreach ($node->handlers->handler as $handlerNode) {
+        if ($data->handlers) {
+            foreach ($data->handlers as $handler) {
                 // build up params
-                $params = array();
-                $formatterData = array();
-                foreach ($handlerNode->params->param as $paramNode) {
-                    $paramName = (string)$paramNode->attributes()->name;
-                    $params[$paramName] = (string)array_shift($handlerNode->xpath(".//param[@name='$paramName']"));
-                }
+                $params = (array)$handler->params;
+                // set up handler infos
+                $handlers[$handler->type]['params'] = $params;
                 // build up formatter infos if exists
-                if (isset($handlerNode->formatter)) {
-                    $formatterType = (string)$handlerNode->formatter->attributes()->type;
-                    $formatterParams = array();
-                    foreach ($handlerNode->formatter->params->param as $paramNode) {
-                        $paramName = (string)$paramNode->attributes()->name;
-                        $formatterParams[$paramName] = (string)array_shift($handlerNode->xpath(".//param[@name='$paramName']"));
-                    }
+                if (isset($handler->formatter)) {
+                    $formatterType = $handler->formatter->type;
+                    $formatterParams = (array)$handler->formatter->params;
                     // setup formatter info
-                    $handlers[(string)$handlerNode->attributes()->type]['formatter'] = array(
+                    $handlers[$handler->type]['formatter'] = array(
                         'type' => $formatterType,
                         'params' => $formatterParams
                     );
                 }
-                // set up handler infos
-                $handlers[(string)$handlerNode->attributes()->type]['params'] = $params;
             }
         }
         return $handlers;
@@ -150,16 +161,16 @@ class LoggerXmlConfiguration implements LoggerConfigurationInterface
     /**
      * Prepares processors array for config
      *
-     * @param \SimpleXMLElement $node The xml node to prepare for
+     * @param \stdClass $data The data object get information from
      *
      * @return array
      */
-    public function prepareProcessors($node)
+    public function prepareProcessors(\stdClass $data)
     {
         $processors = array();
-        if ($node->processors) {
-            foreach ($node->processors->processor as $processorNode) {
-                $processors[(string)$processorNode->attributes()->type] = (string)$processorNode->attributes()->type;
+        if (isset($data->processors)) {
+            foreach ($data->processors as $processor) {
+                $processors[$processor->type] = $processor->type;
             }
         }
         return $processors;

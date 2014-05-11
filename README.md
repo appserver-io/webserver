@@ -43,7 +43,8 @@ Configuration
 -------------
 The phpwebserver can be configured either with xml (default) or json. The demo configuration files are in `etc/`.
 If you want to test json configuration format and / or use your own config file, just run the webserver with config argument:
-```bin/webserver etc/phpwebserver.json```
+```
+src/bin/webserver etc/phpwebserver.json```
 
 The configuration itself is highly self-explanatory so just have a look to the preferred config file and try to change settings. A detailed overview of all configuration settings will follow...
 

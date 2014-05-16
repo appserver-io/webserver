@@ -22,12 +22,12 @@ Usage
 If you can satisfy the requirements it is very simple to use the webserver. Just do this:
 ```bash
 git clone https://github.com/techdivision/TechDivision_WebServer
-PHP_BIN=/path/to/your/threadsafe/php-binary TechDivision_WebServer/src/bin/webserver
+PHP_BIN=/path/to/your/threadsafe/php-binary TechDivision_WebServer/src/bin/phpwebserver
 ```
 If you're using [`appserver.io`](<http://www.appserver.io>) it'll be this:
 ```bash
 git clone https://github.com/techdivision/TechDivision_WebServer
-./TechDivision_WebServer/src/bin/webserver
+./TechDivision_WebServer/src/bin/phpwebserver
 ```
 
 Goto http://127.0.0.1:9080 and if all went good, you will see the welcome page of the php webserver.
@@ -44,7 +44,7 @@ Configuration
 The phpwebserver can be configured either with xml (default) or json. The demo configuration files are in `etc/`.
 If you want to test json configuration format and / or use your own config file, just run the webserver with config argument:
 ```
-src/bin/webserver etc/phpwebserver.json
+src/bin/phpwebserver etc/phpwebserver.json
 ```
 
 The configuration itself is highly self-explanatory so just have a look to the preferred config file and try to change settings. A detailed overview of all configuration settings will follow...

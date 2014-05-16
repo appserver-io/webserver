@@ -113,7 +113,6 @@
                 <access type="allow">
                     <params>
                         <param name="X_REQUEST_URI" type="string">.*</param>
-                        <param name="REMOTE_ADDR" type="string">127\.0\.0\.1</param>
                     </params>
                 </access>
                 <!-- deny errors folder by default -->
@@ -130,7 +129,7 @@
 
             <virtualHosts>
             
-                <virtualHost name="127.0.0.1 localhost phpwebserver.dev phpwebserver.local phpwebserver.test">
+                <virtualHost name="phpwebserver.dev phpwebserver.local phpwebserver.test">
                     <params>
                         <param name="admin" type="string">admin@phpwebserver.dev</param>
                         <!-- Note: it's intended to use a relative path to get content from webservers basedir/var/www -->

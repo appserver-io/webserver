@@ -79,7 +79,6 @@
                 {
                     "type": "allow",
                     "REQUEST_URI": ".*",
-                    "REMOTE_ADDR": "127\\.0\\.0\\.1"
                 },
                 {
                     "type": "deny",
@@ -252,8 +251,7 @@
             "accesses" : [
                 {
                     "type": "allow",
-                    "REQUEST_URI": ".*",
-                    "REMOTE_ADDR": "127\\.0\\.0\\.1"
+                    "REQUEST_URI": ".*"
                 },
                 {
                     "type": "deny",
@@ -271,7 +269,7 @@
 
             "virtualHosts" : [
                 {
-                    "name": "127.0.0.1 localhost phpwebserver.dev phpwebserver.local phpwebserver.test",
+                    "name": "phpwebserver.dev phpwebserver.local phpwebserver.test",
                     "admin": "admin@phpwebserver.dev",
                     "documentRoot": "var/www",
                     "errorsPageTemplatePath": "var/www/errors/error.phtml",

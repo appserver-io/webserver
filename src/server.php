@@ -126,9 +126,22 @@ foreach ($mainConfiguration->getServerConfigs() as $serverConfig) {
         throw new \Exception(sprintf('Logger %s not found.', $serverConfig->getLoggerName()));
     }
 
-    // init and start server
-    $servers[] = new $serverType($serverContext);
+    // Create the server (which should start it automatically)
+    $server = new $serverType($serverContext);
+    // Collect the servers we started
+    $servers[] = $server;
+
+    // Synchronize the server so we can wait until preparation of the server finished.
+    // This is used e.g. to wait for port opening or other important dependencies to proper server functionality
+    $server->synchronized(
+        function ($self) {
+            $self->wait();
+        },
+        $server
+    );
 }
+
+// @TODO here we are able to switch user to someone with lower rights (e.g. www-data or nobody)
 
 // wait for servers
 foreach ($servers as $server) {

@@ -62,8 +62,8 @@
     </loggers>
 
     <servers>
-
-        <server name="httpServer"
+        <server
+            name="httpServer"
             type="\TechDivision\Server\Servers\MultiThreadedServer"
             worker="\TechDivision\Server\Workers\ThreadWorker"
             socket="\TechDivision\Server\Sockets\StreamSocket"
@@ -128,7 +128,7 @@
             </rewrites>
 
             <virtualHosts>
-
+            
                 <virtualHost name="phpwebserver.dev phpwebserver.local phpwebserver.test">
                     <params>
                         <param name="admin" type="string">admin@phpwebserver.dev</param>
@@ -140,7 +140,7 @@
                         <rewrite condition="-f{OR}-l{OR}-d" target="" flag="L"/>
                     </rewrites>
                 </virtualHost>
-
+                
                 <virtualHost name="phpwebserver-fcgi.dev phpwebserver-fcgi.local phpwebserver-fcgi.test">
                     <params>
                         <param name="admin" type="string">admin@phpwebserver.dev</param>
@@ -232,7 +232,7 @@
             </rewrites>
 
             <connectionHandlers>
-                <connectionHandler type="\TechDivision\Http\HttpConnectionHandler" />
+                <connectionHandler type="\TechDivision\WebServer\ConnectionHandlers\HttpConnectionHandler" />
             </connectionHandlers>
 
             <modules>
@@ -257,6 +257,198 @@
             </handlers>
         </server>
 
+        <server
+            name="httpsServer"
+            type="\TechDivision\Server\Servers\MultiThreadedServer"
+            worker="\TechDivision\Server\Workers\ThreadWorker"
+            socket="\TechDivision\Server\Sockets\StreamSocket"
+            serverContext="\TechDivision\Server\ServerContext"
+            loggerName="System">
+
+            <params>
+                <param name="admin" type="string">www@localhost.localdomain</param>
+                <param name="software" type="string">phpWebServer/0.1.0</param>
+                <param name="workerNumber" type="integer">128</param>
+                <param name="transport" type="string">ssl</param>
+                <param name="address" type="string">0.0.0.0</param>
+                <param name="port" type="integer">9443</param>
+                <param name="certPath" type="string">etc/phpwebserver.pem</param>
+                <param name="passphrase" type="string">passphrase</param>
+                <!-- Note: it's intended to use a relative path to get content from webservers basedir/var/www -->
+                <param name="documentRoot" type="string">var/www</param>
+                <param name="directoryIndex" type="string">index.php index.html index.htm</param>
+                <param name="keepAliveMax" type="integer">64</param>
+                <param name="keepAliveTimeout" type="integer">5</param>
+                <param name="errorsPageTemplatePath" type="string"/>
+            </params>
+
+            <virtualHosts>
+            
+                <virtualHost name="phpwebserver.dev phpwebserver.local phpwebserver.test">
+                    <params>
+                        <param name="admin" type="string">admin@phpwebserver.dev</param>
+                        <!-- Note: it's intended to use a relative path to get content from webservers basedir/var/www -->
+                        <param name="documentRoot" type="string">var/www</param>
+                        <param name="errorsPageTemplatePath" type="string">var/www/errors/error.phtml</param>
+                    </params>
+                    <rewrites>
+                        <rewrite condition="-f{OR}-l{OR}-d" target="" flag="L"/>
+                    </rewrites>
+                    <environmentVariables>
+                        <environmentVariable condition="" definition="EXAMPLE_VARIABLE=test" />
+                    </environmentVariables>
+                </virtualHost>
+                
+                <virtualHost name="phpwebserver-fcgi.dev phpwebserver-fcgi.local phpwebserver-fcgi.test">
+                    <params>
+                        <param name="admin" type="string">admin@phpwebserver.dev</param>
+                        <!-- Note: it's intended to use a relative path to get content from webservers basedir/var/www -->
+                        <param name="documentRoot" type="string">var/www/cgi</param>
+                        <param name="errorsPageTemplatePath" type="string">var/www/errors/error.phtml</param>
+                    </params>
+                    <rewrites>
+                        <rewrite condition="-f{OR}-l{OR}-d" target="" flag="L"/>
+                    </rewrites>
+                    <environmentVariables>
+                        <environmentVariable condition="" definition="EXAMPLE_VARIABLE=fastcgi" />
+                    </environmentVariables>
+                    <locations>
+                        <location condition="~*\.php(\/|\?|$)">
+                            <handlers>
+                                <handler name="fastcgi" extension=".php">
+                                    <!--
+                                    <params>
+                                        <param name="host" type="string">127.0.0.1</param>
+                                        <param name="port" type="integer">9000</param>
+                                    </params>
+                                     -->
+                                </handler>
+                            </handlers>
+                        </location>
+                    </locations>
+                </virtualHost>
+
+                <virtualHost name="magento.local">
+                    <params>
+                        <param name="admin" type="string">admin@magento.local</param>
+                        <param name="documentRoot" type="string">/var/www/magento</param>
+                        <param name="errorsPageTemplatePath" type="string">var/www/errors/error.phtml</param>
+                    </params>
+                    <rewriteMaps>
+                        <rewriteMap type="\TechDivision\WebServer\Modules\MagentoRewriteMapper">
+                            <params>
+                                <param name="base" type="string">instance-subdir</param>
+                                <param name="dsn" type="string">mysql:host=127.0.0.1;dbname=magento;charset=utf8</param>
+                                <param name="username" type="string">user</param>
+                                <param name="password" type="string">pass</param>
+                                <!-- this is optionally
+                                <param name="rewriteTableName">table-prefix.core_url_rewrite</param>
+                                <param name="storeTableName">table-prefix.core_store</param>
+                                -->
+                            </params>
+                        </rewriteMap>
+                    </rewriteMaps>
+                    <rewrites>
+                        <rewrite condition="-f{OR}-l{OR}-d" target="" flag="L"/>
+                    </rewrites>
+                    <accesses>
+                        <access type="allow">
+                            <params>
+                                <param name="X_REQUEST_URI" type="string">^\/(media|skin|js|index\.php).*</param>
+                            </params>
+                        </access>
+                    </accesses>
+                </virtualHost>
+
+                <virtualHost name="neos.local">
+                    <params>
+                        <param name="admin" type="string">admin@neos.local</param>
+                        <param name="documentRoot" type="string">/var/www/Neos-1.0.2/Web</param>
+                    </params>
+                    <rewrites>
+                        <rewrite condition="^/(_Resources/Packages/|robots\.txt|favicon\.ico){OR}-d{OR}-f{OR}-l" target="" flag="L" />
+                        <rewrite condition="^/(_Resources/Persistent/[a-z0-9]+/(.+/)?[a-f0-9]{40})/.+(\..+)" target="$1$3" flag="L" />
+                        <rewrite condition="^/(_Resources/Persistent/.{40})/.+(\..+)" target="$1$2" flag="L" />
+                        <rewrite condition="^/_Resources/.*" target="" flag="L" />
+                        <rewrite condition="(.*)" target="index.php" flag="L" />
+                    </rewrites>
+                    <environmentVariables>
+                        <environmentVariable condition="" definition="FLOW_REWRITEURLS=1" />
+                        <environmentVariable condition="" definition="FLOW_CONTEXT=Production" />
+                        <environmentVariable condition="Basic ([a-zA-Z0-9\+/=]+)@$Authorization" definition="REMOTE_AUTHORIZATION=$1" />
+                    </environmentVariables>
+                </virtualHost>
+                
+            </virtualHosts>
+
+            <environmentVariables>
+                <environmentVariable condition="(\\s.*WebKit?|Gecko)@$User-Agent" definition="BROWSER_ENGINE=$1" />
+            </environmentVariables>
+
+            <rewrites>
+                <rewrite condition="-f{OR}-l{OR}-d" target="" flag="L"/>
+            </rewrites>
+
+            <authentications>
+                <authentication uri="^\/auth\/basic\/phpwebserver.*">
+                    <params>
+                        <param name="type" type="string">\TechDivision\WebServer\Authentication\BasicAuthentication</param>
+                        <param name="realm" type="string">PhpWebServer Basic Authentication System</param>
+                        <param name="hash" type="string">cGhwd2Vic2VydmVyOnBocHdlYnNlcnZlci5pMA==</param>
+                        <!-- <param name="file" type="string">var/www/auth/basic/phpwebserver</param> -->
+                        <!-- <param name="username" type="string">phpwebserver</param> -->
+                        <!-- <param name="password" type="string">wURpZpgIT.w1I</param> -->
+                    </params>
+                </authentication>
+                <authentication uri="^\/auth\/basic\/appserver.*">
+                    <params>
+                        <param name="type" type="string">\TechDivision\WebServer\Authentication\BasicAuthentication</param>
+                        <param name="realm" type="string">appserver.io Basic Authentication System</param>
+                        <param name="hash" type="string">YXBwc2VydmVyOmFwcHNlcnZlci5pMA==</param>
+                        <!-- <param name="file" type="string">var/www/auth/basic/appserver</param> -->
+                        <!-- <param name="username" type="string">appserver</param> -->
+                        <!-- <param name="password" type="string">wURpZpgIT.w1I</param> -->
+                    </params>
+                </authentication>
+            </authentications>
+
+            <accesses>
+                <access type="allow">
+                    <params>
+                        <param name="X_REQUEST_URI" type="string">.*</param>
+                    </params>
+                </access>
+                <access type="deny">
+                    <params>
+                        <param name="X_REQUEST_URI" type="string">^\/var\/.*</param>
+                    </params>
+                </access>
+            </accesses>
+
+            <connectionHandlers>
+                <connectionHandler type="\TechDivision\WebServer\ConnectionHandlers\HttpConnectionHandler" />
+            </connectionHandlers>
+
+            <modules>
+                <!-- REQUEST_POST hook -->
+                <module type="\TechDivision\WebServer\Modules\AuthenticationModule"/>
+                <module type="\TechDivision\WebServer\Modules\VirtualHostModule"/>
+                <module type="\TechDivision\WebServer\Modules\EnvironmentVariableModule" />
+                <module type="\TechDivision\RewriteModule\RewriteModule"/>
+                <module type="\TechDivision\WebServer\Modules\DirectoryModule"/>
+                <module type="\TechDivision\WebServer\Modules\AccessModule"/>
+                <module type="\TechDivision\WebServer\Modules\CoreModule"/>
+                <module type="\TechDivision\PhpModule\PhpModule"/>
+                <module type="\TechDivision\FastCgiModule\FastCgiModule"/>
+                <!-- RESPONSE_PRE hook -->
+                <module type="\TechDivision\WebServer\Modules\DeflateModule"/>
+            </modules>
+            <handlers>
+                <handler name="php" extension=".php"/>
+                <handler name="php" extension=".phtml"/>
+                <handler name="servlet" extension=".do"/>
+            </handlers>
+        </server>
     </servers>
 
 </config>

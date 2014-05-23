@@ -63,7 +63,7 @@ class StreamSocket implements SocketInterface
      * @param string   $flags   The flags to be set on server create
      * @param resource $context The context to be set on stream create
      *
-     * @return \TechDivision\WebServer\Sockets\Stream The Stream instance with a server socket created.
+     * @return \TechDivision\WebServer\Sockets\StreamSocket The Stream instance with a server socket created.
      */
     public static function getServerInstance($socket, $flags = null, $context = null)
     {
@@ -72,9 +72,16 @@ class StreamSocket implements SocketInterface
             $flags = STREAM_SERVER_BIND | STREAM_SERVER_LISTEN;
         }
 
-        // init context if none was given
+        // init default context if none was given
         if (is_null($context)) {
-            $context = @stream_context_create();
+            // set socket backlog to 1024 for perform many concurrent connections as default
+            $opts = array(
+                'socket' => array(
+                    'backlog' => 1024,
+                )
+            );
+            // init stream context for server connection
+            $context = @stream_context_create($opts);
         }
 
         // create stream socket server resource
@@ -98,7 +105,7 @@ class StreamSocket implements SocketInterface
      * @param string   $flags   The flags to be set on client create
      * @param resource $context The context to be set on stream create
      *
-     * @return \TechDivision\WebServer\Sockets\Stream The Stream instance with a client socket created.
+     * @return \TechDivision\WebServer\Sockets\StreamSocket The Stream instance with a client socket created.
      */
     public static function getClientInstance($socket, $flags = null, $context = null)
     {

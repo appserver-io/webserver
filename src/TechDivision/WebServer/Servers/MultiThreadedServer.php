@@ -122,7 +122,12 @@ class MultiThreadedServer extends \Thread implements ServerInterface
         $streamContext = stream_context_create($opts);
         // check if ssl server config
         if ($serverConfig->getTransport() === 'ssl') {
-            stream_context_set_option($streamContext, 'ssl', 'local_cert', WEBSERVER_BASEDIR . $serverConfig->getCertPath());
+            stream_context_set_option(
+                $streamContext,
+                'ssl',
+                'local_cert',
+                WEBSERVER_BASEDIR . $serverConfig->getCertPath()
+            );
             stream_context_set_option($streamContext, 'ssl', 'passphrase', $serverConfig->getPassphrase());
             stream_context_set_option($streamContext, 'ssl', 'allow_self_signed', true);
             stream_context_set_option($streamContext, 'ssl', 'verify_peer', false);
@@ -133,6 +138,14 @@ class MultiThreadedServer extends \Thread implements ServerInterface
             $serverConfig->getTransport() . '://' . $serverConfig->getAddress() . ':' . $serverConfig->getPort(),
             STREAM_SERVER_BIND | STREAM_SERVER_LISTEN,
             $streamContext
+        );
+
+        // We have to notify the logical parent thread, the server script or containing container, as they have to
+        // know the port has been opened
+        $this->synchronized(
+            function () {
+                $this->notify();
+            }
         );
 
         // init modules array
@@ -182,7 +195,7 @@ class MultiThreadedServer extends \Thread implements ServerInterface
         );
 
         // setup and start workers
-        for ($i=1; $i <= $serverConfig->getWorkerNumber(); ++$i) {
+        for ($i = 1; $i <= $serverConfig->getWorkerNumber(); ++$i) {
             $workers[$i] = new $workerType(
                 $serverConnection->getConnectionResource(),
                 $serverContext,
@@ -200,7 +213,7 @@ class MultiThreadedServer extends \Thread implements ServerInterface
         // watch dog for all workers to restart if it's needed while server is up
         while ($serverUp === true) {
             // iterate all workers
-            for ($i=1; $i <= $serverConfig->getWorkerNumber(); ++$i) {
+            for ($i = 1; $i <= $serverConfig->getWorkerNumber(); ++$i) {
                 // check if worker should be restarted
                 if ($workers[$i]->shouldRestart()) {
 

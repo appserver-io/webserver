@@ -25,13 +25,13 @@ use TechDivision\Http\HttpProtocol;
 use TechDivision\Http\HttpResponseStates;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
-use TechDivision\WebServer\Dictionaries\ModuleHooks;
-use TechDivision\WebServer\Dictionaries\ServerVars;
-use TechDivision\WebServer\Dictionaries\ModuleVars;
-use TechDivision\WebServer\Interfaces\ModuleInterface;
-use TechDivision\WebServer\Interfaces\ServerContextInterface;
-use TechDivision\WebServer\Exceptions\ModuleException;
-use TechDivision\WebServer\Dictionaries\MimeTypes;
+use TechDivision\Server\Dictionaries\ModuleHooks;
+use TechDivision\Server\Dictionaries\ServerVars;
+use TechDivision\Server\Dictionaries\ModuleVars;
+use TechDivision\Server\Interfaces\ModuleInterface;
+use TechDivision\Server\Interfaces\ServerContextInterface;
+use TechDivision\Server\Exceptions\ModuleException;
+use TechDivision\Server\Dictionaries\MimeTypes;
 
 /**
  * Class CoreModule
@@ -56,7 +56,7 @@ class CoreModule implements ModuleInterface
     /**
      * Holds the server context instance
      *
-     * @var \TechDivision\WebServer\Interfaces\ServerContextInterface
+     * @var \TechDivision\Server\Interfaces\ServerContextInterface
      */
     protected $serverContext;
 
@@ -75,7 +75,7 @@ class CoreModule implements ModuleInterface
      * @param int                                      $hook     The current hook to process logic for
      *
      * @return bool
-     * @throws \TechDivision\WebServer\Exceptions\ModuleException
+     * @throws \TechDivision\Server\Exceptions\ModuleException
      */
     public function process(HttpRequestInterface $request, HttpResponseInterface $response, $hook)
     {
@@ -267,10 +267,10 @@ class CoreModule implements ModuleInterface
     /**
      * Initiates the module
      *
-     * @param \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext The server's context instance
+     * @param \TechDivision\Server\Interfaces\ServerContextInterface $serverContext The server's context instance
      *
      * @return bool
-     * @throws \TechDivision\WebServer\Exceptions\ModuleException
+     * @throws \TechDivision\Server\Exceptions\ModuleException
      */
     public function init(ServerContextInterface $serverContext)
     {
@@ -303,7 +303,7 @@ class CoreModule implements ModuleInterface
     /**
      * Return's the server context instance
      *
-     * @return \TechDivision\WebServer\Interfaces\ServerContextInterface
+     * @return \TechDivision\Server\Interfaces\ServerContextInterface
      */
     public function getServerContext()
     {

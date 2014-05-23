@@ -22,8 +22,6 @@
 namespace TechDivision\WebServer\Interfaces;
 
 use TechDivision\WebServer\Exceptions\ModuleException;
-use TechDivision\Http\HttpRequestInterface;
-use TechDivision\Http\HttpResponseInterface;
 
 /**
  * Interface RewriteMapperInterface

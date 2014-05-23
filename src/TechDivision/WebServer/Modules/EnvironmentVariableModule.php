@@ -20,15 +20,15 @@
 namespace TechDivision\WebServer\Modules;
 
 use TechDivision\Http\HttpProtocol;
-use TechDivision\WebServer\Dictionaries\ModuleHooks;
-use TechDivision\WebServer\Exceptions\ModuleException;
-use TechDivision\WebServer\Dictionaries\ServerVars;
-use TechDivision\WebServer\Dictionaries\EnvVars;
-use TechDivision\WebServer\Interfaces\ServerContextInterface;
+use TechDivision\Server\Dictionaries\ModuleHooks;
+use TechDivision\Server\Exceptions\ModuleException;
+use TechDivision\Server\Dictionaries\ServerVars;
+use TechDivision\Server\Dictionaries\EnvVars;
+use TechDivision\Server\Interfaces\ServerContextInterface;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
-use TechDivision\WebServer\Interfaces\ModuleInterface;
-use TechDivision\WebServer\Dictionaries\ModuleVars;
+use TechDivision\Server\Interfaces\ModuleInterface;
+use TechDivision\Server\Dictionaries\ModuleVars;
 
 /**
  * TechDivision\WebServer\Modules\EnvironmentVariableModule
@@ -77,7 +77,7 @@ class EnvironmentVariableModule implements ModuleInterface
     /**
      * The server's context instance which we preserve for later use
      *
-     * @var \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext $serverContext
+     * @var \TechDivision\Server\Interfaces\ServerContextInterface $serverContext $serverContext
      */
     protected $serverContext;
 
@@ -113,10 +113,10 @@ class EnvironmentVariableModule implements ModuleInterface
     /**
      * Initiates the module
      *
-     * @param \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext The server's context instance
+     * @param \TechDivision\Server\Interfaces\ServerContextInterface $serverContext The server's context instance
      *
      * @return bool
-     * @throws \TechDivision\WebServer\Exceptions\ModuleException
+     * @throws \TechDivision\Server\Exceptions\ModuleException
      */
     public function init(ServerContextInterface $serverContext)
     {
@@ -229,7 +229,7 @@ class EnvironmentVariableModule implements ModuleInterface
      * @param int                                      $hook     The current hook to process logic for
      *
      * @return bool
-     * @throws \TechDivision\WebServer\Exceptions\ModuleException
+     * @throws \TechDivision\Server\Exceptions\ModuleException
      */
     public function process(HttpRequestInterface $request, HttpResponseInterface $response, $hook)
     {
@@ -425,7 +425,7 @@ class EnvironmentVariableModule implements ModuleInterface
     /**
      * Initiates the module
      *
-     * @throws \TechDivision\WebServer\Exceptions\ModuleException
+     * @throws \TechDivision\Server\Exceptions\ModuleException
      *
      * @return void
      */

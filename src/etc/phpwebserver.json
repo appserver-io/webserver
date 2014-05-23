@@ -42,10 +42,10 @@
     "servers": [
         {
             "name": "httpServer",
-            "type": "\\TechDivision\\WebServer\\Servers\\MultiThreadedServer",
-            "worker": "\\TechDivision\\WebServer\\Workers\\ThreadWorker",
-            "socket": "\\TechDivision\\WebServer\\Sockets\\StreamSocket",
-            "serverContext": "\\TechDivision\\WebServer\\ServerContext",
+            "type": "\\TechDivision\\Server\\Servers\\MultiThreadedServer",
+            "worker": "\\TechDivision\\Server\\Workers\\ThreadWorker",
+            "socket": "\\TechDivision\\Server\\Sockets\\StreamSocket",
+            "serverContext": "\\TechDivision\\Server\\ServerContext",
             "loggerName": "System",
             "workerNumber": 128,
 
@@ -213,10 +213,10 @@
         },
         {
             "name": "httpsServer",
-            "type": "\\TechDivision\\WebServer\\Servers\\MultiThreadedServer",
-            "worker": "\\TechDivision\\WebServer\\Workers\\ThreadWorker",
-            "socket": "\\TechDivision\\WebServer\\Sockets\\StreamSocket",
-            "serverContext" : "\\TechDivision\\WebServer\\ServerContext",
+            "type": "\\TechDivision\\Server\\Servers\\MultiThreadedServer",
+            "worker": "\\TechDivision\\Server\\Workers\\ThreadWorker",
+            "socket": "\\TechDivision\\Server\\Sockets\\StreamSocket",
+            "serverContext" : "\\TechDivision\\Server\\ServerContext",
             "loggerName": "System",
             "workerNumber": 128,
 

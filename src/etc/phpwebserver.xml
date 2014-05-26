@@ -64,10 +64,10 @@
     <servers>
         <server
             name="httpServer"
-            type="\TechDivision\WebServer\Servers\MultiThreadedServer"
-            worker="\TechDivision\WebServer\Workers\ThreadWorker"
-            socket="\TechDivision\WebServer\Sockets\StreamSocket"
-            serverContext="\TechDivision\WebServer\ServerContext"
+            type="\TechDivision\Server\Servers\MultiThreadedServer"
+            worker="\TechDivision\Server\Workers\ThreadWorker"
+            socket="\TechDivision\Server\Sockets\StreamSocket"
+            serverContext="\TechDivision\Server\ServerContext"
             loggerName="System">
 
             <params>
@@ -232,7 +232,7 @@
             </rewrites>
 
             <connectionHandlers>
-                <connectionHandler type="\TechDivision\Http\HttpConnectionHandler" />
+                <connectionHandler type="\TechDivision\WebServer\ConnectionHandlers\HttpConnectionHandler" />
             </connectionHandlers>
 
             <modules>
@@ -259,10 +259,10 @@
 
         <server
             name="httpsServer"
-            type="\TechDivision\WebServer\Servers\MultiThreadedServer"
-            worker="\TechDivision\WebServer\Workers\ThreadWorker"
-            socket="\TechDivision\WebServer\Sockets\StreamSocket"
-            serverContext="\TechDivision\WebServer\ServerContext"
+            type="\TechDivision\Server\Servers\MultiThreadedServer"
+            worker="\TechDivision\Server\Workers\ThreadWorker"
+            socket="\TechDivision\Server\Sockets\StreamSocket"
+            serverContext="\TechDivision\Server\ServerContext"
             loggerName="System">
 
             <params>
@@ -426,7 +426,7 @@
             </accesses>
 
             <connectionHandlers>
-                <connectionHandler type="\TechDivision\Http\HttpConnectionHandler" />
+                <connectionHandler type="\TechDivision\WebServer\ConnectionHandlers\HttpConnectionHandler" />
             </connectionHandlers>
 
             <modules>

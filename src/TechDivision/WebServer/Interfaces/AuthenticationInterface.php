@@ -21,9 +21,7 @@
 
 namespace TechDivision\WebServer\Interfaces;
 
-use TechDivision\WebServer\Exceptions\ModuleException;
-use TechDivision\Http\HttpRequestInterface;
-use TechDivision\Http\HttpResponseInterface;
+use TechDivision\Server\Exceptions\ModuleException;
 
 /**
  * Interface AuthenticationInterface

@@ -25,11 +25,11 @@ use TechDivision\Http\HttpProtocol;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
 use TechDivision\Http\HttpResponseStates;
-use TechDivision\WebServer\Dictionaries\ModuleHooks;
-use TechDivision\WebServer\Interfaces\ModuleInterface;
-use TechDivision\WebServer\Modules\ModuleException;
-use TechDivision\WebServer\Interfaces\ServerContextInterface;
-use TechDivision\WebServer\Dictionaries\ServerVars;
+use TechDivision\Server\Dictionaries\ModuleHooks;
+use TechDivision\Server\Interfaces\ModuleInterface;
+use TechDivision\Server\Exceptions\ModuleException;
+use TechDivision\Server\Interfaces\ServerContextInterface;
+use TechDivision\Server\Dictionaries\ServerVars;
 
 /**
  * Class DirectoryModule
@@ -54,7 +54,7 @@ class DirectoryModule implements ModuleInterface
     /**
      * Hold's the server context instance
      *
-     * @var \TechDivision\WebServer\Interfaces\ServerContextInterface
+     * @var \TechDivision\Server\Interfaces\ServerContextInterface
      */
     protected $serverContext;
 
@@ -81,10 +81,10 @@ class DirectoryModule implements ModuleInterface
     /**
      * Initiates the module
      *
-     * @param \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext The server's context instance
+     * @param \TechDivision\Server\Interfaces\ServerContextInterface $serverContext The server's context instance
      *
      * @return bool
-     * @throws \TechDivision\WebServer\Exceptions\ModuleException
+     * @throws \TechDivision\Server\Exceptions\ModuleException
      */
     public function init(ServerContextInterface $serverContext)
     {
@@ -96,7 +96,7 @@ class DirectoryModule implements ModuleInterface
     /**
      * Return's the server context instance
      *
-     * @return \TechDivision\WebServer\Interfaces\ServerContextInterface
+     * @return \TechDivision\Server\Interfaces\ServerContextInterface
      */
     public function getServerContext()
     {
@@ -111,7 +111,7 @@ class DirectoryModule implements ModuleInterface
      * @param int                                      $hook     The current hook to process logic for
      *
      * @return bool
-     * @throws \TechDivision\WebServer\Exceptions\ModuleException
+     * @throws \TechDivision\Server\Exceptions\ModuleException
      */
     public function process(HttpRequestInterface $request, HttpResponseInterface $response, $hook)
     {

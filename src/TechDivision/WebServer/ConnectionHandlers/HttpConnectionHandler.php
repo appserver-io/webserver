@@ -320,9 +320,9 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
 
                 // process connection type keep-alive
                 if (strcasecmp(
-                        $request->getHeader(HttpProtocol::HEADER_CONNECTION),
-                        HttpProtocol::HEADER_CONNECTION_VALUE_KEEPALIVE
-                    ) === 0) {
+                    $request->getHeader(HttpProtocol::HEADER_CONNECTION),
+                    HttpProtocol::HEADER_CONNECTION_VALUE_KEEPALIVE
+                ) === 0) {
                     // only if max connections were not reached yet
                     if ($keepAliveMax > 0) {
                         // enable keep alive connection
@@ -515,8 +515,8 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
 
             $accessLogger->info(
                 sprintf(
-                /* This logs in apaches default combined format */
-                /* LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined */
+                    /* This logs in apaches default combined format */
+                    /* LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined */
                     '%s - - [%s] "%s %s %s" %s %s "%s" "%s"' . PHP_EOL,
                     $serverContext->getServerVar(ServerVars::REMOTE_ADDR),
                     $datetime->format('d/M/Y:H:i:s O'),

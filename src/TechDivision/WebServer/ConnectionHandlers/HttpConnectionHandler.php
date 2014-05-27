@@ -1,6 +1,6 @@
 <?php
 /**
- * \TechDivision\WebServer\ConnectionHandlers\HttpConnection
+ * \TechDivision\WebServer\ConnectionHandlers\
  *
  * NOTICE OF LICENSE
  *
@@ -10,7 +10,7 @@
  *
  * PHP version 5
  *
- * @category   WebServer
+ * @category   Library
  * @package    TechDivision_WebServer
  * @subpackage ConnectionHandlers
  * @author     Johann Zelger <jz@techdivision.com>
@@ -38,15 +38,15 @@ use TechDivision\Http\HttpRequestParserInterface;
 use TechDivision\Http\HttpProtocol;
 use TechDivision\Http\HttpRequest;
 use TechDivision\Http\HttpResponse;
-use TechDivision\Http\HttpRequestParser;
-use TechDivision\Http\HttpResponseStates;
 use TechDivision\Http\HttpPart;
 use TechDivision\Http\HttpQueryParser;
+use TechDivision\Http\HttpRequestParser;
+use TechDivision\Http\HttpResponseStates;
 
 /**
  * Class HttpConnectionHandler
  *
- * @category   WebServer
+ * @category   Library
  * @package    TechDivision_WebServer
  * @subpackage ConnectionHandlers
  * @author     Johann Zelger <jz@techdivision.com>
@@ -320,9 +320,9 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
 
                 // process connection type keep-alive
                 if (strcasecmp(
-                    $request->getHeader(HttpProtocol::HEADER_CONNECTION),
-                    HttpProtocol::HEADER_CONNECTION_VALUE_KEEPALIVE
-                ) === 0) {
+                        $request->getHeader(HttpProtocol::HEADER_CONNECTION),
+                        HttpProtocol::HEADER_CONNECTION_VALUE_KEEPALIVE
+                    ) === 0) {
                     // only if max connections were not reached yet
                     if ($keepAliveMax > 0) {
                         // enable keep alive connection
@@ -515,8 +515,8 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
 
             $accessLogger->info(
                 sprintf(
-                    /* This logs in apaches default combined format */
-                    /* LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined */
+                /* This logs in apaches default combined format */
+                /* LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined */
                     '%s - - [%s] "%s %s %s" %s %s "%s" "%s"' . PHP_EOL,
                     $serverContext->getServerVar(ServerVars::REMOTE_ADDR),
                     $datetime->format('d/M/Y:H:i:s O'),
@@ -550,7 +550,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         // get http host to set server name var but trim the root domain
         $serverName = rtrim($request->getHeader(HttpProtocol::HEADER_HOST), '.');
         if (strpos($serverName, ':') !== false) {
-            $serverName = strstr($serverName, ':', true);
+            $serverName = rtrim(strstr($serverName, ':', true), '.');
         }
 
         // set server name var

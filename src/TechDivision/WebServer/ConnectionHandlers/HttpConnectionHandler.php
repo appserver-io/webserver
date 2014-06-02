@@ -31,6 +31,7 @@ use TechDivision\Server\Interfaces\ServerConfigurationInterface;
 use TechDivision\Server\Interfaces\ServerContextInterface;
 use TechDivision\Server\Interfaces\WorkerInterface;
 use TechDivision\Server\Sockets\SocketInterface;
+use TechDivision\Server\Sockets\SocketReadException;
 use TechDivision\Server\Sockets\SocketReadTimeoutException;
 
 use TechDivision\Http\HttpRequestInterface;
@@ -42,6 +43,7 @@ use TechDivision\Http\HttpPart;
 use TechDivision\Http\HttpQueryParser;
 use TechDivision\Http\HttpRequestParser;
 use TechDivision\Http\HttpResponseStates;
+use TechDivision\Server\Sockets\SocketServerException;
 
 /**
  * Class HttpConnectionHandler
@@ -373,9 +375,16 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                 }
 
             } catch (SocketReadTimeoutException $e) {
-                // set request timeout status code
-                $response->setStatusCode(408);
-                $this->renderErrorPage($e->__toString());
+                // break the request processing due to client timeout
+                break;
+
+            } catch (SocketReadException $e) {
+                // break the request processing due to peer reset
+                break;
+
+            } catch (SocketServerException $e) {
+                // break the request processing
+                break;
 
             } catch (\Exception $e) {
                 // set status code given by exception

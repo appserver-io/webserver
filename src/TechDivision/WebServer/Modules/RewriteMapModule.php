@@ -150,19 +150,28 @@ class RewriteMapModule implements ModuleInterface
 
         // init all rewrite mappers by types and do look up
         foreach ($rewriteMaps as $rewriteMapType => $rewriteMapParams) {
+
+            // Include the requested hostname as a param, some mappers might need it
+            $rewriteMapParams['headerHost'] = $request->getHeader(HttpProtocol::HEADER_HOST);
+            // Same for the protocol
+            $rewriteMapParams['protocol'] = $protocol;
+
+            // Get ourselves a rewriteMapper of the right type
             $rewriteMapper = new $rewriteMapType($rewriteMapParams);
             // lookup by request path
             if ($targetUrl = $rewriteMapper->lookup($requestPath)) {
-                // build up final url
-                $finalTargetUrl = $protocol . $request->getHeader(HttpProtocol::HEADER_HOST) . $targetUrl;
+
                 // set enhance uri to response
-                $response->addHeader(HttpProtocol::HEADER_LOCATION, $finalTargetUrl);
+                $response->addHeader(HttpProtocol::HEADER_LOCATION, $targetUrl);
                 // send redirect status
                 $response->setStatusCode(301);
                 // add header to be sure that is was us
-                $response->addHeader('X-Rewrited-By', __CLASS__);
+                $response->addHeader('X-Rewritten-By', __CLASS__);
                 // set response state to be dispatched after this without calling other modules process
                 $response->setState(HttpResponseStates::DISPATCH);
+
+                // We found something, stop the loop
+                break;
             }
         }
         return true;

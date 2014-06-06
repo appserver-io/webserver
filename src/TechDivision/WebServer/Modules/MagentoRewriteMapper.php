@@ -56,7 +56,7 @@ class MagentoRewriteMapper implements RewriteMapperInterface
      */
     public function lookup($requestUrl)
     {
-        // set targetUrl to null by default
+        // set targetUrl to the current host by default
         $targetUrl = null;
         // set base to local ref
         $base = $this->params['base'];
@@ -102,7 +102,8 @@ class MagentoRewriteMapper implements RewriteMapperInterface
 
             // check if target_path was found and set target url for return
             if (isset($magentoUrlRewrite->target_path)) {
-                $targetUrl = $baseUrl . $magentoUrlRewrite->target_path;
+                $targetUrl .= $this->params['protocol'] . $this->params['headerHost'] .
+                    $baseUrl . $magentoUrlRewrite->target_path;
             }
 
             // disconnect PDO database and YES... this is the right way... read PDO documentation.

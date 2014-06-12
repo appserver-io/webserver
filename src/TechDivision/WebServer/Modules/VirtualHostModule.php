@@ -205,6 +205,15 @@ class VirtualHostModule implements ModuleInterface
                     $virtualHosts[$serverName]['rewriteMaps']
                 );
             }
+
+            // Add the authentications we have (if any) to the configuration's authentications pool
+            if (!empty($virtualHosts[$serverName]['authentications'])) {
+                // Set the authentications we encountered as a temporary module var
+                $this->serverContext->setModuleVar(
+                    ModuleVars::VOLATILE_AUTHENTICATIONS,
+                    $virtualHosts[$serverName]['authentications']
+                );
+            }
         }
 
     }

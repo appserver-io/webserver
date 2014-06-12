@@ -95,14 +95,18 @@ class TotalIntegrationRewriteMapper implements RewriteMapperInterface
                 AND $hostTableName.name = '$host'
                 AND $rewriteTableName.customer = $hostTableName.customer;"
             );
-            $targetEntry = $query->fetch(\PDO::FETCH_OBJ);
 
-            // check if target was found and set target url for return
-            if (is_object($targetEntry) && isset($targetEntry->target)) {
+            // Check if we got something useful
+            if (is_a($query, '\PDOStatement')) {
 
-                $targetUrl = $targetEntry->target;
+                $targetEntry = $query->fetch(\PDO::FETCH_OBJ);
+
+                // check if target was found and set target url for return
+                if (is_object($targetEntry) && isset($targetEntry->target)) {
+
+                    $targetUrl = $targetEntry->target;
+                }
             }
-
             // disconnect PDO database and YES... this is the right way... read PDO documentation.
             $db = null;
         }

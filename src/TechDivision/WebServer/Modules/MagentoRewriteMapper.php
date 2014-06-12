@@ -98,12 +98,17 @@ class MagentoRewriteMapper implements RewriteMapperInterface
                   and store_id = '$magentoStore->store_id'
                   and options = 'RP'"
             );
-            $magentoUrlRewrite = $query->fetch(\PDO::FETCH_OBJ);
 
-            // check if target_path was found and set target url for return
-            if (isset($magentoUrlRewrite->target_path)) {
-                $targetUrl .= $this->params['protocol'] . $this->params['headerHost'] .
-                    $baseUrl . $magentoUrlRewrite->target_path;
+            // Check if we got something useful
+            if (is_a($query, '\PDOStatement')) {
+
+                $magentoUrlRewrite = $query->fetch(\PDO::FETCH_OBJ);
+
+                // check if target_path was found and set target url for return
+                if (isset($magentoUrlRewrite->target_path)) {
+                    $targetUrl .= $this->params['protocol'] . $this->params['headerHost'] .
+                        $baseUrl . $magentoUrlRewrite->target_path;
+                }
             }
 
             // disconnect PDO database and YES... this is the right way... read PDO documentation.

@@ -24,6 +24,7 @@ namespace TechDivision\WebServer\Modules;
 use TechDivision\Http\HttpProtocol;
 use TechDivision\Server\Dictionaries\ModuleHooks;
 use TechDivision\Server\Dictionaries\ServerVars;
+use TechDivision\Server\Dictionaries\ModuleVars;
 use TechDivision\Server\Interfaces\ModuleInterface;
 use TechDivision\Server\Exceptions\ModuleException;
 use TechDivision\Server\Interfaces\ServerContextInterface;
@@ -58,6 +59,13 @@ class AuthenticationModule implements ModuleInterface
      * @var \TechDivision\Server\Interfaces\ServerContextInterface
      */
     protected $serverContext;
+
+    /**
+     * Hold's all authentication instances
+     *
+     * @var array
+     */
+    protected $authentications;
 
     /**
      * Hold's all authenticationType instances used within server while running
@@ -161,7 +169,7 @@ class AuthenticationModule implements ModuleInterface
      */
     public function process(HttpRequestInterface $request, HttpResponseInterface $response, $hook)
     {
-        // if false hook is comming do nothing
+        // if false hook is coming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
             return;
         }
@@ -170,8 +178,21 @@ class AuthenticationModule implements ModuleInterface
         $this->request = $request;
         $this->response = $response;
 
-        // check authentication informations if something matches
-        foreach ($this->authentications as $uriPattern => $data) {
+        // Get teh authentications locally so we do not mess with inter-request configuration
+        $authentications = $this->authentications;
+
+        // check if there are some volatile rewrite map definitions so add them
+        if ($this->serverContext->hasModuleVar(ModuleVars::VOLATILE_AUTHENTICATIONS)) {
+            $volatileAuthentications = $this->serverContext->getModuleVar(ModuleVars::VOLATILE_AUTHENTICATIONS);
+            // merge rewrite maps
+            $authentications = array_merge(
+                $volatileAuthentications,
+                $authentications
+            );
+        }
+
+        // check authentication information if something matches
+        foreach ($authentications as $uriPattern => $data) {
             // check if pattern matches uri
             if (preg_match(
                 '/' . $uriPattern . '/',

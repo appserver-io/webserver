@@ -56,7 +56,7 @@ class MagentoRewriteMapper implements RewriteMapperInterface
      */
     public function lookup($requestUrl)
     {
-        // set targetUrl to the current host by default
+        // set targetUrl to null by default
         $targetUrl = null;
         // set base to local ref
         $base = $this->params['base'];

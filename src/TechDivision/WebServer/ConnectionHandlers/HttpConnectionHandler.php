@@ -642,20 +642,48 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         // get refs to local vars
         $connection = $this->getConnection();
         $worker = $this->getWorker();
+        $response = $this->getParser()->getResponse();
 
         // check if connections is still alive
         if ($connection) {
+
             // set response code to 500 Internal Server Error
-            $this->getParser()->getResponse()->setStatusCode(500);
+            $response->setStatusCode(appserver_get_http_response_code());
+
+            // add this header to prevent .php request to be cached
+            $response->addHeader(HttpProtocol::HEADER_EXPIRES, '19 Nov 1981 08:52:00 GMT');
+            $response->addHeader(HttpProtocol::HEADER_CACHE_CONTROL, 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+            $response->addHeader(HttpProtocol::HEADER_PRAGMA, 'no-cache');
 
             // get last error array
             $lastError = error_get_last();
 
             // check if it was a fatal error
             if (!is_null($lastError) && $lastError['type'] === 1) {
+
+                // set response code to 500 Internal Server Error
+                $response->setStatusCode(500);
                 $errorMessage = 'PHP Fatal error: ' . $lastError['message'] .
                     ' in ' . $lastError['file'] . ' on line ' . $lastError['line'];
                 $this->renderErrorPage($errorMessage);
+            }
+
+            // grep headers and set to response object
+            foreach (appserver_get_headers(true) as $i => $h) {
+                // set headers defined in sapi headers
+                $h = explode(':', $h, 2);
+                if (isset($h[1])) {
+                    // load header key and value
+                    $key = trim($h[0]);
+                    $value = trim($h[1]);
+                    // if no status, add the header normally
+                    if ($key === HttpProtocol::HEADER_STATUS) {
+                        // set status by Status header value which is only used by fcgi sapi's normally
+                        $response->setStatus($value);
+                    } else {
+                        $response->addHeader($key, $value);
+                    }
+                }
             }
 
             // send response before shutdown

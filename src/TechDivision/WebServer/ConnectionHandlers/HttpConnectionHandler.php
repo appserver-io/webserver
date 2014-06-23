@@ -659,7 +659,8 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
      *
      * @return void
      */
-    public function registerShutdown() {
+    public function registerShutdown()
+    {
         // register shutdown handler once to avoid strange memory consumption problems
         if ($this->hasRegisteredShutdown === false) {
             register_shutdown_function(array(&$this, "shutdown"));

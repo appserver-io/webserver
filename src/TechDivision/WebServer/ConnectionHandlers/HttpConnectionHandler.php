@@ -102,6 +102,13 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     protected $worker;
 
     /**
+     * Flag if a shutdown function was registered or not
+     *
+     * @var boolean
+     */
+    protected $hasRegisteredShutdown = false;
+
+    /**
      * Inits the connection handler by given context and params
      *
      * @param \TechDivision\Server\Interfaces\ServerContextInterface $serverContext The server's context
@@ -134,9 +141,6 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         $this->parser = new HttpRequestParser($httpRequest, $httpResponse);
         $this->parser->injectQueryParser(new HttpQueryParser());
         $this->parser->injectPart(new HttpPart());
-
-        // register shutdown handler
-        register_shutdown_function(array(&$this, "shutdown"));
     }
 
     /**
@@ -159,6 +163,21 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     public function getModules()
     {
         return $this->modules;
+    }
+
+
+    /**
+     * Return's a specific module instance by given name
+     *
+     * @param string $name The modules name to return an instance for
+     *
+     * @return \TechDivision\Server\Interfaces\ModuleInterface|null
+     */
+    public function getModule($name)
+    {
+        if (isset($this->modules[$name])) {
+            return $this->modules[$name];
+        }
     }
 
     /**
@@ -232,6 +251,9 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
      */
     public function handle(SocketInterface $connection, WorkerInterface $worker)
     {
+        // register shutdown handler once to avoid strange memory consumption problems
+        $this->registerShutdown();
+
         // add connection ref to self
         $this->connection = $connection;
         $this->worker = $worker;
@@ -633,6 +655,20 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     }
 
     /**
+     * Registers the shutdown function in this context
+     *
+     * @return void
+     */
+    public function registerShutdown()
+    {
+        // register shutdown handler once to avoid strange memory consumption problems
+        if ($this->hasRegisteredShutdown === false) {
+            register_shutdown_function(array(&$this, "shutdown"));
+            $this->hasRegisteredShutdown = true;
+        }
+    }
+
+    /**
      * Does shutdown logic for worker if something breaks in process
      *
      * @return void
@@ -640,48 +676,59 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     public function shutdown()
     {
         // get refs to local vars
+        $serverContext = $this->getServerContext();
         $connection = $this->getConnection();
         $worker = $this->getWorker();
+        $request = $this->getParser()->getRequest();
         $response = $this->getParser()->getResponse();
 
         // check if connections is still alive
         if ($connection) {
 
-            // set response code to 500 Internal Server Error
-            $response->setStatusCode(appserver_get_http_response_code());
-
-            // add this header to prevent .php request to be cached
-            $response->addHeader(HttpProtocol::HEADER_EXPIRES, '19 Nov 1981 08:52:00 GMT');
-            $response->addHeader(HttpProtocol::HEADER_CACHE_CONTROL, 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
-            $response->addHeader(HttpProtocol::HEADER_PRAGMA, 'no-cache');
-
-            // get last error array
-            $lastError = error_get_last();
-
-            // check if it was a fatal error
-            if (!is_null($lastError) && $lastError['type'] === 1) {
-
-                // set response code to 500 Internal Server Error
-                $response->setStatusCode(500);
-                $errorMessage = 'PHP Fatal error: ' . $lastError['message'] .
-                    ' in ' . $lastError['file'] . ' on line ' . $lastError['line'];
-                $this->renderErrorPage($errorMessage);
+            // call current fileahandler module's shutdown hook if exists
+            if ($fileHandleModule = $this->getModule($serverContext->getServerVar(ServerVars::SERVER_HANDLER))) {
+                $fileHandleModule->process($request, $response, ModuleHooks::SHUTDOWN);
             }
 
-            // grep headers and set to response object
-            foreach (appserver_get_headers(true) as $i => $h) {
-                // set headers defined in sapi headers
-                $h = explode(':', $h, 2);
-                if (isset($h[1])) {
-                    // load header key and value
-                    $key = trim($h[0]);
-                    $value = trim($h[1]);
-                    // if no status, add the header normally
-                    if ($key === HttpProtocol::HEADER_STATUS) {
-                        // set status by Status header value which is only used by fcgi sapi's normally
-                        $response->setStatus($value);
-                    } else {
-                        $response->addHeader($key, $value);
+            // check if filehandle module has not handled the shutdown and set the response state to dispatched
+            // so do default shutdown / error handling for current worker process
+            if (!$response->hasState(HttpResponseStates::DISPATCH)) {
+                // set response code to 500 Internal Server Error
+                $response->setStatusCode(appserver_get_http_response_code());
+
+                // add this header to prevent .php request to be cached
+                $response->addHeader(HttpProtocol::HEADER_EXPIRES, '19 Nov 1981 08:52:00 GMT');
+                $response->addHeader(HttpProtocol::HEADER_CACHE_CONTROL, 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+                $response->addHeader(HttpProtocol::HEADER_PRAGMA, 'no-cache');
+
+                // get last error array
+                $lastError = error_get_last();
+
+                // check if it was a fatal error
+                if (!is_null($lastError) && $lastError['type'] === 1) {
+
+                    // set response code to 500 Internal Server Error
+                    $response->setStatusCode(500);
+                    $errorMessage = 'PHP Fatal error: ' . $lastError['message'] .
+                        ' in ' . $lastError['file'] . ' on line ' . $lastError['line'];
+                    $this->renderErrorPage($errorMessage);
+                }
+
+                // grep headers and set to response object
+                foreach (appserver_get_headers(true) as $i => $h) {
+                    // set headers defined in sapi headers
+                    $h = explode(':', $h, 2);
+                    if (isset($h[1])) {
+                        // load header key and value
+                        $key = trim($h[0]);
+                        $value = trim($h[1]);
+                        // if no status, add the header normally
+                        if ($key === HttpProtocol::HEADER_STATUS) {
+                            // set status by Status header value which is only used by fcgi sapi's normally
+                            $response->setStatus($value);
+                        } else {
+                            $response->addHeader($key, $value);
+                        }
                     }
                 }
             }
@@ -690,7 +737,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             $this->sendResponse();
 
             // close client connection
-            $this->getConnection()->close();
+            $connection->close();
         }
 
         // check if worker is given

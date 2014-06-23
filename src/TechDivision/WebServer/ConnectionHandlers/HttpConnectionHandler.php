@@ -102,6 +102,13 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     protected $worker;
 
     /**
+     * Flag if a shutdown function was registered or not
+     *
+     * @var boolean
+     */
+    protected $hasRegisteredShutdown = false;
+
+    /**
      * Inits the connection handler by given context and params
      *
      * @param \TechDivision\Server\Interfaces\ServerContextInterface $serverContext The server's context
@@ -244,8 +251,8 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
      */
     public function handle(SocketInterface $connection, WorkerInterface $worker)
     {
-        // register shutdown handler
-        register_shutdown_function(array(&$this, "shutdown"));
+        // register shutdown handler once to avoid strange memory consumption problems
+        $this->registerShutdown();
 
         // add connection ref to self
         $this->connection = $connection;
@@ -648,13 +655,25 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     }
 
     /**
+     * Registers the shutdown function in this context
+     *
+     * @return void
+     */
+    public function registerShutdown() {
+        // register shutdown handler once to avoid strange memory consumption problems
+        if ($this->hasRegisteredShutdown === false) {
+            register_shutdown_function(array(&$this, "shutdown"));
+            $this->hasRegisteredShutdown = true;
+        }
+    }
+
+    /**
      * Does shutdown logic for worker if something breaks in process
      *
      * @return void
      */
     public function shutdown()
     {
-        error_log(__METHOD__);
         // get refs to local vars
         $serverContext = $this->getServerContext();
         $connection = $this->getConnection();

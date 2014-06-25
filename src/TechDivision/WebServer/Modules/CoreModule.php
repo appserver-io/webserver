@@ -309,4 +309,15 @@ class CoreModule implements ModuleInterface
     {
         return $this->serverContext;
     }
+
+    /**
+     * Prepares the module for upcoming request in specific context
+     *
+     * @return bool
+     * @throws \TechDivision\Server\Exceptions\ModuleException
+     */
+    public function prepare()
+    {
+        // nothing to prepare for this module
+    }
 }

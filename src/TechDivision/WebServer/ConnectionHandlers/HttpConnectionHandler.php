@@ -281,6 +281,9 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                 // reset connection infos to server vars
                 $serverContext->setConnectionServerVars($connection);
 
+                // start time measurement for keep-alive timeout
+                $keepaliveStartTime = microtime(true);
+
                 // time settings
                 $serverContext->setServerVar(ServerVars::REQUEST_TIME, time());
 
@@ -308,7 +311,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                 $keepAliveConnection = false;
 
                 // set first line from connection
-                $line = $connection->readLine(2048, $keepAliveTimeout);
+                $line = $connection->readLine(2048);
 
                 /**
                  * In the interest of robustness, servers SHOULD ignore any empty
@@ -320,7 +323,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                  */
                 if ($line === "\r\n") {
                     // ignore the first CRLF and go on reading the expected start-line.
-                    $line = $connection->readLine(2048, $keepAliveTimeout);
+                    $line = $connection->readLine(2048);
                 }
 
                 // parse read line
@@ -347,8 +350,10 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                     $request->getHeader(HttpProtocol::HEADER_CONNECTION),
                     HttpProtocol::HEADER_CONNECTION_VALUE_KEEPALIVE
                 ) === 0) {
-                    // only if max connections were not reached yet
-                    if ($keepAliveMax > 0) {
+                    // calculate keep-alive idle time for comparison with keep-alive timeout
+                    $keepAliveIdleTime = microtime(true) - $keepaliveStartTime;
+                    // only if max connections or keep-alive timeout not reached yet
+                    if (($keepAliveMax > 0) && ($keepAliveIdleTime < $keepAliveTimeout)) {
                         // enable keep alive connection
                         $keepAliveConnection = true;
                         // set keep-alive headers
@@ -396,6 +401,9 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                     throw new \Exception('Response state is not dispatched', 500);
                 }
 
+                // process modules by hook RESPONSE_PRE
+                $this->processModules(ModuleHooks::RESPONSE_PRE);
+
             } catch (SocketReadTimeoutException $e) {
                 // break the request processing due to client timeout
                 break;
@@ -413,9 +421,6 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                 $response->setStatusCode($e->getCode());
                 $this->renderErrorPage($e->__toString());
             }
-
-            // process modules by hook RESPONSE_PRE
-            $this->processModules(ModuleHooks::RESPONSE_PRE);
 
             // send response to connected client
             $this->prepareResponse();

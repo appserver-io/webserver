@@ -48,6 +48,8 @@
             "serverContext": "\\TechDivision\\Server\\ServerContext",
             "loggerName": "System",
             "workerNumber": 128,
+            "workerAcceptMin": 8,
+            "workerAcceptMax": 16,
 
             "admin": "www@localhost.localdomain",
             "software": "phpWebServer/0.1.0",
@@ -219,6 +221,8 @@
             "serverContext" : "\\TechDivision\\Server\\ServerContext",
             "loggerName": "System",
             "workerNumber": 128,
+            "workerAcceptMin": 8,
+            "workerAcceptMax": 16,
 
             "admin": "www@localhost.localdomain",
             "software": "phpWebServer/0.1.0",

@@ -21,6 +21,8 @@
 
 namespace TechDivision\WebServer\Modules;
 
+use TechDivision\Connection\ConnectionRequestInterface;
+use TechDivision\Connection\ConnectionResponseInterface;
 use TechDivision\Http\HttpProtocol;
 use TechDivision\Http\HttpResponseStates;
 use TechDivision\Http\HttpRequestInterface;
@@ -29,6 +31,7 @@ use TechDivision\Server\Dictionaries\ModuleHooks;
 use TechDivision\Server\Dictionaries\ServerVars;
 use TechDivision\Server\Dictionaries\ModuleVars;
 use TechDivision\Server\Interfaces\ModuleInterface;
+use TechDivision\Server\Interfaces\RequestContextInterface;
 use TechDivision\Server\Interfaces\ServerContextInterface;
 use TechDivision\Server\Exceptions\ModuleException;
 use TechDivision\Server\Dictionaries\MimeTypes;
@@ -70,15 +73,25 @@ class CoreModule implements ModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \TechDivision\Http\HttpRequestInterface  $request  The request object
-     * @param \TechDivision\Http\HttpResponseInterface $response The response object
-     * @param int                                      $hook     The current hook to process logic for
+     * @param \TechDivision\Connection\ConnectionRequestInterface     $request        A request object
+     * @param \TechDivision\Connection\ConnectionResponseInterface    $response       A response object
+     * @param \TechDivision\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
+     * @param int                                                     $hook           The current hook to process logic for
      *
      * @return bool
      * @throws \TechDivision\Server\Exceptions\ModuleException
      */
-    public function process(HttpRequestInterface $request, HttpResponseInterface $response, $hook)
-    {
+    public function process(
+        ConnectionRequestInterface $request,
+        ConnectionResponseInterface $response,
+        RequestContextInterface $requestContext,
+        $hook
+    ) {
+        // In php an interface is, by definition, a fixed contract. It is immutable.
+        // So we have to declair the right ones afterwards...
+        /** @var $request \TechDivision\Http\HttpRequestInterface */
+        /** @var $request \TechDivision\Http\HttpResponseInterface */
+
         // if false hook is comming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
             return;
@@ -89,15 +102,15 @@ class CoreModule implements ModuleInterface
 
         // check if core module should still handle this request
         // maybe later on this can be overwritten by another core module for some reasons
-        if ($serverContext->getServerVar(ServerVars::SERVER_HANDLER) === self::MODULE_NAME) {
+        if ($requestContext->getServerVar(ServerVars::SERVER_HANDLER) === self::MODULE_NAME) {
             // get document root
-            $documentRoot = $serverContext->getServerVar(ServerVars::DOCUMENT_ROOT);
+            $documentRoot = $requestContext->getServerVar(ServerVars::DOCUMENT_ROOT);
             // get handlers
             $handlers = $serverContext->getServerConfig()->getHandlers();
 
             // get uri without querystring
             // Just make sure that you check for the existence of the query string first, as it might not be set
-            $uriWithoutQueryString = parse_url($serverContext->getServerVar(ServerVars::X_REQUEST_URI), PHP_URL_PATH);
+            $uriWithoutQueryString = parse_url($requestContext->getServerVar(ServerVars::X_REQUEST_URI), PHP_URL_PATH);
 
             // split all path parts got from uri without query string
             $pathParts = explode('/', $uriWithoutQueryString);
@@ -147,8 +160,8 @@ class CoreModule implements ModuleInterface
             $locations = $this->locations;
 
             // check if there are some volatile location definitions so use them and override global locations
-            if ($this->serverContext->hasModuleVar(ModuleVars::VOLATILE_LOCATIONS)) {
-                $locations = $this->serverContext->getModuleVar(ModuleVars::VOLATILE_LOCATIONS);
+            if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_LOCATIONS)) {
+                $locations = $requestContext->getModuleVar(ModuleVars::VOLATILE_LOCATIONS);
             }
 
             // process the locations for this request
@@ -167,29 +180,29 @@ class CoreModule implements ModuleInterface
             if (isset($handlers['.' . $possibleValidPathExtension])) {
 
                 // set specific server vars
-                $serverContext->setServerVar(ServerVars::SCRIPT_NAME, $scriptName);
+                $requestContext->setServerVar(ServerVars::SCRIPT_NAME, $scriptName);
                 // check if script is on filesystem
                 if ($scriptFilename) {
-                    $serverContext->setServerVar(ServerVars::SCRIPT_FILENAME, $scriptFilename);
+                    $requestContext->setServerVar(ServerVars::SCRIPT_FILENAME, $scriptFilename);
                     // set special server var for existing file for that request
-                    $serverContext->setServerVar(ServerVars::REQUEST_FILENAME, $scriptFilename);
+                    $requestContext->setServerVar(ServerVars::REQUEST_FILENAME, $scriptFilename);
                 }
                 // if path info is set put it into server vars
                 if (strlen($pathInfo) > 0) {
                     // set path info vars
-                    $serverContext->setServerVar(ServerVars::PATH_INFO, $pathInfo);
-                    $serverContext->setServerVar(ServerVars::PATH_TRANSLATED, $documentRoot . $pathInfo);
+                    $requestContext->setServerVar(ServerVars::PATH_INFO, $pathInfo);
+                    $requestContext->setServerVar(ServerVars::PATH_TRANSLATED, $documentRoot . $pathInfo);
                 }
 
                 // set the file handler to use for modules being able to react on this setting
-                $serverContext->setServerVar(
+                $requestContext->setServerVar(
                     ServerVars::SERVER_HANDLER,
                     $handlers['.' . $possibleValidPathExtension]['name']
                 );
 
                 // if file handler params are given, set them as module var
                 if (isset($handlers['.' . $possibleValidPathExtension]['params'])) {
-                    $serverContext->setModuleVar(
+                    $requestContext->setModuleVar(
                         ModuleVars::VOLATILE_FILE_HANDLER_VARIABLES,
                         $handlers['.' . $possibleValidPathExtension]['params']
                     );

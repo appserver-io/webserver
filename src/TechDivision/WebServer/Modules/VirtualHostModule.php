@@ -21,6 +21,8 @@
 
 namespace TechDivision\WebServer\Modules;
 
+use TechDivision\Connection\ConnectionRequestInterface;
+use TechDivision\Connection\ConnectionResponseInterface;
 use TechDivision\Http\HttpProtocol;
 use TechDivision\Server\Dictionaries\ModuleHooks;
 use TechDivision\Server\Dictionaries\ServerVars;
@@ -29,6 +31,7 @@ use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
 use TechDivision\Server\Interfaces\ModuleInterface;
 use TechDivision\Server\Exceptions\ModuleException;
+use TechDivision\Server\Interfaces\RequestContextInterface;
 use TechDivision\Server\Interfaces\ServerContextInterface;
 
 /**
@@ -117,15 +120,25 @@ class VirtualHostModule implements ModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \TechDivision\Http\HttpRequestInterface  $request  The request object
-     * @param \TechDivision\Http\HttpResponseInterface $response The response object
-     * @param int                                      $hook     The current hook to process logic for
+     * @param \TechDivision\Connection\ConnectionRequestInterface     $request        A request object
+     * @param \TechDivision\Connection\ConnectionResponseInterface    $response       A response object
+     * @param \TechDivision\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
+     * @param int                                                     $hook           The current hook to process logic for
      *
      * @return bool
      * @throws \TechDivision\Server\Exceptions\ModuleException
      */
-    public function process(HttpRequestInterface $request, HttpResponseInterface $response, $hook)
-    {
+    public function process(
+        ConnectionRequestInterface $request,
+        ConnectionResponseInterface $response,
+        RequestContextInterface $requestContext,
+        $hook
+    ) {
+        // In php an interface is, by definition, a fixed contract. It is immutable.
+        // So we have to declair the right ones afterwards...
+        /** @var $request \TechDivision\Http\HttpRequestInterface */
+        /** @var $request \TechDivision\Http\HttpResponseInterface */
+
         // if false hook is comming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
             return;
@@ -136,7 +149,7 @@ class VirtualHostModule implements ModuleInterface
         $this->response = $response;
 
         $virtualHosts = $this->getServerContext()->getServerConfig()->getVirtualHosts();
-        $serverName = $this->getServerContext()->getServerVar(ServerVars::SERVER_NAME);
+        $serverName = $requestContext->getServerVar(ServerVars::SERVER_NAME);
 
         // check if current host matches any virtual host configuration
         if (isset($virtualHosts[$serverName])) {
@@ -154,7 +167,7 @@ class VirtualHostModule implements ModuleInterface
                         }
                     }
                     // set server var
-                    $this->getServerContext()->setServerVar(
+                    $requestContext->setServerVar(
                         $this->paramServerVarsMap[$paramName],
                         $paramValue
                     );
@@ -164,7 +177,7 @@ class VirtualHostModule implements ModuleInterface
             // Add the rewrites we have (if any) to the configuration's rewrite pool
             if (!empty($virtualHosts[$serverName]['rewrites'])) {
                 // Set the rewrites we encountered as a temporary module var
-                $this->serverContext->setModuleVar(
+                $requestContext->setModuleVar(
                     ModuleVars::VOLATILE_REWRITES,
                     $virtualHosts[$serverName]['rewrites']
                 );
@@ -173,7 +186,7 @@ class VirtualHostModule implements ModuleInterface
             // Add the environment vars we have (if any) to the configuration's environment variable pool
             if (!empty($virtualHosts[$serverName]['environmentVariables'])) {
                 // Set the environment variables we encountered as a temporary module var
-                $this->serverContext->setModuleVar(
+                $requestContext->setModuleVar(
                     ModuleVars::VOLATILE_ENVIRONMENT_VARIABLES,
                     $virtualHosts[$serverName]['environmentVariables']
                 );
@@ -182,7 +195,7 @@ class VirtualHostModule implements ModuleInterface
             // Add the accesses (if any) to the configuration's access pool
             if (!empty($virtualHosts[$serverName]['accesses'])) {
                 // Set the environment variables we encountered as a temporary module var
-                $this->serverContext->setModuleVar(
+                $requestContext->setModuleVar(
                     ModuleVars::VOLATILE_ACCESSES,
                     $virtualHosts[$serverName]['accesses']
                 );
@@ -191,7 +204,7 @@ class VirtualHostModule implements ModuleInterface
             // Add the locations we have (if any) to the configuration's location pool
             if (!empty($virtualHosts[$serverName]['locations'])) {
                 // Set the locations we encountered as a temporary module var
-                $this->serverContext->setModuleVar(
+                $requestContext->setModuleVar(
                     ModuleVars::VOLATILE_LOCATIONS,
                     $virtualHosts[$serverName]['locations']
                 );
@@ -200,7 +213,7 @@ class VirtualHostModule implements ModuleInterface
             // Add the rewriteMaps we have (if any) to the configuration's rewriteMaps pool
             if (!empty($virtualHosts[$serverName]['rewriteMaps'])) {
                 // Set the rewriteMaps we encountered as a temporary module var
-                $this->serverContext->setModuleVar(
+                $requestContext->setModuleVar(
                     ModuleVars::VOLATILE_REWRITE_MAPS,
                     $virtualHosts[$serverName]['rewriteMaps']
                 );
@@ -209,7 +222,7 @@ class VirtualHostModule implements ModuleInterface
             // Add the authentications we have (if any) to the configuration's authentications pool
             if (!empty($virtualHosts[$serverName]['authentications'])) {
                 // Set the authentications we encountered as a temporary module var
-                $this->serverContext->setModuleVar(
+                $requestContext->setModuleVar(
                     ModuleVars::VOLATILE_AUTHENTICATIONS,
                     $virtualHosts[$serverName]['authentications']
                 );

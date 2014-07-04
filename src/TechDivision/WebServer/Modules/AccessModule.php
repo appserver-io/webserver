@@ -21,6 +21,8 @@
 
 namespace TechDivision\WebServer\Modules;
 
+use TechDivision\Connection\ConnectionRequestInterface;
+use TechDivision\Connection\ConnectionResponseInterface;
 use TechDivision\Http\HttpProtocol;
 use TechDivision\Server\Dictionaries\ModuleHooks;
 use TechDivision\Server\Dictionaries\ServerVars;
@@ -29,6 +31,7 @@ use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
 use TechDivision\Server\Interfaces\ModuleInterface;
 use TechDivision\Server\Exceptions\ModuleException;
+use TechDivision\Server\Interfaces\RequestContextInterface;
 use TechDivision\Server\Interfaces\ServerContextInterface;
 
 /**
@@ -112,15 +115,25 @@ class AccessModule implements ModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \TechDivision\Http\HttpRequestInterface  $request  The request object
-     * @param \TechDivision\Http\HttpResponseInterface $response The response object
-     * @param int                                      $hook     The current hook to process logic for
+     * @param \TechDivision\Connection\ConnectionRequestInterface     $request        A request object
+     * @param \TechDivision\Connection\ConnectionResponseInterface    $response       A response object
+     * @param \TechDivision\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
+     * @param int                                                     $hook           The current hook to process logic for
      *
      * @return bool
      * @throws \TechDivision\Server\Exceptions\ModuleException
      */
-    public function process(HttpRequestInterface $request, HttpResponseInterface $response, $hook)
-    {
+    public function process(
+        ConnectionRequestInterface $request,
+        ConnectionResponseInterface $response,
+        RequestContextInterface $requestContext,
+        $hook
+    ) {
+        // In php an interface is, by definition, a fixed contract. It is immutable.
+        // So we have to declair the right ones afterwards...
+        /** @var $request \TechDivision\Http\HttpRequestInterface */
+        /** @var $request \TechDivision\Http\HttpResponseInterface */
+
         // if false hook is comming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
             return;
@@ -130,16 +143,13 @@ class AccessModule implements ModuleInterface
         $this->request = $request;
         $this->response = $response;
 
-        // get ref to local var
-        $serverContext = $this->getServerContext();
-
         // get default access definitions
         $accesses = $this->accesses;
 
         // check if there are some volatile access definitions so use them and override global accesses
-        if ($this->serverContext->hasModuleVar(ModuleVars::VOLATILE_ACCESSES)) {
+        if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_ACCESSES)) {
             // reset by volatile accesses
-            $accesses = $this->serverContext->getModuleVar(ModuleVars::VOLATILE_ACCESSES);
+            $accesses = $requestContext->getModuleVar(ModuleVars::VOLATILE_ACCESSES);
         }
 
         // generally everything is not allowed
@@ -156,11 +166,11 @@ class AccessModule implements ModuleInterface
                 foreach ($accessData as $serverVar => $varPattern) {
 
                     // check if server var exists
-                    if ($serverContext->hasServerVar($serverVar)) {
+                    if ($requestContext->hasServerVar($serverVar)) {
                         // check if pattern matches
                         if (!preg_match(
                             '/' . $varPattern . '/',
-                            $serverContext->getServerVar($serverVar)
+                            $requestContext->getServerVar($serverVar)
                         )) {
                             $matchAllow = false;
                             // break here if anything not matches
@@ -190,11 +200,11 @@ class AccessModule implements ModuleInterface
                 foreach ($accessData as $serverVar => $varPattern) {
 
                     // check if server var exists
-                    if ($serverContext->hasServerVar($serverVar)) {
+                    if ($requestContext->hasServerVar($serverVar)) {
                         // check if pattern matches
                         if (preg_match(
                             '/' . $varPattern . '/',
-                            $serverContext->getServerVar($serverVar)
+                            $requestContext->getServerVar($serverVar)
                         )) {
                             $matchDeny = true;
                             // break here if anything matches

@@ -21,6 +21,8 @@
 
 namespace TechDivision\WebServer\Modules;
 
+use TechDivision\Connection\ConnectionRequestInterface;
+use TechDivision\Connection\ConnectionResponseInterface;
 use TechDivision\Http\HttpProtocol;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
@@ -28,6 +30,7 @@ use TechDivision\Http\HttpResponseStates;
 use TechDivision\Server\Dictionaries\ModuleHooks;
 use TechDivision\Server\Interfaces\ModuleInterface;
 use TechDivision\Server\Exceptions\ModuleException;
+use TechDivision\Server\Interfaces\RequestContextInterface;
 use TechDivision\Server\Interfaces\ServerContextInterface;
 use TechDivision\Server\Dictionaries\ServerVars;
 
@@ -106,15 +109,25 @@ class DirectoryModule implements ModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \TechDivision\Http\HttpRequestInterface  $request  The request object
-     * @param \TechDivision\Http\HttpResponseInterface $response The response object
-     * @param int                                      $hook     The current hook to process logic for
+     * @param \TechDivision\Connection\ConnectionRequestInterface     $request        A request object
+     * @param \TechDivision\Connection\ConnectionResponseInterface    $response       A response object
+     * @param \TechDivision\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
+     * @param int                                                     $hook           The current hook to process logic for
      *
      * @return bool
      * @throws \TechDivision\Server\Exceptions\ModuleException
      */
-    public function process(HttpRequestInterface $request, HttpResponseInterface $response, $hook)
-    {
+    public function process(
+        ConnectionRequestInterface $request,
+        ConnectionResponseInterface $response,
+        RequestContextInterface $requestContext,
+        $hook
+    ) {
+        // In php an interface is, by definition, a fixed contract. It is immutable.
+        // So we have to declair the right ones afterwards...
+        /** @var $request \TechDivision\Http\HttpRequestInterface */
+        /** @var $request \TechDivision\Http\HttpResponseInterface */
+
         // if false hook is comming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
             return;
@@ -127,11 +140,11 @@ class DirectoryModule implements ModuleInterface
         $serverContext = $this->getServerContext();
 
         // get document root
-        $documentRoot = $serverContext->getServerVar(ServerVars::DOCUMENT_ROOT);
+        $documentRoot = $requestContext->getServerVar(ServerVars::DOCUMENT_ROOT);
         // get url
-        $url = parse_url($serverContext->getServerVar(ServerVars::X_REQUEST_URI), PHP_URL_PATH);
+        $url = parse_url($requestContext->getServerVar(ServerVars::X_REQUEST_URI), PHP_URL_PATH);
         // get query string with asterisk
-        $queryString = strstr($serverContext->getServerVar(ServerVars::X_REQUEST_URI), '?');
+        $queryString = strstr($requestContext->getServerVar(ServerVars::X_REQUEST_URI), '?');
 
         // get read path to requested uri
         $realPath = $documentRoot . $url;
@@ -153,7 +166,7 @@ class DirectoryModule implements ModuleInterface
                     // check if defined index files are found in directory
                     if (is_file($realPath . $index)) {
                         // reset uri with indexed filename
-                        $this->getServerContext()->setServerVar(ServerVars::X_REQUEST_URI, $url . $index . $queryString);
+                        $requestContext->setServerVar(ServerVars::X_REQUEST_URI, $url . $index . $queryString);
                         // break out if index file was found
                         return true;
                     }

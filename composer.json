@@ -27,7 +27,8 @@
         "techdivision/phpmodule": "dev-master",
         "techdivision/fastcgimodule": "dev-master",
         "monolog/monolog": "*",
-        "psr/log": "*"
+        "psr/log": "*",
+        "techdivision/storage": "dev-master"
     },
     "autoload": {
         "psr-0": {

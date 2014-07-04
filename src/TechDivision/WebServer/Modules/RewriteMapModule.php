@@ -21,6 +21,8 @@
 
 namespace TechDivision\WebServer\Modules;
 
+use TechDivision\Connection\ConnectionRequestInterface;
+use TechDivision\Connection\ConnectionResponseInterface;
 use TechDivision\Http\HttpProtocol;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
@@ -29,6 +31,7 @@ use TechDivision\Server\Dictionaries\ModuleHooks;
 use TechDivision\Server\Dictionaries\ModuleVars;
 use TechDivision\Server\Interfaces\ModuleInterface;
 use TechDivision\Server\Exceptions\ModuleException;
+use TechDivision\Server\Interfaces\RequestContextInterface;
 use TechDivision\Server\Interfaces\ServerContextInterface;
 use TechDivision\Server\Dictionaries\ServerVars;
 
@@ -106,15 +109,25 @@ class RewriteMapModule implements ModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \TechDivision\Http\HttpRequestInterface  $request  The request object
-     * @param \TechDivision\Http\HttpResponseInterface $response The response object
-     * @param int                                      $hook     The current hook to process logic for
+     * @param \TechDivision\Connection\ConnectionRequestInterface     $request        A request object
+     * @param \TechDivision\Connection\ConnectionResponseInterface    $response       A response object
+     * @param \TechDivision\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
+     * @param int                                                     $hook           The current hook to process logic for
      *
      * @return bool
      * @throws \TechDivision\Server\Exceptions\ModuleException
      */
-    public function process(HttpRequestInterface $request, HttpResponseInterface $response, $hook)
-    {
+    public function process(
+        ConnectionRequestInterface $request,
+        ConnectionResponseInterface $response,
+        RequestContextInterface $requestContext,
+        $hook
+    ) {
+        // In php an interface is, by definition, a fixed contract. It is immutable.
+        // So we have to declair the right ones afterwards...
+        /** @var $request \TechDivision\Http\HttpRequestInterface */
+        /** @var $request \TechDivision\Http\HttpResponseInterface */
+
         // if false hook is comming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
             return;
@@ -123,15 +136,13 @@ class RewriteMapModule implements ModuleInterface
         // set req and res object internally
         $this->request = $request;
         $this->response = $response;
-        // get server context ref to local func
-        $serverContext = $this->getServerContext();
 
         // get default rewrite maps definitions
         $rewriteMaps = $this->rewriteMaps;
 
         // check if there are some volatile rewrite map definitions so add them
-        if ($serverContext->hasModuleVar(ModuleVars::VOLATILE_REWRITE_MAPS)) {
-            $volatileRewriteMaps = $serverContext->getModuleVar(ModuleVars::VOLATILE_REWRITE_MAPS);
+        if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_REWRITE_MAPS)) {
+            $volatileRewriteMaps = $requestContext->getModuleVar(ModuleVars::VOLATILE_REWRITE_MAPS);
             // merge rewrite maps
             $rewriteMaps = array_merge(
                 $volatileRewriteMaps,
@@ -141,12 +152,12 @@ class RewriteMapModule implements ModuleInterface
 
         // check protocol to be either http or https when secure is going on
         $protocol = 'http://';
-        if ($serverContext->getServerVar(ServerVars::HTTPS) === ServerVars::VALUE_HTTPS_ON) {
+        if ($requestContext->getServerVar(ServerVars::HTTPS) === ServerVars::VALUE_HTTPS_ON) {
             $protocol = 'https://';
         }
 
         // get clean request path without query string etc...
-        $requestPath = parse_url($serverContext->getServerVar(ServerVars::X_REQUEST_URI), PHP_URL_PATH);
+        $requestPath = parse_url($requestContext->getServerVar(ServerVars::X_REQUEST_URI), PHP_URL_PATH);
 
         // init all rewrite mappers by types and do look up
         foreach ($rewriteMaps as $rewriteMapType => $rewriteMapParams) {

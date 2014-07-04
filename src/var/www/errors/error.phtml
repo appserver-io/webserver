@@ -1,3 +1,4 @@
+<?php /** @var \TechDivision\Server\Interfaces\ConnectionHandlerInterface $this */ ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -46,7 +47,7 @@
 </p>
 
 <footer>
-    <?php echo $this->getServerContext()->getServerVar('SERVER_SIGNATURE') ?>
+    <?php echo $this->getRequestContext()->getServerVar('SERVER_SIGNATURE') ?>
 </footer>
 </body>
 </html>

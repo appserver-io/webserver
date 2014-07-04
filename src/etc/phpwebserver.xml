@@ -67,16 +67,17 @@
             type="\TechDivision\Server\Servers\MultiThreadedServer"
             worker="\TechDivision\Server\Workers\ThreadWorker"
             socket="\TechDivision\Server\Sockets\StreamSocket"
-            serverContext="\TechDivision\Server\ServerContext"
+            serverContext="\TechDivision\Server\Contexts\ServerContext"
+            requestContext="\TechDivision\Server\Contexts\RequestContext"
             loggerName="System">
 
             <params>
                 <param name="admin" type="string">www@localhost.localdomain</param>
-                <param name="software" type="string">phpWebServer/0.1.0</param>
+                <param name="software" type="string">phpWebServer/0.2.0</param>
                 <param name="transport" type="string">tcp</param>
                 <param name="address" type="string">0.0.0.0</param>
                 <param name="port" type="integer">9080</param>
-                <param name="workerNumber" type="integer">128</param>
+                <param name="workerNumber" type="integer">64</param>
                 <param name="workerAcceptMin" type="integer">8</param>
                 <param name="workerAcceptMax" type="integer">16</param>
                 <!-- Note: it's intended to use a relative path to get content from webservers basedir/var/www -->
@@ -264,13 +265,14 @@
             type="\TechDivision\Server\Servers\MultiThreadedServer"
             worker="\TechDivision\Server\Workers\ThreadWorker"
             socket="\TechDivision\Server\Sockets\StreamSocket"
-            serverContext="\TechDivision\Server\ServerContext"
+            serverContext="\TechDivision\Server\Contexts\ServerContext"
+            requestContext="\TechDivision\Server\Contexts\RequestContext"
             loggerName="System">
 
             <params>
                 <param name="admin" type="string">www@localhost.localdomain</param>
-                <param name="software" type="string">phpWebServer/0.1.0</param>
-                <param name="workerNumber" type="integer">128</param>
+                <param name="software" type="string">phpWebServer/0.2.0</param>
+                <param name="workerNumber" type="integer">64</param>
                 <param name="workerAcceptMin" type="integer">8</param>
                 <param name="workerAcceptMax" type="integer">16</param>
                 <param name="transport" type="string">ssl</param>

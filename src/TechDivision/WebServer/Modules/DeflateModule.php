@@ -21,12 +21,15 @@
 
 namespace TechDivision\WebServer\Modules;
 
+use TechDivision\Connection\ConnectionRequestInterface;
+use TechDivision\Connection\ConnectionResponseInterface;
 use TechDivision\Http\HttpProtocol;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
 use TechDivision\Server\Dictionaries\ModuleHooks;
 use TechDivision\Server\Interfaces\ModuleInterface;
 use TechDivision\Server\Exceptions\ModuleException;
+use TechDivision\Server\Interfaces\RequestContextInterface;
 use TechDivision\Server\Interfaces\ServerContextInterface;
 
 /**
@@ -65,15 +68,25 @@ class DeflateModule implements ModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \TechDivision\Http\HttpRequestInterface  $request  The request object
-     * @param \TechDivision\Http\HttpResponseInterface $response The response object
-     * @param int                                      $hook     The current hook to process logic for
+     * @param \TechDivision\Connection\ConnectionRequestInterface     $request        A request object
+     * @param \TechDivision\Connection\ConnectionResponseInterface    $response       A response object
+     * @param \TechDivision\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
+     * @param int                                                     $hook           The current hook to process logic for
      *
      * @return bool
      * @throws \TechDivision\Server\Exceptions\ModuleException
      */
-    public function process(HttpRequestInterface $request, HttpResponseInterface $response, $hook)
-    {
+    public function process(
+        ConnectionRequestInterface $request,
+        ConnectionResponseInterface $response,
+        RequestContextInterface $requestContext,
+        $hook
+    ) {
+        // In php an interface is, by definition, a fixed contract. It is immutable.
+        // So we have to declair the right ones afterwards...
+        /** @var $request \TechDivision\Http\HttpRequestInterface */
+        /** @var $request \TechDivision\Http\HttpResponseInterface */
+
         // if false hook is comming do nothing
         if (ModuleHooks::RESPONSE_PRE !== $hook) {
             return;

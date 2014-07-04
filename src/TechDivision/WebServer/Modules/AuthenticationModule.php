@@ -21,12 +21,15 @@
 
 namespace TechDivision\WebServer\Modules;
 
+use TechDivision\Connection\ConnectionRequestInterface;
+use TechDivision\Connection\ConnectionResponseInterface;
 use TechDivision\Http\HttpProtocol;
 use TechDivision\Server\Dictionaries\ModuleHooks;
 use TechDivision\Server\Dictionaries\ServerVars;
 use TechDivision\Server\Dictionaries\ModuleVars;
 use TechDivision\Server\Interfaces\ModuleInterface;
 use TechDivision\Server\Exceptions\ModuleException;
+use TechDivision\Server\Interfaces\RequestContextInterface;
 use TechDivision\Server\Interfaces\ServerContextInterface;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
@@ -160,15 +163,25 @@ class AuthenticationModule implements ModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \TechDivision\Http\HttpRequestInterface  $request  The request object
-     * @param \TechDivision\Http\HttpResponseInterface $response The response object
-     * @param int                                      $hook     The current hook to process logic for
+     * @param \TechDivision\Connection\ConnectionRequestInterface     $request        A request object
+     * @param \TechDivision\Connection\ConnectionResponseInterface    $response       A response object
+     * @param \TechDivision\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
+     * @param int                                                     $hook           The current hook to process logic for
      *
      * @return bool
      * @throws \TechDivision\Server\Exceptions\ModuleException
      */
-    public function process(HttpRequestInterface $request, HttpResponseInterface $response, $hook)
-    {
+    public function process(
+        ConnectionRequestInterface $request,
+        ConnectionResponseInterface $response,
+        RequestContextInterface $requestContext,
+        $hook
+    ) {
+        // In php an interface is, by definition, a fixed contract. It is immutable.
+        // So we have to declair the right ones afterwards...
+        /** @var $request \TechDivision\Http\HttpRequestInterface */
+        /** @var $request \TechDivision\Http\HttpResponseInterface */
+
         // if false hook is coming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
             return;
@@ -182,8 +195,8 @@ class AuthenticationModule implements ModuleInterface
         $authentications = $this->authentications;
 
         // check if there are some volatile rewrite map definitions so add them
-        if ($this->serverContext->hasModuleVar(ModuleVars::VOLATILE_AUTHENTICATIONS)) {
-            $volatileAuthentications = $this->serverContext->getModuleVar(ModuleVars::VOLATILE_AUTHENTICATIONS);
+        if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_AUTHENTICATIONS)) {
+            $volatileAuthentications = $requestContext->getModuleVar(ModuleVars::VOLATILE_AUTHENTICATIONS);
             // merge rewrite maps
             $authentications = array_merge(
                 $volatileAuthentications,
@@ -196,7 +209,7 @@ class AuthenticationModule implements ModuleInterface
             // check if pattern matches uri
             if (preg_match(
                 '/' . $uriPattern . '/',
-                $this->getServerContext()->getServerVar(ServerVars::X_REQUEST_URI)
+                $requestContext->getServerVar(ServerVars::X_REQUEST_URI)
             )
             ) {
                 // set type Instance to local ref
@@ -208,7 +221,7 @@ class AuthenticationModule implements ModuleInterface
                     // check if auth works
                     if ($typeInstance->auth($data)) {
                         // set server vars
-                        $this->getServerContext()->setServerVar(ServerVars::REMOTE_USER, $typeInstance->getUsername());
+                        $requestContext->setServerVar(ServerVars::REMOTE_USER, $typeInstance->getUsername());
                         // break out because everything is fine at this point
                         return true;
                     }

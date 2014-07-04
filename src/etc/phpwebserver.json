@@ -46,13 +46,14 @@
             "worker": "\\TechDivision\\Server\\Workers\\ThreadWorker",
             "socket": "\\TechDivision\\Server\\Sockets\\StreamSocket",
             "serverContext": "\\TechDivision\\Server\\ServerContext",
+            "requestContext": "\\TechDivision\\Server\\RequestContext",
             "loggerName": "System",
             "workerNumber": 128,
             "workerAcceptMin": 8,
             "workerAcceptMax": 16,
 
             "admin": "www@localhost.localdomain",
-            "software": "phpWebServer/0.1.0",
+            "software": "phpWebServer/0.2.0",
             "transport": "tcp",
             "address": "0.0.0.0",
             "port": "9080",
@@ -80,7 +81,7 @@
             "accesses" : [
                 {
                     "type": "allow",
-                    "REQUEST_URI": ".*",
+                    "REQUEST_URI": ".*"
                 },
                 {
                     "type": "deny",
@@ -219,13 +220,14 @@
             "worker": "\\TechDivision\\Server\\Workers\\ThreadWorker",
             "socket": "\\TechDivision\\Server\\Sockets\\StreamSocket",
             "serverContext" : "\\TechDivision\\Server\\ServerContext",
+            "requestContext": "\\TechDivision\\Server\\RequestContext",
             "loggerName": "System",
             "workerNumber": 128,
             "workerAcceptMin": 8,
             "workerAcceptMax": 16,
 
             "admin": "www@localhost.localdomain",
-            "software": "phpWebServer/0.1.0",
+            "software": "phpWebServer/0.2.0",
             "transport": "ssl",
             "address": "0.0.0.0",
             "port": "9443",

@@ -19,11 +19,14 @@
 
 namespace TechDivision\WebServer\Modules;
 
+use TechDivision\Connection\ConnectionRequestInterface;
+use TechDivision\Connection\ConnectionResponseInterface;
 use TechDivision\Http\HttpProtocol;
 use TechDivision\Server\Dictionaries\ModuleHooks;
 use TechDivision\Server\Exceptions\ModuleException;
 use TechDivision\Server\Dictionaries\ServerVars;
 use TechDivision\Server\Dictionaries\EnvVars;
+use TechDivision\Server\Interfaces\RequestContextInterface;
 use TechDivision\Server\Interfaces\ServerContextInterface;
 use TechDivision\Http\HttpRequestInterface;
 use TechDivision\Http\HttpResponseInterface;
@@ -77,9 +80,16 @@ class EnvironmentVariableModule implements ModuleInterface
     /**
      * The server's context instance which we preserve for later use
      *
-     * @var \TechDivision\Server\Interfaces\ServerContextInterface $serverContext $serverContext
+     * @var \TechDivision\Server\Interfaces\ServerContextInterface $serverContext The server's context instance
      */
     protected $serverContext;
+
+    /**
+     * The request's context instance
+     *
+     * @var \TechDivision\Server\Interfaces\RequestContextInterface $requestContext The request's context instance
+     */
+    protected $requestContext;
 
     /**
      * This array will hold all values which one would suspect as part of the PHP $_SERVER array.
@@ -222,17 +232,37 @@ class EnvironmentVariableModule implements ModuleInterface
     }
 
     /**
+     * Return's the request's context instance
+     *
+     * @return \TechDivision\Server\Interfaces\RequestContextInterface
+     */
+    public function getRequestContext()
+    {
+        return $this->requestContext;
+    }
+
+    /**
      * Implement's module logic for given hook
      *
-     * @param \TechDivision\Http\HttpRequestInterface  $request  The request object
-     * @param \TechDivision\Http\HttpResponseInterface $response The response object
-     * @param int                                      $hook     The current hook to process logic for
+     * @param \TechDivision\Connection\ConnectionRequestInterface     $request        A request object
+     * @param \TechDivision\Connection\ConnectionResponseInterface    $response       A response object
+     * @param \TechDivision\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
+     * @param int                                                     $hook           The current hook to process logic for
      *
      * @return bool
      * @throws \TechDivision\Server\Exceptions\ModuleException
      */
-    public function process(HttpRequestInterface $request, HttpResponseInterface $response, $hook)
-    {
+    public function process(
+        ConnectionRequestInterface $request,
+        ConnectionResponseInterface $response,
+        RequestContextInterface $requestContext,
+        $hook
+    ) {
+        // In php an interface is, by definition, a fixed contract. It is immutable.
+        // So we have to declair the right ones afterwards...
+        /** @var $request \TechDivision\Http\HttpRequestInterface */
+        /** @var $request \TechDivision\Http\HttpResponseInterface */
+
         // if false hook is comming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
             return;
@@ -240,6 +270,9 @@ class EnvironmentVariableModule implements ModuleInterface
 
         // We have to throw a ModuleException on failure, so surround the body with a try...catch block
         try {
+
+            // set request context as member property for further usage
+            $this->requestContext = $requestContext;
 
             // Reset the $serverBackreferences array to avoid mixups of different requests
             $this->serverBackreferences = array();
@@ -258,9 +291,9 @@ class EnvironmentVariableModule implements ModuleInterface
             // We have to also collect any volative rules which might be set on request base.
             // We might not even get anything, so prepare our rules accordingly
             $volatileEnvironmentVariables = array();
-            if ($this->serverContext->hasModuleVar(ModuleVars::VOLATILE_ENVIRONMENT_VARIABLES)) {
+            if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_ENVIRONMENT_VARIABLES)) {
 
-                $volatileEnvironmentVariables = $this->serverContext->getModuleVar(
+                $volatileEnvironmentVariables = $requestContext->getModuleVar(
                     ModuleVars::VOLATILE_ENVIRONMENT_VARIABLES
                 );
             }
@@ -350,16 +383,16 @@ class EnvironmentVariableModule implements ModuleInterface
                     if ($value === 'null') {
 
                         // Unset the variable and continue with the next environment variable
-                        if ($this->serverContext->hasEnvVar($varName)) {
+                        if ($requestContext->hasEnvVar($varName)) {
 
-                            $this->serverContext->unsetEnvVar($varName);
+                            $requestContext->unsetEnvVar($varName);
                         }
 
                         continue;
                     }
 
                     // Take action according to the needed definition
-                    $this->serverContext->setEnvVar($varName, $value);
+                    $requestContext->setEnvVar($varName, $value);
                 }
             }
 
@@ -431,7 +464,7 @@ class EnvironmentVariableModule implements ModuleInterface
      */
     protected function fillContextBackreferences()
     {
-        foreach ($this->serverContext->getServerVars() as $varName => $serverVar) {
+        foreach ($this->getRequestContext()->getServerVars() as $varName => $serverVar) {
 
             // Prefill the value
             $this->serverBackreferences['$' . $varName] = $serverVar;

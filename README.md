@@ -2,6 +2,8 @@ TechDivision_WebServer
 ======================
 ____________________________________________
 [![Latest Stable Version](https://poser.pugx.org/techdivision/webserver/v/stable.png)](https://packagist.org/packages/techdivision/webserver) [![Total Downloads](https://poser.pugx.org/techdivision/webserver/downloads.png)](https://packagist.org/packages/techdivision/webserver) [![Latest Unstable Version](https://poser.pugx.org/techdivision/webserver/v/unstable.png)](https://packagist.org/packages/techdivision/webserver) [![License](https://poser.pugx.org/techdivision/webserver/license.png)](https://packagist.org/packages/techdivision/webserver) [![Build Status](https://travis-ci.org/techdivision/TechDivision_WebServer.png)](https://travis-ci.org/techdivision/TechDivision_WebServer)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/techdivision/TechDivision_WebServer/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/techdivision/TechDivision_WebServer/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/techdivision/TechDivision_WebServer/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/techdivision/TechDivision_WebServer/?branch=master)
 ____________________________________________
 
 ####Are you serious? A web server written in pure PHP for PHP?

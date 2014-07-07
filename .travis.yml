@@ -16,7 +16,7 @@ before_script:
 
 script:
   - ant build
-  - php ocular.phar code-coverage:upload --format=php-clover $TRAVIS_BUILD_DIR/target/reports/unit/coverage/clover.xml
+  - php ocular.phar code-coverage:upload --format=php-clover $TRAVIS_BUILD_DIR/target/reports/unit/clover.xml
 
 notifications:
   email: info@appserver.io

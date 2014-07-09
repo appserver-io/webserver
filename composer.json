@@ -26,9 +26,10 @@
         "techdivision/rewritemodule": "dev-master",
         "techdivision/phpmodule": "dev-master",
         "techdivision/fastcgimodule": "dev-master",
+        "techdivision/storage": "dev-master",
+        "techdivision/collections": "dev-master",
         "monolog/monolog": "*",
-        "psr/log": "*",
-        "techdivision/storage": "dev-master"
+        "psr/log": "*"
     },
     "autoload": {
         "psr-0": {

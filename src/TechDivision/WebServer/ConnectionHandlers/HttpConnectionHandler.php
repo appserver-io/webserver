@@ -310,6 +310,8 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         // init keep alive settings
         $keepAliveTimeout = (int)$serverConfig->getKeepAliveTimeout();
         $keepAliveMax = (int)$serverConfig->getKeepAliveMax();
+        // init keep alive connection flag
+        $keepAliveConnection = false;
 
         do {
             // try to handle request if its a http request
@@ -464,11 +466,17 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             // send response to connected client
             $this->prepareResponse();
 
-            // process modules by hook RESPONSE_PRE
+            // process modules by hook RESPONSE_POST
             $this->processModules(ModuleHooks::RESPONSE_POST);
 
             // send response to connected client
             $this->sendResponse();
+
+            // check if keep alive-loop is finished to close connection before log access and init vars
+            // to avoid waiting on non keep alive requests for that
+            if ($keepAliveConnection !== true) {
+                $connection->close();
+            }
 
             // log informations for access log etc...
             $this->logAccess();
@@ -478,7 +486,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
 
         } while ($keepAliveConnection === true);
 
-        // finally close connection
+        // close connection if not closed yet
         $connection->close();
     }
 

@@ -440,10 +440,15 @@
                 <module type="\TechDivision\WebServer\Modules\AuthenticationModule"/>
                 <module type="\TechDivision\WebServer\Modules\VirtualHostModule"/>
                 <module type="\TechDivision\WebServer\Modules\EnvironmentVariableModule" />
+                <module type="\TechDivision\WebServer\Modules\RewriteMapModule"/>
                 <module type="\TechDivision\RewriteModule\RewriteModule"/>
                 <module type="\TechDivision\WebServer\Modules\DirectoryModule"/>
                 <module type="\TechDivision\WebServer\Modules\AccessModule"/>
                 <module type="\TechDivision\WebServer\Modules\CoreModule"/>
+                <module type="\TechDivision\PhpModule\PhpModule"/>
+                <module type="\TechDivision\FastCgiModule\FastCgiModule"/>
+                <!-- RESPONSE_PRE hook -->
+                <module type="\TechDivision\WebServer\Modules\DeflateModule"/>
             </modules>
             <handlers>
                 <handler name="php" extension=".php"/>

@@ -46,7 +46,6 @@ use TechDivision\Http\HttpQueryParser;
 use TechDivision\Http\HttpRequestParser;
 use TechDivision\Http\HttpResponseStates;
 use TechDivision\Server\Sockets\SocketServerException;
-use TechDivision\Server\Sockets\StreamSocketInterface;
 
 /**
  * Class HttpConnectionHandler

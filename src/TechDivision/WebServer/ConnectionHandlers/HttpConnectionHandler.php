@@ -46,6 +46,7 @@ use TechDivision\Http\HttpQueryParser;
 use TechDivision\Http\HttpRequestParser;
 use TechDivision\Http\HttpResponseStates;
 use TechDivision\Server\Sockets\SocketServerException;
+use TechDivision\Server\Sockets\StreamSocketInterface;
 
 /**
  * Class HttpConnectionHandler
@@ -157,18 +158,16 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         $this->parser = new HttpRequestParser($httpRequest, $httpResponse);
         $this->parser->injectQueryParser(new HttpQueryParser());
         $this->parser->injectPart(new HttpPart());
-    }
 
-    /**
-     * Injects the request context
-     *
-     * @param \TechDivision\Server\Interfaces\RequestContextInterface $requestContext The request's context instance
-     *
-     * @return void
-     */
-    public function injectRequestContext(RequestContextInterface $requestContext)
-    {
-        $this->requestContext = $requestContext;
+        // setup request context
+
+        // get request context type
+        $requestContextType = $this->getServerConfig()->getRequestContextType();
+
+        /** @var RequestContextInterface $requestContext */
+        // instantiate and init request context
+        $this->requestContext = new $requestContextType();
+        $this->requestContext->init($this->getServerConfig());
     }
 
     /**
@@ -295,9 +294,11 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         $this->connection = $connection;
         $this->worker = $worker;
 
+        $serverConfig = $this->getServerConfig();
+
         // get instances for short calls
         $requestContext = $this->getRequestContext();
-        $serverConfig = $this->getServerConfig();
+
         $parser = $this->getParser();
 
         // Get our query parser
@@ -312,6 +313,9 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         $keepAliveMax = (int)$serverConfig->getKeepAliveMax();
         // init keep alive connection flag
         $keepAliveConnection = false;
+
+        // init the request parser
+        $parser->init();
 
         do {
             // try to handle request if its a http request
@@ -342,11 +346,8 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                  * TIME
                  */
 
-                // init the request parser
-                $parser->init();
-
                 // process modules by hook REQUEST_PRE
-                $this->processModules(ModuleHooks::REQUEST_PRE);
+                // $this->processModules(ModuleHooks::REQUEST_PRE);
 
                 // init keep alive connection flag
                 $keepAliveConnection = false;
@@ -484,6 +485,9 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             // init context vars afterwards to avoid performance issues
             $requestContext->initVars();
 
+            // init the request parser for next request
+            $parser->init();
+
         } while ($keepAliveConnection === true);
 
         // close connection if not closed yet
@@ -588,10 +592,21 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         $request = $this->getParser()->getRequest();
         $response = $this->getParser()->getResponse();
         $requestContext = $this->getRequestContext();
+        $serverContext = $this->getServerContext();
         $connection = $this->getConnection();
+        $accessLogger = null;
+
+        // lookup for dynamic logger configuration or take default access logger
+        if ($requestContext->hasEnvVar(EnvVars::LOGGER_ACCESS)) {
+            $accessLogger = $serverContext->getLogger(
+                $requestContext->getEnvVar(EnvVars::LOGGER_ACCESS)
+            );
+        } else  {
+            $accessLogger = $serverContext->getLogger();
+        }
 
         // log access information if AccessLogger exists
-        if ($accessLogger = $requestContext->getLogger(EnvVars::LOGGER_ACCESS)) {
+        if ($accessLogger) {
 
             // init datetime instance with current time and timezone
             $datetime = new \DateTime('now');
@@ -622,6 +637,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
      */
     public function initServerVars()
     {
+
         // get request context to local var reference
         $requestContext = $this->getRequestContext();
         // get request to local var reference
@@ -639,55 +655,13 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         // set server name var
         $requestContext->setServerVar(ServerVars::SERVER_NAME, $serverName);
 
-        // set server vars by request
-        $requestContext->setServerVar(
-            ServerVars::HTTP_USER_AGENT,
-            $request->getHeader(HttpProtocol::HEADER_USER_AGENT)
-        );
-        $requestContext->setServerVar(
-            ServerVars::HTTP_REFERER,
-            $request->getHeader(HttpProtocol::HEADER_REFERER)
-        );
-        $requestContext->setServerVar(
-            ServerVars::HTTP_COOKIE,
-            $request->getHeader(HttpProtocol::HEADER_COOKIE)
-        );
-        $requestContext->setServerVar(
-            ServerVars::HTTP_HOST,
-            $request->getHeader(HttpProtocol::HEADER_HOST)
-        );
-        $requestContext->setServerVar(
-            ServerVars::HTTP_X_REQUESTED_WITH,
-            $request->getHeader(HttpProtocol::HEADER_X_REQUESTED_WITH)
-        );
-        $requestContext->setServerVar(
-            ServerVars::HTTP_ACCEPT,
-            $request->getHeader(HttpProtocol::HEADER_ACCEPT)
-        );
-        $requestContext->setServerVar(
-            ServerVars::HTTP_ACCEPT_CHARSET,
-            $request->getHeader(HttpProtocol::HEADER_ACCEPT_CHARSET)
-        );
-        $requestContext->setServerVar(
-            ServerVars::HTTP_ACCEPT_ENCODING,
-            $request->getHeader(HttpProtocol::HEADER_ACCEPT_ENCODING)
-        );
-        $requestContext->setServerVar(
-            ServerVars::HTTP_ACCEPT_LANGUAGE,
-            $request->getHeader(HttpProtocol::HEADER_ACCEPT_LANGUAGE)
-        );
-        $requestContext->setServerVar(
-            ServerVars::HTTP_CONNECTION,
-            $request->getHeader(HttpProtocol::HEADER_CONNECTION)
-        );
-        $requestContext->setServerVar(
-            ServerVars::HTTP_FORWARDED,
-            $request->getHeader(HttpProtocol::HEADER_X_FORWARD)
-        );
-        $requestContext->setServerVar(
-            ServerVars::HTTP_PROXY_CONNECTION,
-            $request->getHeader(HttpProtocol::HEADER_PROXY_CONNECTION)
-        );
+        // set http headers to server vars
+        foreach ($request->getHeaders() as $headerName => $headerValue) {
+            // set server vars by request
+            $requestContext->setServerVar('HTTP_' . strtoupper($headerName), $headerValue);
+        }
+
+        // set request method, query-string and uri's
         $requestContext->setServerVar(
             ServerVars::REQUEST_METHOD,
             $request->getMethod()

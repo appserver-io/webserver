@@ -225,6 +225,7 @@ class CoreModule implements ModuleInterface
 
                 // set etag header
                 $response->addHeader(HttpProtocol::HEADER_ETAG, $eTag);
+
                 // set correct mimetype header
                 $response->addHeader(
                     HttpProtocol::HEADER_CONTENT_TYPE,

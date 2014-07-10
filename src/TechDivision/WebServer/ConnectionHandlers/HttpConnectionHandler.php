@@ -600,7 +600,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             $accessLogger = $serverContext->getLogger(
                 $requestContext->getEnvVar(EnvVars::LOGGER_ACCESS)
             );
-        } else  {
+        } else {
             $accessLogger = $serverContext->getLogger();
         }
 

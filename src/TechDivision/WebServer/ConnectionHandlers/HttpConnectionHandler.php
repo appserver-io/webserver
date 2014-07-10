@@ -346,7 +346,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                  */
 
                 // process modules by hook REQUEST_PRE
-                // $this->processModules(ModuleHooks::REQUEST_PRE);
+                $this->processModules(ModuleHooks::REQUEST_PRE);
 
                 // init keep alive connection flag
                 $keepAliveConnection = false;

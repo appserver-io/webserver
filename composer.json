@@ -23,7 +23,8 @@
         "monolog/monolog": "1.10.*",
         "psr/log": "*",
         "techdivision/server": "0.1.*",
-        "techdivision/http": "0.1.*"
+        "techdivision/http": "0.1.*",
+        "techdivision/connection": "0.1.*"
     },
     "suggest": {
         "techdivision/rewritemodule": "Add's rewrite support",

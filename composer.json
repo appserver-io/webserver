@@ -4,7 +4,6 @@
     "homepage": "https://github.com/techdivision/TechDivision_WebServer",
     "keywords": ["php", "server", "webserver", "httpd", "http-server"],
     "license": ["OSL-3.0"],
-    "minimum-stability": "dev",
     "authors": [
         {
             "name": "Johann Zelger",
@@ -21,19 +20,19 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "techdivision/server": "dev-master",
-        "techdivision/http": "dev-master",
-        "techdivision/rewritemodule": "dev-master",
-        "techdivision/phpmodule": "dev-master",
-        "techdivision/fastcgimodule": "dev-master",
-        "techdivision/storage": "dev-master",
-        "techdivision/collections": "dev-master",
-        "monolog/monolog": "*",
+        "techdivision/server": "0.1.*",
+        "techdivision/http": "0.1.*",
+        "techdivision/rewritemodule": "0.6.*",
+        "techdivision/phpmodule": "0.1.*",
+        "techdivision/fastcgimodule": "0.1.*",
+        "techdivision/storage": "0.5.*",
+        "techdivision/collections": "0.1.*",
+        "monolog/monolog": "1.10.*",
         "psr/log": "*"
     },
     "autoload": {
         "psr-0": {
-            "TechDivision": [ "src/", "tests/" ]
+            "TechDivision\\WebServer": [ "src/", "tests/" ]
         }
     },
     "config":{

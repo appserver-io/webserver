@@ -20,15 +20,15 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "techdivision/server": "0.1.*",
-        "techdivision/http": "0.1.*",
-        "techdivision/rewritemodule": "0.6.*",
-        "techdivision/phpmodule": "0.1.*",
-        "techdivision/fastcgimodule": "0.1.*",
-        "techdivision/storage": "0.5.*",
-        "techdivision/collections": "0.1.*",
         "monolog/monolog": "1.10.*",
-        "psr/log": "*"
+        "psr/log": "*",
+        "techdivision/server": "0.1.*",
+        "techdivision/http": "0.1.*"
+    },
+    "suggest": {
+        "techdivision/rewritemodule": "Add's rewrite support",
+        "techdivision/phpmodule": "Add's internal php support",
+        "techdivision/fastcgimodule": "Add's fastcgi support"
     },
     "autoload": {
         "psr-0": {

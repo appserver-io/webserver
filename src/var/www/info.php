@@ -1,6 +1,7 @@
 <?php
+
 /**
- * \TechDivision\WebServer\DummyTest
+ * src/var/www/info.php
  *
  * NOTICE OF LICENSE
  *

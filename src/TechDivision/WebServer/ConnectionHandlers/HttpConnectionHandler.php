@@ -660,7 +660,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             $requestContext->setServerVar('HTTP_' . strtoupper($headerName), $headerValue);
         }
 
-        // set request method, query-string and uri's
+        // set request method, query-string, uris and scheme
         $requestContext->setServerVar(
             ServerVars::REQUEST_METHOD,
             $request->getMethod()
@@ -677,6 +677,15 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             ServerVars::X_REQUEST_URI,
             $request->getUri()
         );
+        // this is the http connection handler, therefor we will rely on the https flag
+        if ($requestContext->hasServerVar(ServerVars::HTTPS) && $requestContext->getServerVar(ServerVars::HTTPS) === ServerVars::VALUE_HTTPS_ON) {
+
+            $requestContext->setServerVar(ServerVars::REQUEST_SCHEME, 'https');
+
+        } else {
+
+            $requestContext->setServerVar(ServerVars::REQUEST_SCHEME, 'http');
+        }
     }
 
     /**

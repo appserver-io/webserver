@@ -53,6 +53,36 @@ class DeflateModule implements ModuleInterface
     const MODULE_NAME = 'deflate';
 
     /**
+     * Defines a list of relevant mime types to be compressed
+     *
+     * @var array
+     */
+    protected $relevantMimeTypes = array(
+        "text/plain",
+        "text/css",
+        "application/json",
+        "application/x-javascript",
+        "application/javascript",
+        "text/xml",
+        "application/xml",
+        "application/xml+rss",
+        "text/javascript"
+    );
+
+    /**
+     * Check's if given mime type is relevant for compression
+     *
+     * @param string $mimeType The mime type to check
+     *
+     * @return boolean
+     */
+    protected function isRelevantMimeType($mimeType)
+    {
+        // check if given mime type is in relevant mime types list
+        return in_array($mimeType, $this->relevantMimeTypes);
+    }
+
+    /**
      * Initiates the module
      *
      * @param \TechDivision\Server\Interfaces\ServerContextInterface $serverContext The server's context instance
@@ -85,7 +115,7 @@ class DeflateModule implements ModuleInterface
         // In php an interface is, by definition, a fixed contract. It is immutable.
         // So we have to declair the right ones afterwards...
         /** @var $request \TechDivision\Http\HttpRequestInterface */
-        /** @var $request \TechDivision\Http\HttpResponseInterface */
+        /** @var $response \TechDivision\Http\HttpResponseInterface */
 
         // if false hook is comming do nothing
         if (ModuleHooks::RESPONSE_PRE !== $hook) {
@@ -114,7 +144,8 @@ class DeflateModule implements ModuleInterface
              *
              * @link https://bugs.php.net/bug.php?id=48725
              */
-            if ($streamMetaData['stream_type'] !== 'MEMORY') {
+            if (($streamMetaData['stream_type'] !== 'MEMORY')
+                && ($this->isRelevantMimeType($response->getHeader(HttpProtocol::HEADER_CONTENT_TYPE)))) {
                 // apply encoding filter to response body stream
                 stream_filter_append($response->getBodyStream(), 'zlib.deflate', STREAM_FILTER_READ);
                 // rewind current body stream

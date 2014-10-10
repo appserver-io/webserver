@@ -1,3 +1,13 @@
+# Version 0.2.2
+
+## Bugfixes
+
+* Fixed DeflateModule to compress just a list of specific mime-types. (#112)
+
+## Features
+
+* None
+
 # Version 0.2.1
 
 ## Bugfixes

@@ -132,7 +132,7 @@ class AccessModule implements ModuleInterface
         // In php an interface is, by definition, a fixed contract. It is immutable.
         // So we have to declair the right ones afterwards...
         /** @var $request \TechDivision\Http\HttpRequestInterface */
-        /** @var $request \TechDivision\Http\HttpResponseInterface */
+        /** @var $response \TechDivision\Http\HttpResponseInterface */
 
         // if false hook is comming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {

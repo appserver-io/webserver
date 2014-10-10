@@ -23,9 +23,27 @@ If you want to use the web server with your application you can install it by ad
 
 to your ```composer.json``` and invoke ```composer update``` in your project.
 
-## Usage
+Usage
+-----
+If you can satisfy the requirements it is very simple to use the webserver. Just do this:
+```bash
+git clone https://github.com/techdivision/TechDivision_WebServer
+PHP_BIN=/path/to/your/threadsafe/php-binary TechDivision_WebServer/src/bin/phpwebserver
+```
+If you're using [`appserver.io`](<http://www.appserver.io>) it'll be this:
+```bash
+git clone https://github.com/techdivision/TechDivision_WebServer
+./TechDivision_WebServer/src/bin/phpwebserver
+```
 
-Coming soon!
+Goto http://127.0.0.1:9080 and if all went good, you will see the welcome page of the php webserver.
+It will startup on unsecure http port 9080 and secure https port 9443.
+
+To test a php script just drop a `info.php` to `var/www`.
+```php
+<pre><?php phpinfo() ?></pre>
+```
+Now goto http://127.0.0.1:9080/info.php and see what happens... ;)
 
 # External Links
 

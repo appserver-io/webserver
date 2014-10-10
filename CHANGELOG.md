@@ -1,3 +1,9 @@
+# Version 0.2.2
+
+## Bugfixes
+
+* Fixes #112
+
 # Version 0.2.1
 
 ## Bugfixes

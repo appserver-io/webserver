@@ -73,11 +73,12 @@ class CoreModule implements ModuleInterface
     /**
      * Expands request context on given request constellation (uri) based on file handler configuration
      *
-     * @param
+     * @param \TechDivision\Server\Interfaces\RequestContextInterface $requestContext The request context instance
      *
      * @return void
      */
-    public function populateRequestContext(RequestContextInterface $requestContext) {
+    public function populateRequestContext(RequestContextInterface $requestContext)
+    {
 
         // get local refs
         $serverContext = $this->getServerContext();
@@ -283,9 +284,10 @@ class CoreModule implements ModuleInterface
                 sprintf(
                     "The requested URL %s was not found on this server.",
                     parse_url($requestContext->getServerVar(ServerVars::X_REQUEST_URI), PHP_URL_PATH)
-                ), 404);
+                ),
+                404
+            );
         }
-
     }
 
     /**

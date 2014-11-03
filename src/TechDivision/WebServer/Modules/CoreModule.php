@@ -77,7 +77,7 @@ class CoreModule implements ModuleInterface
      *
      * @return void
      */
-    public function expandRequestContext(RequestContextInterface $requestContext) {
+    public function populateRequestContext(RequestContextInterface $requestContext) {
 
         // get local refs
         $serverContext = $this->getServerContext();
@@ -205,15 +205,16 @@ class CoreModule implements ModuleInterface
      * @throws \TechDivision\Server\Exceptions\ModuleException
      */
     public function process(
-        // In php an interface is, by definition, a fixed contract. It is immutable.
-        // So we have to declare the right ones afterwards...
-        /** @var $request \TechDivision\Http\HttpRequestInterface */
         ConnectionRequestInterface $request,
-        /** @var $response \TechDivision\Http\HttpResponseInterface */
         ConnectionResponseInterface $response,
         RequestContextInterface $requestContext,
         $hook
     ) {
+        // In php an interface is, by definition, a fixed contract. It is immutable.
+        // So we have to declare the right ones afterwards...
+        
+        /** @var $request \TechDivision\Http\HttpRequestInterface */
+        /** @var $response \TechDivision\Http\HttpResponseInterface */
 
         // if false hook is comming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
@@ -222,65 +223,69 @@ class CoreModule implements ModuleInterface
 
         // check if core module should still handle this request
         // maybe later on this can be overwritten by another core module for some reasons
-        if ($requestContext->getServerVar(ServerVars::SERVER_HANDLER) === self::MODULE_NAME) {
-
-            // expand request context for possible script calling based on file handler configurations
-            $this->expandRequestContext($requestContext);
-
-            // check if file handler is still core module
-            if ($requestContext->getServerVar(ServerVars::SERVER_HANDLER) === self::MODULE_NAME) {
-
-                // if existing file should be served
-                if ($requestContext->hasServerVar(ServerVars::SCRIPT_FILENAME)) {
-
-                    $scriptFilename = $requestContext->getServerVar(ServerVars::SCRIPT_FILENAME);
-
-                    // get file info
-                    $fileInfo = new \SplFileInfo($scriptFilename);
-
-                    // build etag
-                    $eTag = sprintf('"%x-%x-%x"', $fileInfo->getInode(), $fileInfo->getSize(), (float)str_pad($fileInfo->getMTime(), 16, '0'));
-
-                    // set last modified header
-                    $response->addHeader(HttpProtocol::HEADER_LAST_MODIFIED, gmdate(DATE_RFC822, $fileInfo->getMTime()));
-
-                    // set etag header
-                    $response->addHeader(HttpProtocol::HEADER_ETAG, $eTag);
-
-                    // set correct mimetype header
-                    $response->addHeader(
-                        HttpProtocol::HEADER_CONTENT_TYPE,
-                        MimeTypes::getMimeTypeByExtension($fileInfo->getExtension())
-                    );
-
-                    // caching checks
-                    if (($request->hasHeader(HttpProtocol::HEADER_IF_NONE_MATCH)) &&
-                        ($request->getHeader(HttpProtocol::HEADER_IF_NONE_MATCH) === $eTag)
-                    ) {
-                        // set not modified status without content
-                        $response->setStatusCode(304);
-                    } else {
-                        // serve file by set body stream to file descriptor stream
-                        $response->setBodyStream(fopen($scriptFilename, "r"));
-                    }
-
-                    // set response state to be dispatched after this without calling other modules process
-                    $response->setState(HttpResponseStates::DISPATCH);
-
-                    // if we got here its maybe a directory index surfing request if $validDir is same as uri
-                    // todo: implement directory index view and surfing
-
-                } else {
-                    // for now we will throw a 404 as well here for non existing index files in directory
-                    throw new ModuleException(
-                        sprintf(
-                            "The requested URL %s was not found on this server.",
-                            parse_url($requestContext->getServerVar(ServerVars::X_REQUEST_URI), PHP_URL_PATH)
-                        ), 404);
-                }
-
-            }
+        if ($requestContext->getServerVar(ServerVars::SERVER_HANDLER) !== self::MODULE_NAME) {
+            // stop processing
+            return;
         }
+
+        // populates request context for possible script calling based on file handler configurations
+        $this->populateRequestContext($requestContext);
+
+        // check if file handler is not core module anymore
+        if ($requestContext->getServerVar(ServerVars::SERVER_HANDLER) !== self::MODULE_NAME) {
+            // stop processing
+            return;
+        }
+
+        // if existing file should be served
+        if ($requestContext->hasServerVar(ServerVars::SCRIPT_FILENAME)) {
+
+            $scriptFilename = $requestContext->getServerVar(ServerVars::SCRIPT_FILENAME);
+
+            // get file info
+            $fileInfo = new \SplFileInfo($scriptFilename);
+
+            // build etag
+            $eTag = sprintf('"%x-%x-%x"', $fileInfo->getInode(), $fileInfo->getSize(), (float)str_pad($fileInfo->getMTime(), 16, '0'));
+
+            // set last modified header
+            $response->addHeader(HttpProtocol::HEADER_LAST_MODIFIED, gmdate(DATE_RFC822, $fileInfo->getMTime()));
+
+            // set etag header
+            $response->addHeader(HttpProtocol::HEADER_ETAG, $eTag);
+
+            // set correct mimetype header
+            $response->addHeader(
+                HttpProtocol::HEADER_CONTENT_TYPE,
+                MimeTypes::getMimeTypeByExtension($fileInfo->getExtension())
+            );
+
+            // caching checks
+            if (($request->hasHeader(HttpProtocol::HEADER_IF_NONE_MATCH)) &&
+                ($request->getHeader(HttpProtocol::HEADER_IF_NONE_MATCH) === $eTag)
+            ) {
+                // set not modified status without content
+                $response->setStatusCode(304);
+            } else {
+                // serve file by set body stream to file descriptor stream
+                $response->setBodyStream(fopen($scriptFilename, "r"));
+            }
+
+            // set response state to be dispatched after this without calling other modules process
+            $response->setState(HttpResponseStates::DISPATCH);
+
+            // if we got here its maybe a directory index surfing request if $validDir is same as uri
+            // todo: implement directory index view and surfing
+
+        } else {
+            // for now we will throw a 404 as well here for non existing index files in directory
+            throw new ModuleException(
+                sprintf(
+                    "The requested URL %s was not found on this server.",
+                    parse_url($requestContext->getServerVar(ServerVars::X_REQUEST_URI), PHP_URL_PATH)
+                ), 404);
+        }
+
     }
 
     /**

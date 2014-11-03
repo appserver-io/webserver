@@ -212,7 +212,7 @@ class CoreModule implements ModuleInterface
     ) {
         // In php an interface is, by definition, a fixed contract. It is immutable.
         // So we have to declare the right ones afterwards...
-        
+
         /** @var $request \TechDivision\Http\HttpRequestInterface */
         /** @var $response \TechDivision\Http\HttpResponseInterface */
 

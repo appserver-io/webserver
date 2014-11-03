@@ -1,3 +1,13 @@
+# Version 0.2.4
+
+## Bugfixes
+
+* Separated core module logic for populating http requests by given uri
+
+## Features
+
+* None
+
 # Version 0.2.3
 
 ## Bugfixes

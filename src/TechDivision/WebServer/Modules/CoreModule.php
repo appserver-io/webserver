@@ -78,6 +78,7 @@ class CoreModule implements ModuleInterface
      * @return void
      */
     public function expandRequestContext(RequestContextInterface $requestContext) {
+
         // get local refs
         $serverContext = $this->getServerContext();
 
@@ -159,23 +160,22 @@ class CoreModule implements ModuleInterface
         // set special server var for requested file
         $requestContext->setServerVar(ServerVars::REQUEST_FILENAME, $documentRoot . $possibleValidPath);
 
-        // check if requested file is on filesystem and set it to be script filename
+        // check if requested file is on filesystem and set it to be valid script filename
         if ($scriptFilename) {
             $requestContext->setServerVar(ServerVars::SCRIPT_FILENAME, $scriptFilename);
+            // set specific server vars
+            $requestContext->setServerVar(ServerVars::SCRIPT_NAME, $scriptName);
+        }
+
+        // if path info is set put it into server vars
+        if (strlen($pathInfo) > 0) {
+            // set path info vars
+            $requestContext->setServerVar(ServerVars::PATH_INFO, $pathInfo);
+            $requestContext->setServerVar(ServerVars::PATH_TRANSLATED, $documentRoot . $pathInfo);
         }
 
         // check if file handler is defined for that script and expand request context
         if (isset($handlers['.' . $possibleValidPathExtension])) {
-
-            // set specific server vars
-            $requestContext->setServerVar(ServerVars::SCRIPT_NAME, $scriptName);
-
-            // if path info is set put it into server vars
-            if (strlen($pathInfo) > 0) {
-                // set path info vars
-                $requestContext->setServerVar(ServerVars::PATH_INFO, $pathInfo);
-                $requestContext->setServerVar(ServerVars::PATH_TRANSLATED, $documentRoot . $pathInfo);
-            }
 
             // set the file handler to use for modules being able to react on this setting
             $requestContext->setServerVar(
@@ -230,9 +230,6 @@ class CoreModule implements ModuleInterface
             // check if file handler is still core module
             if ($requestContext->getServerVar(ServerVars::SERVER_HANDLER) === self::MODULE_NAME) {
 
-                // get document root
-                $documentRoot = $requestContext->getServerVar(ServerVars::DOCUMENT_ROOT);
-
                 // if existing file should be served
                 if ($requestContext->hasServerVar(ServerVars::SCRIPT_FILENAME)) {
 
@@ -270,20 +267,18 @@ class CoreModule implements ModuleInterface
                     // set response state to be dispatched after this without calling other modules process
                     $response->setState(HttpResponseStates::DISPATCH);
 
-                    // go out
-                    return;
+                    // if we got here its maybe a directory index surfing request if $validDir is same as uri
+                    // todo: implement directory index view and surfing
+
+                } else {
+                    // for now we will throw a 404 as well here for non existing index files in directory
+                    throw new ModuleException(
+                        sprintf(
+                            "The requested URL %s was not found on this server.",
+                            parse_url($requestContext->getServerVar(ServerVars::X_REQUEST_URI), PHP_URL_PATH)
+                        ), 404);
                 }
 
-                // if we got here its maybe a directory index surfing request if $validDir is same as uri
-                // todo: implement directory index view and surfing
-
-            } else {
-                // for now we will throw a 404 as well here for non existing index files in directory
-                throw new ModuleException(
-                    sprintf(
-                        "Requested directory or filename '%s' not found.",
-                        $requestContext->getServerVar(ServerVars::REQUEST_FILENAME)
-                    ), 404);
             }
         }
     }

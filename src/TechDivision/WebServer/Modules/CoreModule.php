@@ -161,11 +161,14 @@ class CoreModule implements ModuleInterface
         // set special server var for requested file
         $requestContext->setServerVar(ServerVars::REQUEST_FILENAME, $documentRoot . $possibleValidPath);
 
+        // set specific script name server var if exists
+        if ($scriptName) {
+            $requestContext->setServerVar(ServerVars::SCRIPT_NAME, $scriptName);
+        }
+
         // check if requested file is on filesystem and set it to be valid script filename
         if ($scriptFilename) {
             $requestContext->setServerVar(ServerVars::SCRIPT_FILENAME, $scriptFilename);
-            // set specific server vars
-            $requestContext->setServerVar(ServerVars::SCRIPT_NAME, $scriptName);
         }
 
         // if path info is set put it into server vars

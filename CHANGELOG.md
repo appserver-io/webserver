@@ -1,3 +1,13 @@
+# Version 0.2.5
+
+## Bugfixes
+
+* fixed script name server var to be set if found
+
+## Features
+
+* None
+
 # Version 0.2.4
 
 ## Bugfixes

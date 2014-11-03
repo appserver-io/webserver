@@ -679,11 +679,8 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         );
         // this is the http connection handler, therefor we will rely on the https flag
         if ($requestContext->hasServerVar(ServerVars::HTTPS) && $requestContext->getServerVar(ServerVars::HTTPS) === ServerVars::VALUE_HTTPS_ON) {
-
             $requestContext->setServerVar(ServerVars::REQUEST_SCHEME, 'https');
-
         } else {
-
             $requestContext->setServerVar(ServerVars::REQUEST_SCHEME, 'http');
         }
     }

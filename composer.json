@@ -1,60 +1,61 @@
 {
-	"name" : "techdivision/webserver",
-	"description" : "Multithreaded webserver for php written in php",
-	"homepage" : "https://github.com/techdivision/TechDivision_WebServer",
-	"license" : "OSL-3.0",
-	"keywords" : [
-		"php",
-		"server",
-		"webserver",
-		"httpd",
-		"http-server"
-	],
-	"authors" : [{
-			"name" : "Johann Zelger",
-			"email" : "jz@techdivision.com",
-			"homepage" : "http://www.techdivision.com",
-			"role" : "Developer"
-		}, {
-			"name" : "Tim Wagner",
-			"email" : "tw@techdivision.com",
-			"homepage" : "http://www.techdivision.com",
-			"role" : "Developer"
-		}
-	],
-	"require" : {
-		"php" : ">=5.4.0",
-		"monolog/monolog" : "1.10.*",
-		"psr/log" : "*",
-		"techdivision/server" : "0.1.*",
-		"techdivision/http" : "0.1.*",
-		"techdivision/connection" : "0.1.*"
-	},
-	"require-dev" : {
-		"phpunit/phpunit" : "3.7.*",
-		"appserver-io/build" : "0.1.*"
-	},
-	"suggest" : {
-		"techdivision/rewritemodule" : "Add's rewrite support",
-		"techdivision/phpmodule" : "Add's internal php support",
-		"techdivision/fastcgimodule" : "Add's fastcgi support"
-	},
-	"autoload" : {
-		"psr-0" : {
-			"TechDivision\\WebServer" : [
-				"src/",
-				"tests/"
-			]
-		}
-	},
-	"config" : {
-		"github-oauth" : {
-			"github.com" : "604a3b5943228e434a5b52c2ba3cf72286d30db9"
-		}
-	},
-    "support" : {
-        "email" : "jz@techdivision.com",
-        "issues" : "https://github.com/techdivision/TechDivision_WebServer/issues",
-        "source" : "https://github.com/techdivision/TechDivision_WebServer"
+    "name": "techdivision/webserver",
+    "description": "Multithreaded webserver for php written in php",
+    "homepage": "https://github.com/techdivision/TechDivision_WebServer",
+    "license": "OSL-3.0",
+    "keywords": [
+        "php",
+        "server",
+        "webserver",
+        "httpd",
+        "http-server"
+    ],
+    "authors": [
+        {
+            "name": "Johann Zelger",
+            "email": "jz@techdivision.com",
+            "homepage": "http://www.techdivision.com",
+            "role": "Developer"
+        }, {
+            "name": "Tim Wagner",
+            "email": "tw@techdivision.com",
+            "homepage": "http://www.techdivision.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "monolog/monolog": "1.10.*",
+        "psr/log": "*",
+        "techdivision/server": "0.1.*",
+        "techdivision/http": "0.1.*",
+        "techdivision/connection": "0.1.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*",
+        "appserver-io/build": "0.1.*"
+    },
+    "suggest": {
+        "techdivision/rewritemodule": "Add's rewrite support",
+        "techdivision/phpmodule": "Add's internal php support",
+        "techdivision/fastcgimodule": "Add's fastcgi support"
+    },
+    "autoload": {
+        "psr-0": {
+            "TechDivision\\WebServer": [
+                "src/",
+                "tests/"
+            ]
+        }
+    },
+    "config": {
+        "github-oauth": {
+            "github.com": "604a3b5943228e434a5b52c2ba3cf72286d30db9"
+        }
+    },
+    "support": {
+        "email": "jz@techdivision.com",
+        "issues": "https://github.com/techdivision/TechDivision_WebServer/issues",
+        "source": "https://github.com/techdivision/TechDivision_WebServer"
     }
 }

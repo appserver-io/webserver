@@ -3,6 +3,7 @@
     <description><![CDATA[This is an example of a php WebServer configuration in xml]]></description>
 
     <loggers>
+        <!-- <logger name="System" type="\TechDivision\Server\Loggers\DummyLogger"/> -->
         <logger name="System" type="\Monolog\Logger">
             <!-- Example for using processors -->
             <!--

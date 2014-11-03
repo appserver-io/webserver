@@ -36,14 +36,8 @@ cd src
 PHP_BIN=/path/to/your/threadsafe/php-binary bin/phpwebserver
 ```
 
-If you're using [`appserver.io`](<http://www.appserver.io>) it'll be this:
+If you're using [`appserver.io`](<http://www.appserver.io>) the start line will be:
 ```bash
-git clone https://github.com/techdivision/TechDivision_WebServer
-cd TechDivision_WebServer
-composer require techdivision/rewritemodule
-composer require techdivision/phpmodule
-composer require techdivision/fastcgimodule
-cd src
 PHP_BIN=/opt/appserver/bin/php bin/phpwebserver
 ```
 

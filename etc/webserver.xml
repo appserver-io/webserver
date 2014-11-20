@@ -245,12 +245,12 @@
                 <module type="\AppserverIo\WebServer\Modules\VirtualHostModule"/>
                 <module type="\AppserverIo\WebServer\Modules\EnvironmentVariableModule" />
                 <module type="\AppserverIo\WebServer\Modules\RewriteMapModule"/>
-                <module type="\AppserverIo\WebServer\Modules\Rewrite\RewriteModule"/>
+                <module type="\AppserverIo\WebServer\Modules\RewriteModule"/>
                 <module type="\AppserverIo\WebServer\Modules\DirectoryModule"/>
                 <module type="\AppserverIo\WebServer\Modules\AccessModule"/>
                 <module type="\AppserverIo\WebServer\Modules\CoreModule"/>
                 <module type="\AppserverIo\WebServer\Modules\Php\PhpModule"/>
-                <module type="\AppserverIo\FastCgiModule\FastCgiModule"/>
+                <module type="\AppserverIo\WebServer\Modules\FastCgiModule"/>
                 <!-- RESPONSE_PRE hook -->
                 <module type="\AppserverIo\WebServer\Modules\DeflateModule"/>
             </modules>
@@ -442,12 +442,12 @@
                 <module type="\AppserverIo\WebServer\Modules\VirtualHostModule"/>
                 <module type="\AppserverIo\WebServer\Modules\EnvironmentVariableModule" />
                 <module type="\AppserverIo\WebServer\Modules\RewriteMapModule"/>
-                <module type="\AppserverIo\WebServer\Modules\Rewrite\RewriteModule"/>
+                <module type="\AppserverIo\WebServer\Modules\RewriteModule"/>
                 <module type="\AppserverIo\WebServer\Modules\DirectoryModule"/>
                 <module type="\AppserverIo\WebServer\Modules\AccessModule"/>
                 <module type="\AppserverIo\WebServer\Modules\CoreModule"/>
                 <module type="\AppserverIo\WebServer\Modules\Php\PhpModule"/>
-                <module type="\AppserverIo\FastCgiModule\FastCgiModule"/>
+                <module type="\AppserverIo\WebServer\Modules\FastCgiModule"/>
                 <!-- RESPONSE_PRE hook -->
                 <module type="\AppserverIo\WebServer\Modules\DeflateModule"/>
             </modules>

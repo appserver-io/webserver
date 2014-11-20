@@ -199,12 +199,12 @@
                 "\\AppserverIo\\WebServer\\Modules\\VirtualHostModule",
                 "\\AppserverIo\\WebServer\\Modules\\EnvironmentVariableModule",
                 "\\AppserverIo\\WebServer\\Modules\\RewriteMapModule",
-                "\\AppserverIo\\RewriteModule\\RewriteModule",
+                "\\AppserverIo\\WebServer\\Modules\\RewriteModule",
                 "\\AppserverIo\\WebServer\\Modules\\DirectoryModule",
                 "\\AppserverIo\\WebServer\\Modules\\AccessModule",
                 "\\AppserverIo\\WebServer\\Modules\\CoreModule",
-                "\\AppserverIo\\PhpModule\\PhpModule",
-                "\\AppserverIo\\FastCgiModule\\FastCgiModule",
+                "\\AppserverIo\\WebServer\\Modules\\PhpModule",
+                "\\AppserverIo\\WebServer\\Modules\\FastCgiModule",
                 "\\AppserverIo\\WebServer\\Modules\\DeflateModule"
             ],
 
@@ -373,12 +373,12 @@
                 "\\AppserverIo\\WebServer\\Modules\\VirtualHostModule",
                 "\\AppserverIo\\WebServer\\Modules\\EnvironmentVariableModule",
                 "\\AppserverIo\\WebServer\\Modules\\RewriteMapModule",
-                "\\AppserverIo\\RewriteModule\\RewriteModule",
+                "\\AppserverIo\\WebServer\\Modules\\RewriteModule",
                 "\\AppserverIo\\WebServer\\Modules\\DirectoryModule",
                 "\\AppserverIo\\WebServer\\Modules\\AccessModule",
                 "\\AppserverIo\\WebServer\\Modules\\CoreModule",
-                "\\AppserverIo\\PhpModule\\PhpModule",
-                "\\AppserverIo\\FastCgiModule\\FastCgiModule",
+                "\\AppserverIo\\WebServer\\Modules\\PhpModule",
+                "\\AppserverIo\\WebServer\\Modules\\FastCgiModule",
                 "\\AppserverIo\\WebServer\\Modules\\DeflateModule"
             ],
 

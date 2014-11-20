@@ -99,7 +99,7 @@ class FastCgiModuleTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($mockFastCgiConnection));
 
         // create a mock version of the module
-        $mockFastCgiModule = $this->getMock('AppserverIo\FastCgiModule\FastCgiModule', array('getFastCgiClient'));
+        $mockFastCgiModule = $this->getMock('AppserverIo\WebServer\Modules\FastCgiModule\FastCgiModule', array('getFastCgiClient'));
         $mockFastCgiModule->expects($this->once())
             ->method('getFastCgiClient')
             ->will($this->returnValue($mockFastCgiClient));

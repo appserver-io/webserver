@@ -33,7 +33,7 @@ use AppserverIo\Server\Interfaces\ServerContextInterface;
 use AppserverIo\Http\HttpRequestInterface;
 use AppserverIo\Server\Interfaces\ModuleInterface;
 use AppserverIo\Server\Dictionaries\ModuleVars;
-use AppserverIo\RewriteModule\Entities\Rule;
+use AppserverIo\WebServer\Modules\Rewrite\Entities\Rule;
 
 /**
  * Class RewriteModule

@@ -22,7 +22,7 @@
 
 namespace AppserverIo\WebServer\Mock;
 
-use AppserverIo\RewriteModule\Entities\Rule;
+use AppserverIo\WebServer\Modules\Rewrite\Entities\Rule;
 
 /**
  * Class MockRule

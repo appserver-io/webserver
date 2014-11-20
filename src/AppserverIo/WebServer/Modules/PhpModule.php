@@ -34,6 +34,8 @@ use AppserverIo\Server\Interfaces\ModuleInterface;
 use AppserverIo\Server\Exceptions\ModuleException;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
+use AppserverIo\WebServer\Modules\Php\Globals;
+use AppserverIo\WebServer\Modules\Php\ProcessThread\ProcessThread;
 
 /**
  * Class PhpModule
@@ -246,7 +248,7 @@ class PhpModule implements ModuleInterface
             $this->initGlobals();
 
             // start new php process
-            $process = new PhpProcessThread(
+            $process = new ProcessThread(
                 $scriptFilename,
                 $this->globals,
                 $this->uploadedFiles
@@ -289,7 +291,7 @@ class PhpModule implements ModuleInterface
     /**
      * Prepares the response instance for delivery
      *
-     * @param \AppserverIo\PhpModule\PhpProcessThread $process The process to prepare response for
+     * @param \AppserverIo\WebServer\Modules\Php\ProcessThread $process The process to prepare response for
      *
      * @return void
      */
@@ -363,7 +365,7 @@ class PhpModule implements ModuleInterface
         $requestContext = $this->getRequestContext();
 
         // Init the actual globals storage and make sure to generate it anew
-        $this->globals = new PhpGlobals();
+        $this->globals = new Globals();
         $globals = $this->globals;
 
         // initialize the globals

@@ -25,12 +25,12 @@ namespace AppserverIo\WebServer\Modules\Rewrite\Entities;
 use AppserverIo\Http\HttpProtocol;
 use AppserverIo\Http\HttpResponseInterface;
 use AppserverIo\Http\HttpResponseStates;
-use AppserverIo\RewriteModule\Dictionaries\RuleFlags;
+use AppserverIo\WebServer\Modules\Rewrite\Dictionaries\RuleFlags;
 use AppserverIo\Server\Dictionaries\ServerVars;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 
 /**
- * AppserverIo\RewriteModule\Entities\Rule
+ * AppserverIo\WebServer\Modules\Rewrite\Entities\Rule
  *
  * This class provides an object based representation of a rewrite rule, including logic for testing, applying
  * and handeling conditions.

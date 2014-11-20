@@ -25,9 +25,9 @@ namespace AppserverIo\WebServer\Functional;
 use AppserverIo\Http\HttpProtocol;
 use AppserverIo\Http\HttpRequest;
 use AppserverIo\Http\HttpResponse;
-use AppserverIo\RewriteModule\Mock\MockServerConfig;
-use AppserverIo\RewriteModule\Mock\MockRequestContext;
-use AppserverIo\RewriteModule\RewriteModule;
+use AppserverIo\WebServer\Mock\MockServerConfig;
+use AppserverIo\WebServer\Mock\MockRequestContext;
+use AppserverIo\WebServer\Modules\Rewrite\RewriteModule;
 use AppserverIo\Server\Contexts\ServerContext;
 use AppserverIo\Server\Dictionaries\ModuleHooks;
 use AppserverIo\Server\Dictionaries\ModuleVars;
@@ -52,7 +52,7 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
     /**
      * The rewrite module instance to test.
      *
-     * @var \AppserverIo\RewriteModule\RewriteModule
+     * @var \AppserverIo\WebServer\Modules\Rewrite\RewriteModule
      */
     protected $rewriteModule;
 
@@ -74,14 +74,14 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
     /**
      * The mock server context we use in this test
      *
-     * @var \AppserverIo\RewriteModule\Mock\MockServerContext $mockServerContext
+     * @var \AppserverIo\WebServer\Mock\MockServerContext $mockServerContext
      */
     protected $mockServerContext;
 
     /**
      * The request context we use in this test
      *
-     * @var \AppserverIo\RewriteModule\Mock\MockRequestContext $mockRequestContext
+     * @var \AppserverIo\WebServer\Mock\MockRequestContext $mockRequestContext
      */
     protected $mockRequestContext;
 
@@ -169,7 +169,7 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
      */
     public function testInstanceOf()
     {
-        $this->assertInstanceOf('\AppserverIo\RewriteModule\RewriteModule', $this->rewriteModule);
+        $this->assertInstanceOf('\AppserverIo\WebServer\Modules\Rewrite\RewriteModule', $this->rewriteModule);
     }
 
     /**

@@ -1,6 +1,6 @@
-# TechDivision_WebServer
+# webserver
 
-[![Latest Stable Version](https://poser.pugx.org/techdivision/webserver/v/stable.png)](https://packagist.org/packages/techdivision/webserver) [![Total Downloads](https://poser.pugx.org/techdivision/webserver/downloads.png)](https://packagist.org/packages/techdivision/webserver) [![Latest Unstable Version](https://poser.pugx.org/techdivision/webserver/v/unstable.png)](https://packagist.org/packages/techdivision/webserver) [![License](https://poser.pugx.org/techdivision/webserver/license.png)](https://packagist.org/packages/techdivision/webserver) [![Build Status](https://travis-ci.org/techdivision/TechDivision_WebServer.png)](https://travis-ci.org/techdivision/TechDivision_WebServer)[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/techdivision/TechDivision_WebServer/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/techdivision/TechDivision_WebServer/?branch=master)[![Code Coverage](https://scrutinizer-ci.com/g/techdivision/TechDivision_WebServer/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/techdivision/TechDivision_WebServer/?branch=master)
+[![Latest Stable Version](https://poser.pugx.org/appserver-io/webserver/v/stable.png)](https://packagist.org/packages/appserver-io/webserver) [![Total Downloads](https://poser.pugx.org/appserver-io/webserver/downloads.png)](https://packagist.org/packages/appserver-io/webserver) [![Latest Unstable Version](https://poser.pugx.org/appserver-io/webserver/v/unstable.png)](https://packagist.org/packages/appserver-io/webserver) [![License](https://poser.pugx.org/appserver-io/webserver/license.png)](https://packagist.org/packages/appserver-io/webserver) [![Build Status](https://travis-ci.org/appserver-io/webserver.png)](https://travis-ci.org/appserver-io/webserver)[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/appserver-io/webserver/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/appserver-io/webserver/?branch=master)[![Code Coverage](https://scrutinizer-ci.com/g/appserver-io/webserver/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/appserver-io/webserver/?branch=master)
 
 ## Introduction
 
@@ -16,7 +16,7 @@ If you want to use the web server with your application add this
 ```sh
 {
     "require": {
-        "techdivision/webserver": "dev-master"
+        "appserver-io/webserver": "dev-master"
     },
 }
 ```
@@ -27,18 +27,14 @@ Usage
 -----
 If you can satisfy the requirements it is very simple to use the webserver. Just do this:
 ```bash
-git clone https://github.com/techdivision/TechDivision_WebServer
-cd TechDivision_WebServer
-composer require techdivision/rewritemodule
-composer require techdivision/phpmodule
-composer require techdivision/fastcgimodule
-cd src
-PHP_BIN=/path/to/your/threadsafe/php-binary bin/phpwebserver
+git clone https://github.com/appserver-io/webserver
+cd webserver/src
+PHP_BIN=/path/to/your/threadsafe/php-binary bin/webserver
 ```
 
 If you're using [`appserver.io`](<http://www.appserver.io>) the start line will be:
 ```bash
-PHP_BIN=/opt/appserver/bin/php bin/phpwebserver
+PHP_BIN=/opt/appserver/bin/php bin/webserver
 ```
 
 Goto http://127.0.0.1:9080 and if all went good, you will see the welcome page of the php webserver.

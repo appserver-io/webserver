@@ -20,7 +20,7 @@
  * @link       https://github.com/appserver-io/webserver
  */
 
-require('../vendor/techdivision/server/src/TechDivision/Server/Standalone.php');
+require('../vendor/techdivision/server/src/AppserverIo/Server/Standalone.php');
 
 // check if first argument is given for configuration
 if (isset($argv[1])) {

@@ -2,7 +2,7 @@ php.ini
 composer.lock
 composer.phar
 .idea
-/src/var/log/*.log
+/var/log/*.log
 /target
 /reports
 /instance-src

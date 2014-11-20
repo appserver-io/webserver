@@ -1,6 +1,7 @@
 <?php
+
 /**
- * \AppserverIo\WebServer\DummyTest
+ * \AppserverIo\WebServer\Modules\PhpModuleTest
  *
  * NOTICE OF LICENSE
  *
@@ -19,10 +20,10 @@
  * @link       https://github.com/appserver-io/webserver
  */
 
-namespace AppserverIo\WebServer;
+namespace AppserverIo\WebServer\Modules;
 
 /**
- * Class DummyTest
+ * Class PhpModuleTest
  *
  * @category   Server
  * @package    WebServer
@@ -32,15 +33,27 @@ namespace AppserverIo\WebServer;
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/appserver-io/webserver
  */
-class DummyTest extends \PHPUnit_Framework_TestCase
-{
+class PhpModuleTest extends \PHPUnit_Framework_TestCase {
+
     /**
-     * Test set server var functionality on response object.
+     * @var PhpModule
+     */
+    public $module;
+
+    /**
+     * Initializes module object to test.
      *
      * @return void
      */
-    public function testDummy()
-    {
-        $this->assertSame(1, 1);
+    public function setUp() {
+        $this->module = new PhpModule();
+    }
+
+    /**
+     * Test add header functionality on response object.
+     */
+    public function testModuleName() {
+        $module = $this->module;
+        $this->assertSame('php', $module::MODULE_NAME);
     }
 }

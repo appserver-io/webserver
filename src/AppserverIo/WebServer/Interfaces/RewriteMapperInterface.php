@@ -1,6 +1,7 @@
 <?php
+
 /**
- * \AppserverIo\WebServer\DummyTest
+ * \AppserverIo\Server\Exceptions\ModuleException
  *
  * NOTICE OF LICENSE
  *
@@ -12,35 +13,37 @@
  *
  * @category   Server
  * @package    WebServer
- * @subpackage Modules
+ * @subpackage Interfaces
  * @author     Johann Zelger <jz@appserver.io>
  * @copyright  2014 TechDivision GmbH <info@appserver.io>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/appserver-io/webserver
  */
 
-namespace AppserverIo\WebServer;
+namespace AppserverIo\WebServer\Interfaces;
+
+use AppserverIo\Server\Exceptions\ModuleException;
 
 /**
- * Class DummyTest
+ * Interface RewriteMapperInterface
  *
  * @category   Server
  * @package    WebServer
- * @subpackage Modules
+ * @subpackage Interfaces
  * @author     Johann Zelger <jz@appserver.io>
  * @copyright  2014 TechDivision GmbH <info@appserver.io>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/appserver-io/webserver
  */
-class DummyTest extends \PHPUnit_Framework_TestCase
+interface RewriteMapperInterface
 {
+
     /**
-     * Test set server var functionality on response object.
+     * Look's up a target url for given request url
      *
-     * @return void
+     * @param string $requestUri The requested url without query params
+     *
+     * @return null|string
      */
-    public function testDummy()
-    {
-        $this->assertSame(1, 1);
-    }
+    public function lookup($requestUri);
 }

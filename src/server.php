@@ -1,4 +1,5 @@
 <?php
+
 /**
  * server.php
  *
@@ -10,12 +11,13 @@
  *
  * PHP version 5
  *
- * @category  WebServer
- * @package   TechDivision_WebServer
- * @author    Johann Zelger <jz@techdivision.com>
- * @copyright 2014 TechDivision GmbH <info@techdivision.com>
- * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link      https://github.com/techdivision/TechDivision_Server
+ * @category   Server
+ * @package    WebServer
+ * @subpackage Modules
+ * @author     Johann Zelger <jz@appserver.io>
+ * @copyright  2014 TechDivision GmbH <info@appserver.io>
+ * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link       https://github.com/appserver-io/webserver
  */
 
 require('../vendor/techdivision/server/src/TechDivision/Server/Standalone.php');
@@ -24,8 +26,8 @@ require('../vendor/techdivision/server/src/TechDivision/Server/Standalone.php');
 if (isset($argv[1])) {
     $config = $argv[1];
 } else {
-    $config = 'etc/phpwebserver.xml';
+    $config = 'etc/webserver.xml';
 }
 
-$server = new \TechDivision\Server\Standalone(__DIR__, $config, '../vendor/autoload.php');
+$server = new \AppserverIo\Server\Standalone(__DIR__, $config, '../vendor/autoload.php');
 $server->start();

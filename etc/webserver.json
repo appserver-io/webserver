@@ -1,0 +1,392 @@
+{
+    "description": "This is an example of a php WebServer configuration in json",
+
+    "loggers": [
+        {
+            "name": "System",
+            "type": "\\Monolog\\Logger",
+            "handlers": [
+                {
+                    "type": "\\Monolog\\Handler\\StreamHandler",
+                    "params": {
+                        "stream": "var/log/webserver-system.log",
+                        "level": 100,
+                        "bubble": 1
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Access",
+            "type": "\\Monolog\\Logger",
+            "handlers": [
+                {
+                    "type": "\\Monolog\\Handler\\StreamHandler",
+                    "formatter": {
+                        "type": "\\Monolog\\Formatter\\LineFormatter",
+                        "params": {
+                            "format": "%message%",
+                            "dateFormat": "Y-m-d H:i:s",
+                            "allowInlineLineBreaks": 1
+                        }
+                    },
+                    "params": {
+                        "stream": "var/log/webserver-access.log",
+                        "level": 100,
+                        "bubble": 1
+                    }
+                }
+            ]
+        }
+    ],
+    "servers": [
+        {
+            "name": "httpServer",
+            "type": "\\AppserverIo\\Server\\Servers\\MultiThreadedServer",
+            "worker": "\\AppserverIo\\Server\\Workers\\ThreadWorker",
+            "socket": "\\AppserverIo\\Server\\Sockets\\StreamSocket",
+            "serverContext": "\\AppserverIo\\Server\\ServerContext",
+            "requestContext": "\\AppserverIo\\Server\\RequestContext",
+            "loggerName": "System",
+            "workerNumber": 128,
+            "workerAcceptMin": 8,
+            "workerAcceptMax": 16,
+
+            "admin": "www@localhost.localdomain",
+            "software": "phpWebServer/0.2.0",
+            "transport": "tcp",
+            "address": "0.0.0.0",
+            "port": "9080",
+            "documentRoot" : "var/www",
+            "directoryIndex": "index.php index.html index.htm",
+            "keepAliveMax": 64,
+            "keepAliveTimeout": 5,
+            "errorsPageTemplatePath": "",
+
+            "authentications" : [
+                {
+                    "uri": "^\\/auth\\/basic\\/phpwebserver.*",
+                    "realm": "PhpWebServer Basic Authentication System",
+                    "type": "\\AppserverIo\\WebServer\\Authentication\\BasicAuthentication",
+                    "hash": "cGhwd2Vic2VydmVyOnBocHdlYnNlcnZlci5pMA=="
+                },
+                {
+                    "uri": "^\\/auth\\/basic\\/appserver.*",
+                    "realm": "appserver.io Basic Authentication System",
+                    "type": "\\AppserverIo\\WebServer\\Authentication\\BasicAuthentication",
+                    "hash": "YXBwc2VydmVyOmFwcHNlcnZlci5pMA=="
+                }
+            ],
+
+            "accesses" : [
+                {
+                    "type": "allow",
+                    "REQUEST_URI": ".*"
+                },
+                {
+                    "type": "deny",
+                    "REQUEST_URI": "^\\/errors.*"
+                }
+            ],
+
+            "rewrites" : [
+                {
+                    "condition" : "-f{OR}-l{OR}-d",
+                    "target" : "",
+                    "flag" : "L"
+                }
+            ],
+
+            "virtualHosts" : [
+                {
+                    "name": "phpwebserver.dev phpwebserver.local phpwebserver.test",
+                    "admin": "admin@phpwebserver.dev",
+                    "documentRoot": "var/www",
+                    "errorsPageTemplatePath": "var/www/errors/error.phtml",
+                    "rewrites" : [
+                        {
+                            "condition" : "-f{OR}-l{OR}-d",
+                            "target" : "",
+                            "flag" : "L"
+                        }
+                    ],
+                    "environmentVariables" : [
+                        {
+                            "condition" : "",
+                            "definition" : "EXAMPLE_VARIABLE=test"
+                        }
+                    ]
+                },
+                {
+                    "name": "phpwebserver-fcgi.dev phpwebserver-fcgi.local phpwebserver-fcgi.test",
+                    "admin": "admin@phpwebserver.dev",
+                    "documentRoot": "var/www/cgi",
+                    "errorsPageTemplatePath": "var/www/errors/error.phtml",
+                    "rewrites" : [
+                        {
+                            "condition" : "-f{OR}-l{OR}-d",
+                            "target" : "",
+                            "flag" : "L"
+                        }
+                    ],
+                    "environmentVariables" : [
+                        {
+                            "condition" : "",
+                            "definition" : "EXAMPLE_VARIABLE=fastcgi"
+                        }
+                    ],
+                    "locations" : [
+                        {
+                            "condition" : "~*\\.php(\\\/|\\?|$",
+                            "handlers" : [
+                                {
+                                    "name": "fastcgi",
+                                    "extension": ".php",
+                                    "params" : {
+                                        "host": "127.0.0.1",
+                                        "port": 9000
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "magento.local",
+                    "admin": "admin@magento.local",
+                    "documentRoot": "/var/www/magento",
+                    "errorsPageTemplatePath": "var/www/errors/error.phtml",
+                    "rewriteMaps": [
+                        {
+                            "type": "\\AppserverIo\\WebServer\\Modules\\MagentoRewriteMapper",
+                            "params": {
+                                "base": "instance-subdir",
+                                "dsn": "mysql:host=127.0.0.1;dbname=magento;charset=utf8",
+                                "username": "user",
+                                "password": "pass"
+                            }
+                        }
+                    ],
+                    "rewrites" : [
+                        {
+                            "condition" : "-f{OR}-l{OR}-d",
+                            "target" : "",
+                            "flag" : "L"
+                        }
+                    ],
+                    "accesses" : [
+                        {
+                            "type": "allow",
+                            "REQUEST_URI": "^\\/(media|skin|js|index\\.php).*"
+                        }
+                    ]
+                }
+            ],
+
+            "environmentVariables" : [
+                {
+                    "condition" : "(\\s.*WebKit?|Gecko)@$User-Agent",
+                    "definition" : "BROWSER_ENGINE=$1"
+                }
+            ],
+
+            "connectionHandlers": [
+                "\\AppserverIo\\Http\\HttpConnectionHandler"
+            ],
+
+            "modules": [
+                "\\AppserverIo\\WebServer\\Modules\\AuthenticationModule",
+                "\\AppserverIo\\WebServer\\Modules\\VirtualHostModule",
+                "\\AppserverIo\\WebServer\\Modules\\EnvironmentVariableModule",
+                "\\AppserverIo\\WebServer\\Modules\\RewriteMapModule",
+                "\\AppserverIo\\RewriteModule\\RewriteModule",
+                "\\AppserverIo\\WebServer\\Modules\\DirectoryModule",
+                "\\AppserverIo\\WebServer\\Modules\\AccessModule",
+                "\\AppserverIo\\WebServer\\Modules\\CoreModule",
+                "\\AppserverIo\\PhpModule\\PhpModule",
+                "\\AppserverIo\\FastCgiModule\\FastCgiModule",
+                "\\AppserverIo\\WebServer\\Modules\\DeflateModule"
+            ],
+
+            "handlers": [
+                { "name": "php", "extension": ".php" },
+                { "name": "php", "extension": ".phtml" },
+                { "name": "servlet", "extension": ".do" }
+            ]
+        },
+        {
+            "name": "httpsServer",
+            "type": "\\AppserverIo\\Server\\Servers\\MultiThreadedServer",
+            "worker": "\\AppserverIo\\Server\\Workers\\ThreadWorker",
+            "socket": "\\AppserverIo\\Server\\Sockets\\StreamSocket",
+            "serverContext" : "\\AppserverIo\\Server\\ServerContext",
+            "requestContext": "\\AppserverIo\\Server\\RequestContext",
+            "loggerName": "System",
+            "workerNumber": 128,
+            "workerAcceptMin": 8,
+            "workerAcceptMax": 16,
+
+            "admin": "www@localhost.localdomain",
+            "software": "phpWebServer/0.2.0",
+            "transport": "ssl",
+            "address": "0.0.0.0",
+            "port": "9443",
+            "certPath": "etc/phpwebserver.pem",
+            "passphrase": "passphrase",
+            "documentRoot" : "var/www",
+            "directoryIndex": "index.php index.html index.htm",
+            "keepAliveMax": 64,
+            "keepAliveTimeout": 5,
+            "errorsPageTemplatePath": "",
+
+            "authentications" : [
+                {
+                    "uri": "^\\/auth\\/basic\\/phpwebserver.*",
+                    "realm": "PhpWebServer Basic Authentication System",
+                    "type": "\\AppserverIo\\WebServer\\Authentication\\BasicAuthentication",
+                    "hash": "cGhwd2Vic2VydmVyOnBocHdlYnNlcnZlci5pMA=="
+                },
+                {
+                    "uri": "^\\/auth\\/basic\\/appserver.*",
+                    "realm": "appserver.io Basic Authentication System",
+                    "type": "\\AppserverIo\\WebServer\\Authentication\\BasicAuthentication",
+                    "hash": "YXBwc2VydmVyOmFwcHNlcnZlci5pMA=="
+                }
+            ],
+
+            "accesses" : [
+                {
+                    "type": "allow",
+                    "REQUEST_URI": ".*"
+                },
+                {
+                    "type": "deny",
+                    "REQUEST_URI": "^\\/errors.*"
+                }
+            ],
+
+            "rewrites" : [
+                {
+                    "condition" : "-f{OR}-l{OR}-d",
+                    "target" : "",
+                    "flag" : "L"
+                }
+            ],
+
+            "virtualHosts" : [
+                {
+                    "name": "phpwebserver.dev phpwebserver.local phpwebserver.test",
+                    "admin": "admin@phpwebserver.dev",
+                    "documentRoot": "var/www",
+                    "errorsPageTemplatePath": "var/www/errors/error.phtml",
+                    "rewrites" : [
+                        {
+                            "condition" : "-f{OR}-l{OR}-d",
+                            "target" : "",
+                            "flag" : "L"
+                        }
+                    ],
+                    "environmentVariables" : [
+                        {
+                            "condition" : "",
+                            "definition" : "EXAMPLE_VARIABLE=test"
+                        }
+                    ]
+                },
+                {
+                    "name": "phpwebserver-fcgi.dev phpwebserver-fcgi.local phpwebserver-fcgi.test",
+                    "admin": "admin@phpwebserver.dev",
+                    "documentRoot": "var/www/cgi",
+                    "errorsPageTemplatePath": "var/www/errors/error.phtml",
+                    "rewrites" : [
+                        {
+                            "condition" : "-f{OR}-l{OR}-d",
+                            "target" : "",
+                            "flag" : "L"
+                        }
+                    ],
+                    "environmentVariables" : [
+                        {
+                            "condition" : "",
+                            "definition" : "EXAMPLE_VARIABLE=fastcgi"
+                        }
+                    ],
+                    "locations" : [
+                        {
+                            "condition" : "~*\\.php(\\\/|\\?|$",
+                            "handlers" : [
+                                {
+                                    "name": "fastcgi",
+                                    "extension": ".php",
+                                    "params" : {
+                                        "host": "127.0.0.1",
+                                        "port": 9000
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "magento.local",
+                    "admin": "admin@magento.local",
+                    "documentRoot": "/var/www/magento",
+                    "errorsPageTemplatePath": "var/www/errors/error.phtml",
+                    "rewriteMaps": [
+                        {
+                            "type": "\\AppserverIo\\WebServer\\Modules\\MagentoRewriteMapper",
+                            "base": "instance-subdir",
+                            "dsn": "mysql:host=127.0.0.1;dbname=magento;charset=utf8",
+                            "username": "user",
+                            "password": "pass"
+                        }
+                    ],
+                    "rewrites" : [
+                        {
+                            "condition" : "-f{OR}-l{OR}-d",
+                            "target" : "",
+                            "flag" : "L"
+                        }
+                    ],
+                    "accesses" : [
+                        {
+                            "type": "allow",
+                            "REQUEST_URI": "^\\/(media|skin|js|index\\.php).*"
+                        }
+                    ]
+                }
+            ],
+
+            "environmentVariables" : [
+                {
+                    "condition" : "(\\s.*WebKit?|Gecko)@$User-Agent",
+                    "definition" : "BROWSER_ENGINE=$1"
+                }
+            ],
+
+            "connectionHandlers": [
+                "\\AppserverIo\\Http\\HttpConnectionHandler"
+            ],
+
+            "modules": [
+                "\\AppserverIo\\WebServer\\Modules\\AuthenticationModule",
+                "\\AppserverIo\\WebServer\\Modules\\VirtualHostModule",
+                "\\AppserverIo\\WebServer\\Modules\\EnvironmentVariableModule",
+                "\\AppserverIo\\WebServer\\Modules\\RewriteMapModule",
+                "\\AppserverIo\\RewriteModule\\RewriteModule",
+                "\\AppserverIo\\WebServer\\Modules\\DirectoryModule",
+                "\\AppserverIo\\WebServer\\Modules\\AccessModule",
+                "\\AppserverIo\\WebServer\\Modules\\CoreModule",
+                "\\AppserverIo\\PhpModule\\PhpModule",
+                "\\AppserverIo\\FastCgiModule\\FastCgiModule",
+                "\\AppserverIo\\WebServer\\Modules\\DeflateModule"
+            ],
+
+            "handlers": [
+                { "name": "php", "extension": ".php" },
+                { "name": "php", "extension": ".phtml" },
+                { "name": "servlet", "extension": ".do" }
+            ]
+        }
+    ]
+}

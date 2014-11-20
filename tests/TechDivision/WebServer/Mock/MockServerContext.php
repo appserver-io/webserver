@@ -1,6 +1,7 @@
 <?php
+
 /**
- * \AppserverIo\WebServer\DummyTest
+ * \AppserverIo\WebServer\Mock\MockServerContext
  *
  * NOTICE OF LICENSE
  *
@@ -12,35 +13,40 @@
  *
  * @category   Server
  * @package    WebServer
- * @subpackage Modules
- * @author     Johann Zelger <jz@appserver.io>
+ * @subpackage Mock
+ * @author     Bernhard Wick <bw@appserver.io>
  * @copyright  2014 TechDivision GmbH <info@appserver.io>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/appserver-io/webserver
  */
 
-namespace AppserverIo\WebServer;
+namespace AppserverIo\WebServer\Mock;
+
+use AppserverIo\Server\Contexts\ServerContext;
 
 /**
- * Class DummyTest
+ * Class MockServerContext
+ *
+ * Mocks the ServerContext class to test exception catching
  *
  * @category   Server
  * @package    WebServer
- * @subpackage Modules
- * @author     Johann Zelger <jz@appserver.io>
+ * @subpackage Mock
+ * @author     Bernhard Wick <bw@appserver.io>
  * @copyright  2014 TechDivision GmbH <info@appserver.io>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/appserver-io/webserver
  */
-class DummyTest extends \PHPUnit_Framework_TestCase
+class MockServerContext extends ServerContext
 {
     /**
-     * Test set server var functionality on response object.
+     * Overridden method to test exception handling
      *
      * @return void
+     * @throws \Exception
      */
-    public function testDummy()
+    public function getServerConfig()
     {
-        $this->assertSame(1, 1);
+        throw new \Exception();
     }
 }

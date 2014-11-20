@@ -1,6 +1,7 @@
 <?php
+
 /**
- * \AppserverIo\WebServer\DummyTest
+ * \AppserverIo\WebServer\Interfaces\DirectiveInterface
  *
  * NOTICE OF LICENSE
  *
@@ -12,35 +13,38 @@
  *
  * @category   Server
  * @package    WebServer
- * @subpackage Modules
+ * @subpackage Interfaces
  * @author     Johann Zelger <jz@appserver.io>
  * @copyright  2014 TechDivision GmbH <info@appserver.io>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/appserver-io/webserver
  */
 
-namespace AppserverIo\WebServer;
+namespace AppserverIo\WebServer\Interfaces;
 
 /**
- * Class DummyTest
+ * AppserverIo\WebServer\Interfaces\DirectiveInterface
+ *
+ * This interface acts as a very basic interface for directives of config files
  *
  * @category   Server
  * @package    WebServer
- * @subpackage Modules
- * @author     Johann Zelger <jz@appserver.io>
+ * @subpackage Interfaces
+ * @author     Bernhard Wick <bw@appserver.io>
  * @copyright  2014 TechDivision GmbH <info@appserver.io>
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/appserver-io/webserver
  */
-class DummyTest extends \PHPUnit_Framework_TestCase
+interface DirectiveInterface
 {
     /**
-     * Test set server var functionality on response object.
+     * Will fill an empty directive object with vital information delivered via an array.
+     * This is mostly useful as an interface for different parsers
      *
-     * @return void
+     * @param array $parts The array to extract information from
+     *
+     * @return null
+     * @throws \InvalidArgumentException
      */
-    public function testDummy()
-    {
-        $this->assertSame(1, 1);
-    }
+    public function fillFromArray(array $parts);
 }

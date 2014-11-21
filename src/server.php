@@ -31,5 +31,5 @@ if (isset($argv[1])) {
     $config = STARTUP_BASE . 'etc/webserver.xml';
 }
 
-$server = new \AppserverIo\Server\Standalone(STARTUP_BASE , $config, STARTUP_BASE . 'vendor/autoload.php');
+$server = new \AppserverIo\Server\Standalone(STARTUP_BASE, $config, STARTUP_BASE . 'vendor/autoload.php');
 $server->start();

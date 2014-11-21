@@ -328,11 +328,11 @@ class RewriteModule implements HttpModuleInterface
     /**
      * Will fill the header variables into our pre-collected $serverVars array
      *
-     * @param \AppserverIo\Connection\ConnectionRequestInterface $request The request instance
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface $request The request instance
      *
      * @return void
      */
-    protected function fillHeaderBackreferences(ConnectionRequestInterface $request)
+    protected function fillHeaderBackreferences(RequestInterface $request)
     {
         $headerArray = $request->getHeaders();
 

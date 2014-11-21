@@ -203,12 +203,12 @@ class FastCgiModule implements HttpModuleInterface
     /**
      * Prepares and returns the array with the FastCGI environment varaibles.
      *
-     * @param \AppserverIo\Connection\ConnectionRequestInterface     $request        A request object
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
      * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
      *
      * @return array The array with the prepared FastCGI environment variables
      */
-    protected function prepareEnvironment(ConnectionRequestInterface $request, RequestContextInterface $requestContext)
+    protected function prepareEnvironment(RequestInterface $request, RequestContextInterface $requestContext)
     {
 
         // prepare the Fast-CGI environment variables

@@ -422,7 +422,7 @@ class EnvironmentVariableModule implements HttpModuleInterface
      * @return void
      */
     protected function fillHeaderBackreferences(
-        HttpRequestInterface $request
+        RequestInterface $request
     ) {
         $headerArray = $request->getHeaders();
 

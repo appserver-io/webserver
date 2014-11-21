@@ -20,7 +20,7 @@
  * @link       https://github.com/appserver-io/webserver
  */
 
-namespace AppserverIo\WebServer\Modules\Php\ProcessThread;
+namespace AppserverIo\WebServer\Modules\Php;
 
 /**
  * Class ProcessThread
@@ -79,11 +79,11 @@ class ProcessThread extends \Thread
     /**
      * Constructs the process
      *
-     * @param string     $scriptFilename The script filename to execute
-     * @param \Stackable $globals        The globals array access object
-     * @param array      $uploadedFiles  The uploaded files as array
+     * @param string $scriptFilename The script filename to execute
+     * @param array  $globals        The globals array access object
+     * @param array  $uploadedFiles  The uploaded files as array
      */
-    public function __construct($scriptFilename, \Stackable $globals, array $uploadedFiles = array())
+    public function __construct($scriptFilename, array $globals = array(), array $uploadedFiles = array())
     {
         $this->scriptFilename = $scriptFilename;
         $this->globals = $globals;

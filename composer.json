@@ -1,5 +1,5 @@
 {
-    "name": "techdivision/webserver",
+    "name": "appserver-io/webserver",
     "description": "Multithreaded webserver for php written in php",
     "homepage": "https://github.com/appserver-io/webserver",
     "license": "OSL-3.0",
@@ -21,6 +21,11 @@
             "email": "tw@appserver.io",
             "homepage": "http://www.appserver.io",
             "role": "Developer"
+        }, {
+            "name": "Bernhard Wick",
+            "email": "bw@appserver.io",
+            "homepage": "http://www.appserver.io",
+            "role": "Developer"
         }
     ],
     "require": {
@@ -28,7 +33,8 @@
         "monolog/monolog": "1.10.*",
         "psr/log": "*",
         "appserver-io/server": "0.1.*",
-        "appserver-io/http": "0.1.*"
+        "appserver-io/http": "0.1.*",
+        "appserver-io/fastcgi": "0.1.*"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*",

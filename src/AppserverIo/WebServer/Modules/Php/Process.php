@@ -59,11 +59,11 @@ class Process
     /**
      * Constructs the process
      *
-     * @param string                             $scriptFilename The script filename to execute
-     * @param \AppserverIo\WebServer\Modules\Php\Globals $globals        The globals instance
-     * @param array                              $uploadedFiles  The uploaded files as array
+     * @param string $scriptFilename The script filename to execute
+     * @param array  $globals        The globals instance
+     * @param array  $uploadedFiles  The uploaded files as array
      */
-    public function __construct($scriptFilename, $globals, array $uploadedFiles = array())
+    public function __construct($scriptFilename, array $globals = array(), array $uploadedFiles = array())
     {
         $this->scriptFilename = $scriptFilename;
         $this->globals = $globals;

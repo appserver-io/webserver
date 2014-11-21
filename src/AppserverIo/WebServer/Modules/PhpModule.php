@@ -32,8 +32,7 @@ use AppserverIo\Server\Dictionaries\ServerVars;
 use AppserverIo\Server\Exceptions\ModuleException;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
-use AppserverIo\WebServer\Modules\Php\Globals;
-use AppserverIo\WebServer\Modules\Php\ProcessThread\ProcessThread;
+use AppserverIo\WebServer\Modules\Php\ProcessThread;
 
 /**
  * Class PhpModule
@@ -363,8 +362,7 @@ class PhpModule implements HttpModuleInterface
         $requestContext = $this->getRequestContext();
 
         // Init the actual globals storage and make sure to generate it anew
-        $this->globals = new Globals();
-        $globals = $this->globals;
+        $globals = array();
 
         // initialize the globals
         $globals['server'] = $requestContext->getServerVars();
@@ -406,6 +404,8 @@ class PhpModule implements HttpModuleInterface
         $globals['cookie'] = $cookies;
         // set files globals
         $globals['files'] = $this->initFileGlobals($request);
+
+        $this->globals = $globals;
     }
 
     /**
@@ -506,7 +506,7 @@ class PhpModule implements HttpModuleInterface
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
-    public function shutdown(HttpRequestInterface $request, HttpResponseInterface $response)
+    public function shutdown(RequestInterface $request, ResponseInterface $response)
     {
         // todo: if non thread process is used than here should be the shutdown handling
         // if exit/die or fatal error happens in this context so that the worker will be

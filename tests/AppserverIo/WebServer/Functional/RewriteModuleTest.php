@@ -124,7 +124,12 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
         $this->rewriteModule->init($this->mockServerContext);
 
         // We will collect all data files
-        $dataPath = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR;
+        $dataPath = __DIR__ .
+            DIRECTORY_SEPARATOR . '..' .
+            DIRECTORY_SEPARATOR . '_files' .
+            DIRECTORY_SEPARATOR . 'modules' .
+            DIRECTORY_SEPARATOR . RewriteModule::MODULE_NAME . DIRECTORY_SEPARATOR;
+
         $dataFiles = scandir($dataPath);
 
         // Iterate over all data files and collect the sets of test data
@@ -169,7 +174,7 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
      */
     public function testInstanceOf()
     {
-        $this->assertInstanceOf('\AppserverIo\WebServer\Modules\Rewrite\RewriteModule', $this->rewriteModule);
+        $this->assertInstanceOf('\AppserverIo\WebServer\Modules\RewriteModule', $this->rewriteModule);
     }
 
     /**

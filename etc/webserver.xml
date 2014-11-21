@@ -249,7 +249,7 @@
                 <module type="\AppserverIo\WebServer\Modules\DirectoryModule"/>
                 <module type="\AppserverIo\WebServer\Modules\AccessModule"/>
                 <module type="\AppserverIo\WebServer\Modules\CoreModule"/>
-                <module type="\AppserverIo\WebServer\Modules\Php\PhpModule"/>
+                <module type="\AppserverIo\WebServer\Modules\PhpModule"/>
                 <module type="\AppserverIo\WebServer\Modules\FastCgiModule"/>
                 <!-- RESPONSE_PRE hook -->
                 <module type="\AppserverIo\WebServer\Modules\DeflateModule"/>
@@ -446,7 +446,7 @@
                 <module type="\AppserverIo\WebServer\Modules\DirectoryModule"/>
                 <module type="\AppserverIo\WebServer\Modules\AccessModule"/>
                 <module type="\AppserverIo\WebServer\Modules\CoreModule"/>
-                <module type="\AppserverIo\WebServer\Modules\Php\PhpModule"/>
+                <module type="\AppserverIo\WebServer\Modules\PhpModule"/>
                 <module type="\AppserverIo\WebServer\Modules\FastCgiModule"/>
                 <!-- RESPONSE_PRE hook -->
                 <module type="\AppserverIo\WebServer\Modules\DeflateModule"/>

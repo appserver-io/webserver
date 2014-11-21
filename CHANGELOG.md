@@ -1,3 +1,14 @@
+# Version 0.3.0
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Moved to appserver-io organisation
+* Refactored namespaces
+
 # Version 0.2.5
 
 ## Bugfixes

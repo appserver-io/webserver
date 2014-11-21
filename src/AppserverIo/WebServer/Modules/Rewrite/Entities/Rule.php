@@ -22,9 +22,9 @@
 
 namespace AppserverIo\WebServer\Modules\Rewrite\Entities;
 
-use AppserverIo\Http\HttpProtocol;
-use AppserverIo\Http\HttpResponseInterface;
+use AppserverIo\Psr\HttpMessage\Protocol;
 use AppserverIo\Http\HttpResponseStates;
+use AppserverIo\Psr\HttpMessage\ResponseInterface;
 use AppserverIo\WebServer\Modules\Rewrite\Dictionaries\RuleFlags;
 use AppserverIo\Server\Dictionaries\ServerVars;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
@@ -353,8 +353,8 @@ class Rule
      * Initiates the module
      *
      * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext       The request's context
-     * @param \AppserverIo\Http\HttpResponseInterface                $response             The response instance
-     * @param array                                                   $serverBackreferences Server backreferences
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response             The response instance
+     * @param array                                                  $serverBackreferences Server backreferences
      *
      * @throws \InvalidArgumentException
      *
@@ -362,7 +362,7 @@ class Rule
      */
     public function apply(
         RequestContextInterface $requestContext,
-        HttpResponseInterface $response,
+        ResponseInterface $response,
         array $serverBackreferences
     ) {
 
@@ -490,11 +490,11 @@ class Rule
      * module chain
      *
      * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext The request's context
-     * @param \AppserverIo\Http\HttpResponseInterface                $response       The response instance to be prepared
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       The response instance to be prepared
      *
      * @return void
      */
-    protected function prepareRedirect($requestContext, $response)
+    protected function prepareRedirect($requestContext, ResponseInterface $response)
     {
         // if we got a specific status code we have to filter it and apply it if possible
         $statusCode = 301;
@@ -514,7 +514,7 @@ class Rule
         }
 
         // set enhance uri to response
-        $response->addHeader(HttpProtocol::HEADER_LOCATION, $this->target);
+        $response->addHeader(Protocol::HEADER_LOCATION, $this->target);
         // send redirect status
         $response->setStatusCode($statusCode);
         // set response state to be dispatched after this without calling other modules process

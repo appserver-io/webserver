@@ -22,8 +22,6 @@
 
 namespace AppserverIo\WebServer\Interfaces;
 
-use AppserverIo\Server\Exceptions\ModuleException;
-
 /**
  * Interface RewriteMapperInterface
  *

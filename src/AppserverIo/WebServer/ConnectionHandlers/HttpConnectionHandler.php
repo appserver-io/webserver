@@ -24,29 +24,24 @@ namespace AppserverIo\WebServer\ConnectionHandlers;
 
 use AppserverIo\Server\Dictionaries\EnvVars;
 use AppserverIo\Server\Dictionaries\ModuleHooks;
-use AppserverIo\Server\Dictionaries\ModuleVars;
 use AppserverIo\Server\Dictionaries\ServerVars;
-use AppserverIo\Server\Exceptions\ModuleException;
 use AppserverIo\Server\Interfaces\ConnectionHandlerInterface;
-use AppserverIo\Server\Interfaces\ModuleInterface;
-use AppserverIo\Server\Interfaces\ServerConfigurationInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Server\Interfaces\WorkerInterface;
-use AppserverIo\Server\Sockets\SocketInterface;
-use AppserverIo\Server\Sockets\SocketReadException;
-use AppserverIo\Server\Sockets\SocketReadTimeoutException;
-
-use AppserverIo\Http\HttpRequestInterface;
-use AppserverIo\Http\HttpRequestParserInterface;
-use AppserverIo\Http\HttpProtocol;
+use AppserverIo\WebServer\Interfaces\HttpModuleInterface;
+use AppserverIo\Psr\Socket\SocketInterface;
+use AppserverIo\Psr\Socket\SocketReadException;
+use AppserverIo\Psr\Socket\SocketReadTimeoutException;
+use AppserverIo\Psr\Socket\SocketServerException;
+use AppserverIo\Psr\HttpMessage\Protocol;
 use AppserverIo\Http\HttpRequest;
 use AppserverIo\Http\HttpResponse;
 use AppserverIo\Http\HttpPart;
 use AppserverIo\Http\HttpQueryParser;
 use AppserverIo\Http\HttpRequestParser;
 use AppserverIo\Http\HttpResponseStates;
-use AppserverIo\Server\Sockets\SocketServerException;
+
 
 /**
  * Class HttpConnectionHandler
@@ -149,8 +144,8 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         // set default response headers
         $httpResponse->setDefaultHeaders(
             array(
-                HttpProtocol::HEADER_SERVER => $this->getServerConfig()->getSoftware(),
-                HttpProtocol::HEADER_CONNECTION => HttpProtocol::HEADER_CONNECTION_VALUE_CLOSE
+                Protocol::HEADER_SERVER => $this->getServerConfig()->getSoftware(),
+                Protocol::HEADER_CONNECTION => Protocol::HEADER_CONNECTION_VALUE_CLOSE
             )
         );
 
@@ -197,7 +192,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
      *
      * @param string $name The modules name to return an instance for
      *
-     * @return \AppserverIo\Server\Interfaces\ModuleInterface|null
+     * @return \AppserverIo\WebServer\Interfaces\HttpModuleInterface|null
      */
     public function getModule($name)
     {
@@ -249,7 +244,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     /**
      * Return's the connection used to handle with
      *
-     * @return \AppserverIo\Server\Sockets\SocketInterface
+     * @return \AppserverIo\Psr\Socket\SocketInterface
      */
     protected function getConnection()
     {
@@ -280,7 +275,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
      * Handles the connection with the connected client in a proper way the given
      * protocol type and version expects for example.
      *
-     * @param \AppserverIo\Server\Sockets\SocketInterface    $connection The connection to handle
+     * @param \AppserverIo\Psr\Socket\SocketInterface        $connection The connection to handle
      * @param \AppserverIo\Server\Interfaces\WorkerInterface $worker     The worker how started this handle
      *
      * @return bool Weather it was responsible to handle the firstLine or not.
@@ -389,8 +384,8 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
 
                 // process connection type keep-alive
                 if (strcasecmp(
-                    $request->getHeader(HttpProtocol::HEADER_CONNECTION),
-                    HttpProtocol::HEADER_CONNECTION_VALUE_KEEPALIVE
+                    $request->getHeader(Protocol::HEADER_CONNECTION),
+                    Protocol::HEADER_CONNECTION_VALUE_KEEPALIVE
                 ) === 0) {
                     // calculate keep-alive idle time for comparison with keep-alive timeout
                     $keepAliveIdleTime = microtime(true) - $keepaliveStartTime;
@@ -399,25 +394,25 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                         // enable keep alive connection
                         $keepAliveConnection = true;
                         // set keep-alive headers
-                        $response->addHeader(HttpProtocol::HEADER_CONNECTION, HttpProtocol::HEADER_CONNECTION_VALUE_KEEPALIVE);
-                        $response->addHeader(HttpProtocol::HEADER_KEEP_ALIVE, "timeout: $keepAliveTimeout, max: $keepAliveMax");
+                        $response->addHeader(Protocol::HEADER_CONNECTION, Protocol::HEADER_CONNECTION_VALUE_KEEPALIVE);
+                        $response->addHeader(Protocol::HEADER_KEEP_ALIVE, "timeout: $keepAliveTimeout, max: $keepAliveMax");
                         // decrease keep-alive max
                         --$keepAliveMax;
                     }
                 }
 
                 // check if message body will be transmitted
-                if ($request->hasHeader(HttpProtocol::HEADER_CONTENT_LENGTH)) {
+                if ($request->hasHeader(Protocol::HEADER_CONTENT_LENGTH)) {
                     // get content-length header
-                    if (($contentLength = (int)$request->getHeader(HttpProtocol::HEADER_CONTENT_LENGTH)) > 0) {
+                    if (($contentLength = (int)$request->getHeader(Protocol::HEADER_CONTENT_LENGTH)) > 0) {
                         // copy connection stream to body stream by given content length
                         $request->copyBodyStream($connection->getConnectionResource(), $contentLength);
                         // get content out for oldschool query parsing todo: refactor query parsing
                         $content = $request->getBodyContent();
                         // check if request has to be parsed depending on Content-Type header
-                        if ($queryParser->isParsingRelevant($request->getHeader(HttpProtocol::HEADER_CONTENT_TYPE))) {
+                        if ($queryParser->isParsingRelevant($request->getHeader(Protocol::HEADER_CONTENT_TYPE))) {
                             // checks if request has multipart formdata or not
-                            preg_match('/boundary=(.*)$/', $request->getHeader(HttpProtocol::HEADER_CONTENT_TYPE), $boundaryMatches);
+                            preg_match('/boundary=(.*)$/', $request->getHeader(Protocol::HEADER_CONTENT_TYPE), $boundaryMatches);
                             // check if boundaryMatches are found
                             // todo: refactor content string var to be able to use bodyStream
                             if (count($boundaryMatches) > 0) {
@@ -511,7 +506,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
 
         // interate all modules and call process by given hook
         foreach ($modules as $module) {
-            /* @var $module \AppserverIo\Server\Interfaces\ModuleInterface */
+            /* @var $module \AppserverIo\WebServer\Interfaces\HttpModuleInterface */
             // process modules logic by hook
             $module->process($request, $response, $requestContext, $hook);
             // break chain if hook type is REQUEST_POST and response state is DISPATCH
@@ -622,9 +617,9 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                     $request->getUri(),
                     $request->getVersion(),
                     $response->getStatusCode(),
-                    $response->hasHeader(HttpProtocol::HEADER_CONTENT_LENGTH) ? $response->getHeader(HttpProtocol::HEADER_CONTENT_LENGTH) : '-',
-                    $request->hasHeader(HttpProtocol::HEADER_REFERER) ? $request->getHeader(HttpProtocol::HEADER_REFERER) : '-',
-                    $request->hasHeader(HttpProtocol::HEADER_USER_AGENT) ? $request->getHeader(HttpProtocol::HEADER_USER_AGENT) : '-'
+                    $response->hasHeader(Protocol::HEADER_CONTENT_LENGTH) ? $response->getHeader(Protocol::HEADER_CONTENT_LENGTH) : '-',
+                    $request->hasHeader(Protocol::HEADER_REFERER) ? $request->getHeader(Protocol::HEADER_REFERER) : '-',
+                    $request->hasHeader(Protocol::HEADER_USER_AGENT) ? $request->getHeader(Protocol::HEADER_USER_AGENT) : '-'
                 )
             );
         }
@@ -644,10 +639,10 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         $request = $this->getParser()->getRequest();
 
         // set http protocol because this is the http connection class which implements http 1.1
-        $requestContext->setServerVar(ServerVars::SERVER_PROTOCOL, HttpProtocol::VERSION_1_1);
+        $requestContext->setServerVar(ServerVars::SERVER_PROTOCOL, Protocol::VERSION_1_1);
 
         // get http host to set server name var but trim the root domain
-        $serverName = rtrim($request->getHeader(HttpProtocol::HEADER_HOST), '.');
+        $serverName = rtrim($request->getHeader(Protocol::HEADER_HOST), '.');
         if (strpos($serverName, ':') !== false) {
             $serverName = rtrim(strstr($serverName, ':', true), '.');
         }
@@ -729,9 +724,9 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                 $response->setStatusCode(appserver_get_http_response_code());
 
                 // add this header to prevent .php request to be cached
-                $response->addHeader(HttpProtocol::HEADER_EXPIRES, '19 Nov 1981 08:52:00 GMT');
-                $response->addHeader(HttpProtocol::HEADER_CACHE_CONTROL, 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
-                $response->addHeader(HttpProtocol::HEADER_PRAGMA, 'no-cache');
+                $response->addHeader(Protocol::HEADER_EXPIRES, '19 Nov 1981 08:52:00 GMT');
+                $response->addHeader(Protocol::HEADER_CACHE_CONTROL, 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+                $response->addHeader(Protocol::HEADER_PRAGMA, 'no-cache');
 
                 // get last error array
                 $lastError = error_get_last();
@@ -755,7 +750,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                         $key = trim($h[0]);
                         $value = trim($h[1]);
                         // if no status, add the header normally
-                        if ($key === HttpProtocol::HEADER_STATUS) {
+                        if ($key === Protocol::HEADER_STATUS) {
                             // set status by Status header value which is only used by fcgi sapi's normally
                             $response->setStatus($value);
                         } else {

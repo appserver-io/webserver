@@ -22,15 +22,13 @@
 
 namespace AppserverIo\WebServer\Modules;
 
-use AppserverIo\Connection\ConnectionRequestInterface;
-use AppserverIo\Connection\ConnectionResponseInterface;
-use AppserverIo\Http\HttpProtocol;
+use AppserverIo\Psr\HttpMessage\Protocol;
+use AppserverIo\Psr\HttpMessage\RequestInterface;
+use AppserverIo\Psr\HttpMessage\ResponseInterface;
+use AppserverIo\WebServer\Interfaces\HttpModuleInterface;
 use AppserverIo\Http\HttpResponseStates;
-use AppserverIo\Http\HttpRequestInterface;
-use AppserverIo\Http\HttpResponseInterface;
 use AppserverIo\Server\Dictionaries\ModuleHooks;
 use AppserverIo\Server\Dictionaries\ServerVars;
-use AppserverIo\Server\Interfaces\ModuleInterface;
 use AppserverIo\Server\Exceptions\ModuleException;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
@@ -48,7 +46,7 @@ use AppserverIo\WebServer\Modules\Php\ProcessThread\ProcessThread;
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/appserver-io/webserver
  */
-class PhpModule implements ModuleInterface
+class PhpModule implements HttpModuleInterface
 {
     /**
      * Defines the module name
@@ -81,14 +79,14 @@ class PhpModule implements ModuleInterface
     /**
      * Hold's the request instance
      *
-     * @var \AppserverIo\Http\HttpRequestInterface
+     * @var \AppserverIo\Psr\HttpMessage\RequestInterface
      */
     protected $request;
 
     /**
      * Hold's the response instance
      *
-     * @var \AppserverIo\Http\HttpResponseInterface
+     * @var \AppserverIo\Psr\HttpMessage\ResponseInterface
      */
     protected $response;
 
@@ -133,7 +131,7 @@ class PhpModule implements ModuleInterface
     /**
      * Return's the request instance
      *
-     * @return \AppserverIo\Http\HttpRequestInterface
+     * @return \AppserverIo\Psr\HttpMessage\RequestInterface
      */
     public function getRequest()
     {
@@ -143,7 +141,7 @@ class PhpModule implements ModuleInterface
     /**
      * Return's the response instance
      *
-     * @return \AppserverIo\Http\HttpResponseInterface
+     * @return \AppserverIo\Psr\HttpMessage\ResponseInterface
      */
     public function getResponse()
     {
@@ -174,24 +172,24 @@ class PhpModule implements ModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \AppserverIo\Connection\ConnectionRequestInterface     $request        A request object
-     * @param \AppserverIo\Connection\ConnectionResponseInterface    $response       A response object
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
      * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
-     * @param int                                                     $hook           The current hook to process logic for
+     * @param int                                                    $hook           The current hook to process logic for
      *
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
     public function process(
-        ConnectionRequestInterface $request,
-        ConnectionResponseInterface $response,
+        RequestInterface $request,
+        ResponseInterface $response,
         RequestContextInterface $requestContext,
         $hook
     ) {
         // In php an interface is, by definition, a fixed contract. It is immutable.
         // So we have to declair the right ones afterwards...
-        /** @var $request \AppserverIo\Http\HttpRequestInterface */
-        /** @var $request \AppserverIo\Http\HttpResponseInterface */
+        /** @var $request \AppserverIo\Psr\HttpMessage\RequestInterface */
+        /** @var $request \AppserverIo\Psr\HttpMessage\ResponseInterface */
 
         // check if shutdown hook is comming
         if (ModuleHooks::SHUTDOWN === $hook) {
@@ -301,7 +299,7 @@ class PhpModule implements ModuleInterface
         $response = $this->getResponse();
 
         // add x powered
-        $response->addHeader(HttpProtocol::HEADER_X_POWERED_BY, __CLASS__);
+        $response->addHeader(Protocol::HEADER_X_POWERED_BY, __CLASS__);
 
         // read out status code and set if exists
         if ($responseCode = $process->getHttpResponseCode()) {
@@ -309,12 +307,12 @@ class PhpModule implements ModuleInterface
         }
 
         // add this header to prevent .php request to be cached
-        $response->addHeader(HttpProtocol::HEADER_EXPIRES, '19 Nov 1981 08:52:00 GMT');
-        $response->addHeader(HttpProtocol::HEADER_CACHE_CONTROL, 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
-        $response->addHeader(HttpProtocol::HEADER_PRAGMA, 'no-cache');
+        $response->addHeader(Protocol::HEADER_EXPIRES, '19 Nov 1981 08:52:00 GMT');
+        $response->addHeader(Protocol::HEADER_CACHE_CONTROL, 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+        $response->addHeader(Protocol::HEADER_PRAGMA, 'no-cache');
 
         // set per default text/html mimetype
-        $response->addHeader(HttpProtocol::HEADER_CONTENT_TYPE, 'text/html');
+        $response->addHeader(Protocol::HEADER_CONTENT_TYPE, 'text/html');
         // check if headers are given
         if (is_array($process->getHttpHeaders())) {
             // grep headers and set to response object
@@ -326,7 +324,7 @@ class PhpModule implements ModuleInterface
                     $key = trim($h[0]);
                     $value = trim($h[1]);
                     // if no status, add the header normally
-                    if ($key === HttpProtocol::HEADER_STATUS) {
+                    if ($key === Protocol::HEADER_STATUS) {
                         // set status by Status header value which is only used by fcgi sapi's normally
                         $response->setStatus($value);
                     } else {
@@ -377,14 +375,14 @@ class PhpModule implements ModuleInterface
         $globals['request'] = $request->getParams();
 
         // init post / get. default init vars as GET method case
-        if ($requestContext->getServerVar(ServerVars::REQUEST_METHOD) === HttpProtocol::METHOD_GET) {
+        if ($requestContext->getServerVar(ServerVars::REQUEST_METHOD) === Protocol::METHOD_GET) {
             // clear post array
             $globals['post'] = array();
             // set all params to get
             $globals['get'] = $request->getParams();
         }
         // check if method post was given
-        if ($request->getMethod() === HttpProtocol::METHOD_POST) {
+        if ($request->getMethod() === Protocol::METHOD_POST) {
             // set raw request if post method is going on
             $globals['httpRawPostData'] = $request->getBodyContent();
             // set params to post
@@ -399,7 +397,7 @@ class PhpModule implements ModuleInterface
         // set cookie globals
         $cookies = array();
         // iterate all cookies and set them in globals if exists
-        if ($cookieHeaderValue = $request->getHeader(HttpProtocol::HEADER_COOKIE)) {
+        if ($cookieHeaderValue = $request->getHeader(Protocol::HEADER_COOKIE)) {
             foreach (explode(';', $cookieHeaderValue) as $cookieLine) {
                 list ($key, $value) = explode('=', $cookieLine);
                 $cookies[trim($key)] = trim($value);
@@ -413,11 +411,11 @@ class PhpModule implements ModuleInterface
     /**
      * Returns the array with the $_FILES vars.
      *
-     * @param \AppserverIo\Http\HttpRequestInterface $request The request instance
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface $request The request instance
      *
      * @return array The $_FILES vars
      */
-    protected function initFileGlobals(\AppserverIo\Http\HttpRequestInterface $request)
+    protected function initFileGlobals(\AppserverIo\Psr\HttpMessage\RequestInterface $request)
     {
         // init query str
         $queryStr = '';
@@ -502,8 +500,8 @@ class PhpModule implements ModuleInterface
     /**
      * Implement's module shutdown logic
      *
-     * @param \AppserverIo\Http\HttpRequestInterface  $request  The request object
-     * @param \AppserverIo\Http\HttpResponseInterface $response The response object
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface  $request  The request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface $response The response object
      *
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException

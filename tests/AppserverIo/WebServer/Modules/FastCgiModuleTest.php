@@ -24,7 +24,7 @@ namespace AppserverIo\WebServer\Modules;
 
 use AppserverIo\Server\Dictionaries\ServerVars;
 use AppserverIo\Server\Dictionaries\ModuleHooks;
-use AppserverIo\Http\HttpProtocol;
+use AppserverIo\Psr\HttpMessage\Protocol;
 
 /**
  * Class FastCgiModuleTest
@@ -107,7 +107,7 @@ class FastCgiModuleTest extends \PHPUnit_Framework_TestCase
         // prepare the array with the server vars
         $serverVars = array(
             array(ServerVars::SERVER_HANDLER,  FastCgiModule::MODULE_NAME),
-            array(ServerVars::REQUEST_METHOD,  HttpProtocol::METHOD_POST),
+            array(ServerVars::REQUEST_METHOD,  Protocol::METHOD_POST),
             array(ServerVars::SCRIPT_FILENAME, '/opt/appserver-0.8.2-alpha.48/webapps/test.php'),
             array(ServerVars::QUERY_STRING,    'test=test'),
             array(ServerVars::SCRIPT_NAME,     '/index.php'),

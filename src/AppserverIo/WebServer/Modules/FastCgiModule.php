@@ -23,16 +23,14 @@
 
 namespace AppserverIo\WebServer\Modules;
 
-use AppserverIo\Connection\ConnectionRequestInterface;
-use AppserverIo\Connection\ConnectionResponseInterface;
-use AppserverIo\Http\HttpProtocol;
+use AppserverIo\Psr\HttpMessage\Protocol;
+use AppserverIo\Psr\HttpMessage\RequestInterface;
+use AppserverIo\Psr\HttpMessage\ResponseInterface;
+use AppserverIo\WebServer\Interfaces\HttpModuleInterface;
 use AppserverIo\Http\HttpResponseStates;
-use AppserverIo\Http\HttpRequestInterface;
-use AppserverIo\Http\HttpResponseInterface;
 use AppserverIo\Server\Dictionaries\ServerVars;
 use AppserverIo\Server\Dictionaries\ModuleVars;
 use AppserverIo\Server\Dictionaries\ModuleHooks;
-use AppserverIo\Server\Interfaces\ModuleInterface;
 use AppserverIo\Server\Exceptions\ModuleException;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
@@ -54,7 +52,7 @@ use Crunch\FastCGI\Client as FastCgiClient;
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/appserver-io/webserver
  */
-class FastCgiModule implements ModuleInterface
+class FastCgiModule implements HttpModuleInterface
 {
 
     /**
@@ -79,20 +77,19 @@ class FastCgiModule implements ModuleInterface
     const MODULE_NAME = 'fastcgi';
 
     /**
-     * Implements module logic for given hook, in this case passing the Fast-CGI request
-     * through to the configured Fast-CGI server.
+     * Implement's module logic for given hook
      *
-     * @param \AppserverIo\Connection\ConnectionRequestInterface     $request        A request object
-     * @param \AppserverIo\Connection\ConnectionResponseInterface    $response       A response object
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
      * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
-     * @param int                                                     $hook           The current hook to process logic for
+     * @param int                                                    $hook           The current hook to process logic for
      *
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
     public function process(
-        ConnectionRequestInterface $request,
-        ConnectionResponseInterface $response,
+        RequestInterface $request,
+        ResponseInterface $response,
         RequestContextInterface $requestContext,
         $hook
     ) {
@@ -101,8 +98,8 @@ class FastCgiModule implements ModuleInterface
 
             // in php an interface is, by definition, a fixed contract. It is immutable.
             // so we have to declair the right ones afterwards...
-            /** @var $request \AppserverIo\Http\HttpRequestInterface */
-            /** @var $request \AppserverIo\Http\HttpResponseInterface */
+            /** @var $request \AppserverIo\Psr\HttpMessage\RequestInterface */
+            /** @var $request \AppserverIo\Psr\HttpMessage\ResponseInterface */
 
             // if false hook is comming do nothing
             if (ModuleHooks::REQUEST_POST !== $hook) {
@@ -158,7 +155,7 @@ class FastCgiModule implements ModuleInterface
             }
 
             // add the X-Powered-By header
-            $response->addHeader(HttpProtocol::HEADER_X_POWERED_BY, __CLASS__);
+            $response->addHeader(Protocol::HEADER_X_POWERED_BY, __CLASS__);
 
             // set response state to be dispatched after this without calling other modules process
             $response->setState(HttpResponseStates::DISPATCH);
@@ -239,13 +236,13 @@ class FastCgiModule implements ModuleInterface
         }
 
         // if we found a Content-Type header, add it to the environment variables
-        if ($request->hasHeader(HttpProtocol::HEADER_CONTENT_TYPE)) {
-            $environment['CONTENT_TYPE'] = $request->getHeader(HttpProtocol::HEADER_CONTENT_TYPE);
+        if ($request->hasHeader(Protocol::HEADER_CONTENT_TYPE)) {
+            $environment['CONTENT_TYPE'] = $request->getHeader(Protocol::HEADER_CONTENT_TYPE);
         }
 
         // if we found a Content-Length header, add it to the environment variables
-        if ($request->hasHeader(HttpProtocol::HEADER_CONTENT_LENGTH)) {
-            $environment['CONTENT_LENGTH'] = $request->getHeader(HttpProtocol::HEADER_CONTENT_LENGTH);
+        if ($request->hasHeader(Protocol::HEADER_CONTENT_LENGTH)) {
+            $environment['CONTENT_LENGTH'] = $request->getHeader(Protocol::HEADER_CONTENT_LENGTH);
         }
 
         // create an HTTP_ environment variable for each header

@@ -22,16 +22,14 @@
 
 namespace AppserverIo\WebServer\Modules;
 
-use AppserverIo\Connection\ConnectionRequestInterface;
-use AppserverIo\Connection\ConnectionResponseInterface;
-use AppserverIo\Http\HttpProtocol;
+use AppserverIo\Psr\HttpMessage\RequestInterface;
+use AppserverIo\Psr\HttpMessage\ResponseInterface;
+use AppserverIo\WebServer\Interfaces\HttpModuleInterface;
+use AppserverIo\Psr\HttpMessage\Protocol;
 use AppserverIo\Http\HttpResponseStates;
-use AppserverIo\Http\HttpRequestInterface;
-use AppserverIo\Http\HttpResponseInterface;
 use AppserverIo\Server\Dictionaries\ModuleHooks;
 use AppserverIo\Server\Dictionaries\ServerVars;
 use AppserverIo\Server\Dictionaries\ModuleVars;
-use AppserverIo\Server\Interfaces\ModuleInterface;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
 use AppserverIo\Server\Exceptions\ModuleException;
@@ -48,7 +46,7 @@ use AppserverIo\Server\Dictionaries\MimeTypes;
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/appserver-io/webserver
  */
-class CoreModule implements ModuleInterface
+class CoreModule implements HttpModuleInterface
 {
     /**
      * Defines the module name.
@@ -201,25 +199,25 @@ class CoreModule implements ModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \AppserverIo\Connection\ConnectionRequestInterface     $request        A request object
-     * @param \AppserverIo\Connection\ConnectionResponseInterface    $response       A response object
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
      * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
-     * @param int                                                     $hook           The current hook to process logic for
+     * @param int                                                    $hook           The current hook to process logic for
      *
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
     public function process(
-        ConnectionRequestInterface $request,
-        ConnectionResponseInterface $response,
+        RequestInterface $request,
+        ResponseInterface $response,
         RequestContextInterface $requestContext,
         $hook
     ) {
         // In php an interface is, by definition, a fixed contract. It is immutable.
         // So we have to declare the right ones afterwards...
 
-        /** @var $request \AppserverIo\Http\HttpRequestInterface */
-        /** @var $response \AppserverIo\Http\HttpResponseInterface */
+        /** @var $request \AppserverIo\Psr\HttpMessage\RequestInterface */
+        /** @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface */
 
         // if false hook is comming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
@@ -254,20 +252,20 @@ class CoreModule implements ModuleInterface
             $eTag = sprintf('"%x-%x-%x"', $fileInfo->getInode(), $fileInfo->getSize(), (float)str_pad($fileInfo->getMTime(), 16, '0'));
 
             // set last modified header
-            $response->addHeader(HttpProtocol::HEADER_LAST_MODIFIED, gmdate(DATE_RFC822, $fileInfo->getMTime()));
+            $response->addHeader(Protocol::HEADER_LAST_MODIFIED, gmdate(DATE_RFC822, $fileInfo->getMTime()));
 
             // set etag header
-            $response->addHeader(HttpProtocol::HEADER_ETAG, $eTag);
+            $response->addHeader(Protocol::HEADER_ETAG, $eTag);
 
             // set correct mimetype header
             $response->addHeader(
-                HttpProtocol::HEADER_CONTENT_TYPE,
+                Protocol::HEADER_CONTENT_TYPE,
                 MimeTypes::getMimeTypeByExtension($fileInfo->getExtension())
             );
 
             // caching checks
-            if (($request->hasHeader(HttpProtocol::HEADER_IF_NONE_MATCH)) &&
-                ($request->getHeader(HttpProtocol::HEADER_IF_NONE_MATCH) === $eTag)
+            if (($request->hasHeader(Protocol::HEADER_IF_NONE_MATCH)) &&
+                ($request->getHeader(Protocol::HEADER_IF_NONE_MATCH) === $eTag)
             ) {
                 // set not modified status without content
                 $response->setStatusCode(304);

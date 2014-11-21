@@ -22,15 +22,13 @@
 
 namespace AppserverIo\WebServer\Modules;
 
-use AppserverIo\Connection\ConnectionRequestInterface;
-use AppserverIo\Connection\ConnectionResponseInterface;
-use AppserverIo\Http\HttpProtocol;
+use AppserverIo\Psr\HttpMessage\Protocol;
+use AppserverIo\Psr\HttpMessage\RequestInterface;
+use AppserverIo\Psr\HttpMessage\ResponseInterface;
+use AppserverIo\WebServer\Interfaces\HttpModuleInterface;
 use AppserverIo\Server\Dictionaries\ModuleHooks;
 use AppserverIo\Server\Dictionaries\ServerVars;
 use AppserverIo\Server\Dictionaries\ModuleVars;
-use AppserverIo\Http\HttpRequestInterface;
-use AppserverIo\Http\HttpResponseInterface;
-use AppserverIo\Server\Interfaces\ModuleInterface;
 use AppserverIo\Server\Exceptions\ModuleException;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
@@ -46,7 +44,7 @@ use AppserverIo\Server\Interfaces\ServerContextInterface;
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/appserver-io/webserver
  */
-class AccessModule implements ModuleInterface
+class AccessModule implements HttpModuleInterface
 {
     /**
      * Defines the module name
@@ -72,7 +70,7 @@ class AccessModule implements ModuleInterface
     /**
      * Return's the request instance
      *
-     * @return \AppserverIo\Http\HttpRequestInterface The request instance
+     * @return \AppserverIo\Psr\HttpMessage\RequestInterface The request instance
      */
     public function getRequest()
     {
@@ -82,7 +80,7 @@ class AccessModule implements ModuleInterface
     /**
      * Returns the response instance
      *
-     * @return \AppserverIo\Http\HttpResponseInterface The response instance;
+     * @return \AppserverIo\Psr\HttpMessage\ResponseInterface The response instance;
      */
     public function getResponse()
     {
@@ -116,24 +114,24 @@ class AccessModule implements ModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \AppserverIo\Connection\ConnectionRequestInterface     $request        A request object
-     * @param \AppserverIo\Connection\ConnectionResponseInterface    $response       A response object
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
      * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
-     * @param int                                                     $hook           The current hook to process logic for
+     * @param int                                                    $hook           The current hook to process logic for
      *
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
     public function process(
-        ConnectionRequestInterface $request,
-        ConnectionResponseInterface $response,
+        RequestInterface $request,
+        ResponseInterface $response,
         RequestContextInterface $requestContext,
         $hook
     ) {
         // In php an interface is, by definition, a fixed contract. It is immutable.
         // So we have to declair the right ones afterwards...
-        /** @var $request \AppserverIo\Http\HttpRequestInterface */
-        /** @var $response \AppserverIo\Http\HttpResponseInterface */
+        /** @var $request \AppserverIo\Psr\HttpMessage\RequestInterface */
+        /** @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface */
 
         // if false hook is comming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {

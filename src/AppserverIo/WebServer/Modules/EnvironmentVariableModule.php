@@ -22,18 +22,16 @@
 
 namespace AppserverIo\WebServer\Modules;
 
-use AppserverIo\Connection\ConnectionRequestInterface;
-use AppserverIo\Connection\ConnectionResponseInterface;
-use AppserverIo\Http\HttpProtocol;
+use AppserverIo\Psr\HttpMessage\Protocol;
+use AppserverIo\Psr\HttpMessage\RequestInterface;
+use AppserverIo\Psr\HttpMessage\ResponseInterface;
+use AppserverIo\WebServer\Interfaces\HttpModuleInterface;
 use AppserverIo\Server\Dictionaries\ModuleHooks;
 use AppserverIo\Server\Exceptions\ModuleException;
 use AppserverIo\Server\Dictionaries\ServerVars;
 use AppserverIo\Server\Dictionaries\EnvVars;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
-use AppserverIo\Http\HttpRequestInterface;
-use AppserverIo\Http\HttpResponseInterface;
-use AppserverIo\Server\Interfaces\ModuleInterface;
 use AppserverIo\Server\Dictionaries\ModuleVars;
 
 /**
@@ -50,7 +48,7 @@ use AppserverIo\Server\Dictionaries\ModuleVars;
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/appserver-io/webserver
  */
-class EnvironmentVariableModule implements ModuleInterface
+class EnvironmentVariableModule implements HttpModuleInterface
 {
     /**
      * Server variables we support and need
@@ -146,41 +144,41 @@ class EnvironmentVariableModule implements ModuleInterface
 
             $this->supportedServerVars = array(
                 'headers' => array(
-                    HttpProtocol::HEADER_STATUS,
-                    HttpProtocol::HEADER_DATE,
-                    HttpProtocol::HEADER_CONNECTION,
-                    HttpProtocol::HEADER_CONNECTION_VALUE_CLOSE,
-                    HttpProtocol::HEADER_CONNECTION_VALUE_KEEPALIVE,
-                    HttpProtocol::HEADER_CONTENT_TYPE,
-                    HttpProtocol::HEADER_CONTENT_DISPOSITION,
-                    HttpProtocol::HEADER_CONTENT_LENGTH,
-                    HttpProtocol::HEADER_CONTENT_ENCODING,
-                    HttpProtocol::HEADER_CACHE_CONTROL,
-                    HttpProtocol::HEADER_PRAGMA,
-                    HttpProtocol::HEADER_PROXY_CONNECTION,
-                    HttpProtocol::HEADER_X_FORWARD,
-                    HttpProtocol::HEADER_LAST_MODIFIED,
-                    HttpProtocol::HEADER_EXPIRES,
-                    HttpProtocol::HEADER_IF_MODIFIED_SINCE,
-                    HttpProtocol::HEADER_LOCATION,
-                    HttpProtocol::HEADER_X_POWERED_BY,
-                    HttpProtocol::HEADER_COOKIE,
-                    HttpProtocol::HEADER_SET_COOKIE,
-                    HttpProtocol::HEADER_HOST,
-                    HttpProtocol::HEADER_ACCEPT,
-                    HttpProtocol::HEADER_ACCEPT_CHARSET,
-                    HttpProtocol::HEADER_ACCEPT_LANGUAGE,
-                    HttpProtocol::HEADER_ACCEPT_ENCODING,
-                    HttpProtocol::HEADER_USER_AGENT,
-                    HttpProtocol::HEADER_REFERER,
-                    HttpProtocol::HEADER_KEEP_ALIVE,
-                    HttpProtocol::HEADER_SERVER,
-                    HttpProtocol::HEADER_WWW_AUTHENTICATE,
-                    HttpProtocol::HEADER_AUTHORIZATION,
-                    HttpProtocol::HEADER_X_REQUESTED_WITH,
-                    HttpProtocol::HEADER_ACCESS_CONTROL_ALLOW_ORIGIN,
-                    HttpProtocol::HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS,
-                    HttpProtocol::STATUS_REASONPHRASE_UNASSIGNED
+                    Protocol::HEADER_STATUS,
+                    Protocol::HEADER_DATE,
+                    Protocol::HEADER_CONNECTION,
+                    Protocol::HEADER_CONNECTION_VALUE_CLOSE,
+                    Protocol::HEADER_CONNECTION_VALUE_KEEPALIVE,
+                    Protocol::HEADER_CONTENT_TYPE,
+                    Protocol::HEADER_CONTENT_DISPOSITION,
+                    Protocol::HEADER_CONTENT_LENGTH,
+                    Protocol::HEADER_CONTENT_ENCODING,
+                    Protocol::HEADER_CACHE_CONTROL,
+                    Protocol::HEADER_PRAGMA,
+                    Protocol::HEADER_PROXY_CONNECTION,
+                    Protocol::HEADER_X_FORWARD,
+                    Protocol::HEADER_LAST_MODIFIED,
+                    Protocol::HEADER_EXPIRES,
+                    Protocol::HEADER_IF_MODIFIED_SINCE,
+                    Protocol::HEADER_LOCATION,
+                    Protocol::HEADER_X_POWERED_BY,
+                    Protocol::HEADER_COOKIE,
+                    Protocol::HEADER_SET_COOKIE,
+                    Protocol::HEADER_HOST,
+                    Protocol::HEADER_ACCEPT,
+                    Protocol::HEADER_ACCEPT_CHARSET,
+                    Protocol::HEADER_ACCEPT_LANGUAGE,
+                    Protocol::HEADER_ACCEPT_ENCODING,
+                    Protocol::HEADER_USER_AGENT,
+                    Protocol::HEADER_REFERER,
+                    Protocol::HEADER_KEEP_ALIVE,
+                    Protocol::HEADER_SERVER,
+                    Protocol::HEADER_WWW_AUTHENTICATE,
+                    Protocol::HEADER_AUTHORIZATION,
+                    Protocol::HEADER_X_REQUESTED_WITH,
+                    Protocol::HEADER_ACCESS_CONTROL_ALLOW_ORIGIN,
+                    Protocol::HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS,
+                    Protocol::STATUS_REASONPHRASE_UNASSIGNED
                 )
             );
 
@@ -247,24 +245,24 @@ class EnvironmentVariableModule implements ModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \AppserverIo\Connection\ConnectionRequestInterface     $request        A request object
-     * @param \AppserverIo\Connection\ConnectionResponseInterface    $response       A response object
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
      * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
-     * @param int                                                     $hook           The current hook to process logic for
+     * @param int                                                    $hook           The current hook to process logic for
      *
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
     public function process(
-        ConnectionRequestInterface $request,
-        ConnectionResponseInterface $response,
+        RequestInterface $request,
+        ResponseInterface $response,
         RequestContextInterface $requestContext,
         $hook
     ) {
         // In php an interface is, by definition, a fixed contract. It is immutable.
         // So we have to declair the right ones afterwards...
-        /** @var $request \AppserverIo\Http\HttpRequestInterface */
-        /** @var $response \AppserverIo\Http\HttpResponseInterface */
+        /** @var $request \AppserverIo\Psr\HttpMessage\RequestInterface */
+        /** @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface */
 
         // if false hook is comming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
@@ -419,7 +417,7 @@ class EnvironmentVariableModule implements ModuleInterface
     /**
      * Will fill the header variables into our pre-collected $serverVars array
      *
-     * @param \AppserverIo\Http\HttpRequestInterface $request The request instance
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface $request The request instance
      *
      * @return void
      */

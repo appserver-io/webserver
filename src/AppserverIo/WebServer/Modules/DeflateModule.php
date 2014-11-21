@@ -22,13 +22,11 @@
 
 namespace AppserverIo\WebServer\Modules;
 
-use AppserverIo\Connection\ConnectionRequestInterface;
-use AppserverIo\Connection\ConnectionResponseInterface;
-use AppserverIo\Http\HttpProtocol;
-use AppserverIo\Http\HttpRequestInterface;
-use AppserverIo\Http\HttpResponseInterface;
+use AppserverIo\Psr\HttpMessage\RequestInterface;
+use AppserverIo\Psr\HttpMessage\ResponseInterface;
+use AppserverIo\WebServer\Interfaces\HttpModuleInterface;
+use AppserverIo\Psr\HttpMessage\Protocol;
 use AppserverIo\Server\Dictionaries\ModuleHooks;
-use AppserverIo\Server\Interfaces\ModuleInterface;
 use AppserverIo\Server\Exceptions\ModuleException;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
@@ -44,7 +42,7 @@ use AppserverIo\Server\Interfaces\ServerContextInterface;
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/appserver-io/webserver
  */
-class DeflateModule implements ModuleInterface
+class DeflateModule implements HttpModuleInterface
 {
     /**
      * Defines the module name
@@ -99,39 +97,39 @@ class DeflateModule implements ModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \AppserverIo\Connection\ConnectionRequestInterface     $request        A request object
-     * @param \AppserverIo\Connection\ConnectionResponseInterface    $response       A response object
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
      * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
-     * @param int                                                     $hook           The current hook to process logic for
+     * @param int                                                    $hook           The current hook to process logic for
      *
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
     public function process(
-        ConnectionRequestInterface $request,
-        ConnectionResponseInterface $response,
+        RequestInterface $request,
+        ResponseInterface $response,
         RequestContextInterface $requestContext,
         $hook
     ) {
         // In php an interface is, by definition, a fixed contract. It is immutable.
         // So we have to declair the right ones afterwards...
-        /** @var $request \AppserverIo\Http\HttpRequestInterface */
-        /** @var $response \AppserverIo\Http\HttpResponseInterface */
+        /** @var $request \AppserverIo\Psr\HttpMessage\RequestInterface */
+        /** @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface */
 
         // if false hook is comming do nothing
         if (ModuleHooks::RESPONSE_PRE !== $hook) {
             return;
         }
         // check if no accept encoding headers are sent
-        if (!$request->hasHeader(HttpProtocol::HEADER_ACCEPT_ENCODING)) {
+        if (!$request->hasHeader(Protocol::HEADER_ACCEPT_ENCODING)) {
             return;
         }
         // check if response was encoded before and exit than
-        if ($response->hasHeader(HttpProtocol::HEADER_CONTENT_ENCODING)) {
+        if ($response->hasHeader(Protocol::HEADER_CONTENT_ENCODING)) {
             return;
         }
         // check if request accepts deflate
-        if (strpos($request->getHeader(HttpProtocol::HEADER_ACCEPT_ENCODING), 'deflate') !== false) {
+        if (strpos($request->getHeader(Protocol::HEADER_ACCEPT_ENCODING), 'deflate') !== false) {
 
             // get stream meta data
             $streamMetaData = stream_get_meta_data($response->getBodyStream());
@@ -146,7 +144,7 @@ class DeflateModule implements ModuleInterface
              * @link https://bugs.php.net/bug.php?id=48725
              */
             if (($streamMetaData['stream_type'] !== 'MEMORY')
-                && ($this->isRelevantMimeType($response->getHeader(HttpProtocol::HEADER_CONTENT_TYPE)))) {
+                && ($this->isRelevantMimeType($response->getHeader(Protocol::HEADER_CONTENT_TYPE)))) {
                 // apply encoding filter to response body stream
                 stream_filter_append($response->getBodyStream(), 'zlib.deflate', STREAM_FILTER_READ);
                 // rewind current body stream
@@ -158,7 +156,7 @@ class DeflateModule implements ModuleInterface
                 // reset body stream on response
                 $response->setBodyStream($deflateBodyStream);
                 // set encoding header info
-                $response->addHeader(HttpProtocol::HEADER_CONTENT_ENCODING, 'deflate');
+                $response->addHeader(Protocol::HEADER_CONTENT_ENCODING, 'deflate');
             }
         }
     }

@@ -22,7 +22,7 @@
 
 namespace AppserverIo\WebServer\Functional;
 
-use AppserverIo\Http\HttpProtocol;
+use AppserverIo\Psr\HttpMessage\Protocol;
 use AppserverIo\Http\HttpRequest;
 use AppserverIo\Http\HttpResponse;
 use AppserverIo\WebServer\Mock\MockServerConfig;
@@ -222,13 +222,13 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
                 try {
                     // Has the header location been set at all?
                     // If we did not match any redirect condition and will set it to the input so we get some output
-                    if (!$this->response->hasHeader(HttpProtocol::HEADER_LOCATION)) {
+                    if (!$this->response->hasHeader(Protocol::HEADER_LOCATION)) {
 
-                        $this->response->addHeader(HttpProtocol::HEADER_LOCATION, $input);
+                        $this->response->addHeader(Protocol::HEADER_LOCATION, $input);
                     }
 
                     // Asserting that the header location was set correctly
-                    $this->assertSame($desiredOutput, $this->response->getHeader(HttpProtocol::HEADER_LOCATION));
+                    $this->assertSame($desiredOutput, $this->response->getHeader(Protocol::HEADER_LOCATION));
                     // If we got a custom status code we have to check for it
                     if (isset($dataSet['redirectAs'])) {
 

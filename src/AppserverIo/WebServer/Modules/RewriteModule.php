@@ -22,16 +22,15 @@
 
 namespace AppserverIo\WebServer\Modules;
 
-use AppserverIo\Connection\ConnectionRequestInterface;
-use AppserverIo\Connection\ConnectionResponseInterface;
+use AppserverIo\Psr\HttpMessage\RequestInterface;
+use AppserverIo\Psr\HttpMessage\ResponseInterface;
+use AppserverIo\WebServer\Interfaces\HttpModuleInterface;
 use AppserverIo\Server\Dictionaries\ModuleHooks;
 use AppserverIo\Server\Exceptions\ModuleException;
 use AppserverIo\Server\Dictionaries\ServerVars;
 use AppserverIo\Server\Dictionaries\EnvVars;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
-use AppserverIo\Http\HttpRequestInterface;
-use AppserverIo\Server\Interfaces\ModuleInterface;
 use AppserverIo\Server\Dictionaries\ModuleVars;
 use AppserverIo\WebServer\Modules\Rewrite\Entities\Rule;
 
@@ -46,7 +45,7 @@ use AppserverIo\WebServer\Modules\Rewrite\Entities\Rule;
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/appserver-io/webserver
  */
-class RewriteModule implements ModuleInterface
+class RewriteModule implements HttpModuleInterface
 {
     /**
      * Server variables we support and need
@@ -228,24 +227,24 @@ class RewriteModule implements ModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \AppserverIo\Connection\ConnectionRequestInterface     $request        A request object
-     * @param \AppserverIo\Connection\ConnectionResponseInterface    $response       A response object
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
      * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
-     * @param int                                                     $hook           The current hook to process
+     * @param int                                                    $hook           The current hook to process logic for
      *
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
     public function process(
-        ConnectionRequestInterface $request,
-        ConnectionResponseInterface $response,
+        RequestInterface $request,
+        ResponseInterface $response,
         RequestContextInterface $requestContext,
         $hook
     ) {
         // In php an interface is, by definition, a fixed contract. It is immutable.
         // So we have to declare the right ones afterwards...
-        /** @var $request \AppserverIo\Http\HttpRequestInterface */
-        /** @var $request \AppserverIo\Http\HttpResponseInterface */
+        /** @var $request \AppserverIo\Psr\HttpMessage\RequestInterface */
+        /** @var $request \AppserverIo\Psr\HttpMessage\ResponseInterface */
 
         // if false hook is coming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
@@ -342,16 +341,16 @@ class RewriteModule implements ModuleInterface
 
             // As we got them with another name, we have to rename them, so we will not have to do this on the fly
             $tmp = strtoupper(str_replace('HTTP', 'HEADER', $supportedServerVar));
-            if (@isset($headerArray[constant("AppserverIo\\Http\\HttpProtocol::$tmp")])) {
+            if (@isset($headerArray[constant("AppserverIo\\Psr\\HttpMessage\\Protocol::$tmp")])) {
                 $this->serverBackreferences['$' . $supportedServerVar] = $headerArray[constant(
-                    "AppserverIo\\Http\\HttpProtocol::$tmp"
+                    "AppserverIo\\Psr\\HttpMessage\\Protocol::$tmp"
                 )];
 
                 // Also create for the "dynamic" substitution syntax
                 $this->serverBackreferences['$' . constant(
-                    "AppserverIo\\Http\\HttpProtocol::$tmp"
+                    "AppserverIo\\Psr\\HttpMessage\\Protocol::$tmp"
                 )] = $headerArray[constant(
-                    "AppserverIo\\Http\\HttpProtocol::$tmp"
+                    "AppserverIo\\Psr\\HttpMessage\\Protocol::$tmp"
                 )];
             }
         }

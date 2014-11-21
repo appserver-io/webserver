@@ -27,9 +27,8 @@
         "php": ">=5.4.0",
         "monolog/monolog": "1.10.*",
         "psr/log": "*",
-        "appserver-io/server": "~1.0",
-        "appserver-io/http": "~1.0",
-        "appserver-io-psr/connection": "~1.0"
+        "appserver-io/server": "0.1.*",
+        "appserver-io/http": "0.1.*"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*",

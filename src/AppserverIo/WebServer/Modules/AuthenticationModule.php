@@ -22,18 +22,16 @@
 
 namespace AppserverIo\WebServer\Modules;
 
-use AppserverIo\Connection\ConnectionRequestInterface;
-use AppserverIo\Connection\ConnectionResponseInterface;
-use AppserverIo\Http\HttpProtocol;
+use AppserverIo\Psr\HttpMessage\Protocol;
+use AppserverIo\Psr\HttpMessage\RequestInterface;
+use AppserverIo\Psr\HttpMessage\ResponseInterface;
+use AppserverIo\WebServer\Interfaces\HttpModuleInterface;
 use AppserverIo\Server\Dictionaries\ModuleHooks;
 use AppserverIo\Server\Dictionaries\ServerVars;
 use AppserverIo\Server\Dictionaries\ModuleVars;
-use AppserverIo\Server\Interfaces\ModuleInterface;
 use AppserverIo\Server\Exceptions\ModuleException;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
-use AppserverIo\Http\HttpRequestInterface;
-use AppserverIo\Http\HttpResponseInterface;
 use AppserverIo\WebServer\Interfaces\AuthenticationInterface;
 use AppserverIo\WebServer\Authentication\BasicAuthentication;
 
@@ -48,7 +46,7 @@ use AppserverIo\WebServer\Authentication\BasicAuthentication;
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/appserver-io/webserver
  */
-class AuthenticationModule implements ModuleInterface
+class AuthenticationModule implements HttpModuleInterface
 {
     /**
      * Defines the module name
@@ -88,7 +86,7 @@ class AuthenticationModule implements ModuleInterface
     /**
      * Return's the request instance
      *
-     * @return \AppserverIo\Http\HttpRequestInterface The request instance
+     * @return \AppserverIo\Psr\HttpMessage\RequestInterface The request instance
      */
     public function getRequest()
     {
@@ -98,7 +96,7 @@ class AuthenticationModule implements ModuleInterface
     /**
      * Returns the response instance
      *
-     * @return \AppserverIo\Http\HttpResponseInterface The response instance;
+     * @return \AppserverIo\Psr\HttpMessage\ResponseInterface The response instance;
      */
     public function getResponse()
     {
@@ -164,24 +162,24 @@ class AuthenticationModule implements ModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \AppserverIo\Connection\ConnectionRequestInterface     $request        A request object
-     * @param \AppserverIo\Connection\ConnectionResponseInterface    $response       A response object
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
      * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
-     * @param int                                                     $hook           The current hook to process logic for
+     * @param int                                                    $hook           The current hook to process logic for
      *
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
     public function process(
-        ConnectionRequestInterface $request,
-        ConnectionResponseInterface $response,
+        RequestInterface $request,
+        ResponseInterface $response,
         RequestContextInterface $requestContext,
         $hook
     ) {
         // In php an interface is, by definition, a fixed contract. It is immutable.
         // So we have to declair the right ones afterwards...
-        /** @var $request \AppserverIo\Http\HttpRequestInterface */
-        /** @var $response \AppserverIo\Http\HttpResponseInterface */
+        /** @var $request \AppserverIo\Psr\HttpMessage\RequestInterface */
+        /** @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface */
 
         // if false hook is coming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
@@ -216,7 +214,7 @@ class AuthenticationModule implements ModuleInterface
                 // set type Instance to local ref
                 $typeInstance = $this->getAuthenticationTypeInstance($data["type"]);
                 // check if client sends an authentication header
-                if ($authHeader = $request->getHeader(HttpProtocol::HEADER_AUTHORIZATION)) {
+                if ($authHeader = $request->getHeader(Protocol::HEADER_AUTHORIZATION)) {
                     // init type instance by auth header
                     $typeInstance->init($authHeader);
                     // check if auth works
@@ -229,7 +227,7 @@ class AuthenticationModule implements ModuleInterface
                 }
                 // send header for challenge authentication against client
                 $response->addHeader(
-                    HttpProtocol::HEADER_WWW_AUTHENTICATE,
+                    Protocol::HEADER_WWW_AUTHENTICATE,
                     $typeInstance->getType() . ' realm="' . $data["realm"] . "'"
                 );
                 // throw exception for auth required

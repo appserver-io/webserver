@@ -20,14 +20,16 @@
  * @link       https://github.com/appserver-io/webserver
  */
 
-require('../vendor/techdivision/server/src/AppserverIo/Server/Standalone.php');
+define('STARTUP_BASE', __DIR__ . '/../');
+
+require(STARTUP_BASE . 'vendor/appserver-io/server/src/AppserverIo/Server/Standalone.php');
 
 // check if first argument is given for configuration
 if (isset($argv[1])) {
     $config = $argv[1];
 } else {
-    $config = 'etc/webserver.xml';
+    $config = STARTUP_BASE . 'etc/webserver.xml';
 }
 
-$server = new \AppserverIo\Server\Standalone(__DIR__, $config, '../vendor/autoload.php');
+$server = new \AppserverIo\Server\Standalone(STARTUP_BASE , $config, STARTUP_BASE . 'vendor/autoload.php');
 $server->start();

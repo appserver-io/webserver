@@ -36,7 +36,7 @@ use AppserverIo\Server\Dictionaries\ModuleHooks;
 use AppserverIo\WebServer\Mock\MockHttpRequest;
 
 /**
- * AppserverIo\WebServer\Modules\Rewrite\RewriteModuleTest
+ * Class RewriteModuleTest
  *
  * Basic test class for the RewriteModule class.
  *

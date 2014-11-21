@@ -29,7 +29,7 @@ use AppserverIo\Http\HttpResponse;
 use AppserverIo\Server\Dictionaries\ServerVars;
 
 /**
- * AppserverIo\WebServer\Modules\Rewrite\RuleTest
+ * Class RuleTest
  *
  * Basic test class for the Rule class.
  *

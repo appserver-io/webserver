@@ -24,7 +24,7 @@ namespace AppserverIo\WebServer\Mock;
 
 use AppserverIo\WebServer\Modules\RewriteModule;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
-use AppserverIo\Connection\ConnectionRequestInterface;
+use AppserverIo\Psr\HttpMessage\RequestInterface;
 
 /**
  * Class MockRewriteModule
@@ -79,11 +79,11 @@ class MockRewriteModule extends RewriteModule
     /**
      * Exposes the parent method
      *
-     * @param \AppserverIo\Connection\ConnectionRequestInterface $request The request instance
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface $request The request instance
      *
      * @return void
      */
-    public function fillHeaderBackreferences(ConnectionRequestInterface $request)
+    public function fillHeaderBackreferences(RequestInterface $request)
     {
         parent::fillHeaderBackreferences($request);
     }

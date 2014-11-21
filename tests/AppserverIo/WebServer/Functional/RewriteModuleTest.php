@@ -27,7 +27,7 @@ use AppserverIo\Http\HttpRequest;
 use AppserverIo\Http\HttpResponse;
 use AppserverIo\WebServer\Mock\MockServerConfig;
 use AppserverIo\WebServer\Mock\MockRequestContext;
-use AppserverIo\WebServer\Modules\Rewrite\RewriteModule;
+use AppserverIo\WebServer\Modules\RewriteModule;
 use AppserverIo\Server\Contexts\ServerContext;
 use AppserverIo\Server\Dictionaries\ModuleHooks;
 use AppserverIo\Server\Dictionaries\ModuleVars;
@@ -52,7 +52,7 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
     /**
      * The rewrite module instance to test.
      *
-     * @var \AppserverIo\WebServer\Modules\Rewrite\RewriteModule
+     * @var \AppserverIo\WebServer\Modules\RewriteModule
      */
     protected $rewriteModule;
 

@@ -124,7 +124,7 @@ class FastCgiModuleTest extends \PHPUnit_Framework_TestCase
         );
 
         // create a mock HTTP request instance
-        $mockHttpRequest = $this->getMockForAbstractClass('AppserverIo\Http\HttpRequest');
+        $mockHttpRequest = $this->getMock('AppserverIo\Http\HttpRequest');
         $mockHttpRequest->expects($this->once())
             ->method('getHeaders')
             ->will($this->returnValue(array()));
@@ -148,7 +148,7 @@ class FastCgiModuleTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(array()));
 
         // create a mock HTTP response instance
-        $mockHttpResponse = $this->getMockForAbstractClass('AppserverIo\Http\HttpResponse');
+        $mockHttpResponse = $this->getMock('AppserverIo\Http\HttpResponse');
 
         // process the FastCGI request
         $mockFastCgiModule->process($mockHttpRequest, $mockHttpResponse, $mockRequestContext, ModuleHooks::REQUEST_POST);

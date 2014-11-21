@@ -24,6 +24,7 @@ namespace AppserverIo\WebServer\Modules\Rewrite\Entities;
 
 use AppserverIo\WebServer\Modules\Rewrite\Entities\Condition;
 use AppserverIo\WebServer\Mock\MockCondition;
+use AppserverIo\WebServer\Modules\RewriteModule;
 
 /**
  * Class ConditionTest
@@ -217,19 +218,19 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchesIsExecutable()
     {
+        $htmlBaseDir = __DIR__ .
+            DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' .
+            DIRECTORY_SEPARATOR . '_files' .
+            DIRECTORY_SEPARATOR . 'modules' .
+            DIRECTORY_SEPARATOR . RewriteModule::MODULE_NAME . DIRECTORY_SEPARATOR . 'html';
+
         // This should succeed
-        $condition = new Condition(
-            __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'html',
-            '-x'
-        );
+        $condition = new Condition($htmlBaseDir, '-x');
+
         $this->assertTrue($condition->matches());
 
         // This should not
-        $condition = new Condition(
-            __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR .
-            '_files' . DIRECTORY_SEPARATOR . 'html' . DIRECTORY_SEPARATOR . 'emptyFile',
-            '-x'
-        );
+        $condition = new Condition($htmlBaseDir . DIRECTORY_SEPARATOR . 'emptyFile', '-x');
         $this->assertFalse($condition->matches());
     }
 

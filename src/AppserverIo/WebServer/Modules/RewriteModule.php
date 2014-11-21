@@ -174,44 +174,7 @@ class RewriteModule implements HttpModuleInterface
                 )
             );
 
-            $this->supportedEnvVars = array(
-                EnvVars::HTTPS,
-                EnvVars::SSL_PROTOCOL,
-                EnvVars::SSL_SESSION_ID,
-                EnvVars::SSL_CIPHER,
-                EnvVars::SSL_CIPHER_EXPORT,
-                EnvVars::SSL_CIPHER_USEKEYSIZE,
-                EnvVars::SSL_CIPHER_ALGKEYSIZE,
-                EnvVars::SSL_COMPRESS_METHOD,
-                EnvVars::SSL_VERSION_INTERFACE,
-                EnvVars::SSL_VERSION_LIBRARY,
-                EnvVars::SSL_CLIENT_M_VERSION,
-                EnvVars::SSL_CLIENT_M_SERIAL,
-                EnvVars::SSL_CLIENT_S_DN,
-                EnvVars::SSL_CLIENT_S_DN_X509,
-                EnvVars::SSL_CLIENT_I_DN,
-                EnvVars::SSL_CLIENT_I_DN_X509,
-                EnvVars::SSL_CLIENT_V_START,
-                EnvVars::SSL_CLIENT_V_END,
-                EnvVars::SSL_CLIENT_V_REMAIN,
-                EnvVars::SSL_CLIENT_A_SIG,
-                EnvVars::SSL_CLIENT_A_KEY,
-                EnvVars::SSL_CLIENT_CERT,
-                EnvVars::SSL_CLIENT_CERT_CHAIN_N,
-                EnvVars::SSL_CLIENT_VERIFY,
-                EnvVars::SSL_SERVER_M_VERSION,
-                EnvVars::SSL_SERVER_M_SERIAL,
-                EnvVars::SSL_SERVER_S_DN,
-                EnvVars::SSL_SERVER_S_DN_X509,
-                EnvVars::SSL_SERVER_I_DN,
-                EnvVars::SSL_SERVER_I_DN_X509,
-                EnvVars::SSL_SERVER_V_START,
-                EnvVars::SSL_SERVER_V_END,
-                EnvVars::SSL_SERVER_A_SIG,
-                EnvVars::SSL_SERVER_A_KEY,
-                EnvVars::SSL_SERVER_CERT,
-                EnvVars::SSL_TLS_SNI
-            );
+            $this->supportedEnvVars = EnvVars::all();
 
             // Get the rules as the array they are within the config
             // We might not even get anything, so prepare our rules accordingly

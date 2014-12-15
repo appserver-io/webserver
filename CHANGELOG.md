@@ -2,7 +2,7 @@
 
 ## Bugfixes
 
-* None
+* Updated dependencies for the webserver.json example configuration
 
 ## Features
 

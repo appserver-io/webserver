@@ -78,17 +78,6 @@ class MeasurementProtocol implements ConnectorInterface
     protected $parameters = array();
 
     /**
-     * Array for mapping incoming parameters to the measurement protocol API
-     *
-     * @var array $parameterMapping
-     */
-    protected $parameterMapping = array(
-        'os' => 'aid',
-        'version' => 'av',
-        'dist' => 'aiid'
-    );
-
-    /**
      * Will call for the measurement protocol endpoint
      *
      * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
@@ -97,26 +86,10 @@ class MeasurementProtocol implements ConnectorInterface
      */
     public function call(RequestContextInterface $requestContext)
     {
-        // we will work with the query string which we have to parse first
-        $queryString = $requestContext->getServerVar(ServerVars::QUERY_STRING);
-
-        $parameters = array();
-        foreach (explode('&', $queryString) as $paramPair) {
-
-            list($param, $value) = explode('=', $paramPair);
-
-            // we might have to map our parameters
-            if (isset($this->parameterMapping[$param])) {
-
-                $param = $this->parameterMapping[$param];
-            }
-            $parameters[$param] = urldecode($value);
-        }
-
         // merge default and configured parameters into our list
-        $parameters = array_merge($parameters, $this->defaultParameters, $this->parameters);
+        $parameters = array_merge($this->defaultParameters, $this->parameters);
 
-        // do a CURL call to the service
+        // make a CURL call to the service
         $ch = curl_init(self::SERVICE_BASE_URL);
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_POST, true);

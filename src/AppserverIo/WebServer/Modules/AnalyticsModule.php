@@ -170,14 +170,29 @@ class AnalyticsModule implements HttpModuleInterface
             foreach ($analytics as $analytic) {
 
                 // run through our connectors if the if the URI matches
-                if (preg_match('/' . $analytic['uri'] . '/', $requestContext->getServerVar(ServerVars::X_REQUEST_URI))) {
+                $matches = array();
+                if (preg_match('/' . $analytic['uri'] . '/', $requestContext->getServerVar(ServerVars::X_REQUEST_URI), $matches)) {
 
+                    // we only need the matching parts of the URI
+                    unset($matches[0]);
+
+                    // iterate over all connectors and call their services
                     foreach ($analytic['connectors'] as $connector) {
 
+                        // iterate all params and fill in the regex backreferences
+                        foreach ($connector['params'] as $key => $param) {
+
+                            $param = str_replace('$', '', $param);
+                            if (isset($matches[$param])) {
+
+                                $connector['params'][$key] = $matches[$param];
+                            }
+                        }
+
+                        // make a new connector instance, initialize it and make the call to its service
                         $connectorClass = str_replace('\\\\', '\\', $connector['type']);
                         if (class_exists($connectorClass)) {
 
-                            // make a new connector instance, initialize it and make the call to its service
                             $connectorInstance = new $connectorClass();
                             $connectorInstance->init($connector['params']);
                             $connectorInstance->call($requestContext);

@@ -108,8 +108,16 @@ class AnalyticsModule implements HttpModuleInterface
      */
     public function init(ServerContextInterface $serverContext)
     {
-        $this->serverContext = $serverContext;
-        $this->analytics = $serverContext->getServerConfig()->getAnalytics();
+        try {
+
+            $this->serverContext = $serverContext;
+            $this->analytics = $serverContext->getServerConfig()->getAnalytics();
+
+        } catch (\Exception $e) {
+
+            // Re-throw as a ModuleException
+            throw new ModuleException($e);
+        }
     }
 
     /**
@@ -141,38 +149,46 @@ class AnalyticsModule implements HttpModuleInterface
         $hook
     ) {
 
-        // if false hook is coming do nothing
-        if (ModuleHooks::RESPONSE_POST !== $hook) {
-            return;
-        }
+        try {
 
-        // get default analytics definitions
-        $analytics = $this->analytics;
+            // if false hook is coming do nothing
+            if (ModuleHooks::RESPONSE_POST !== $hook) {
+                return;
+            }
 
-        // check if there are some volatile access definitions so use them and override global accesses
-        if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_ANALYTICS)) {
-            // reset by volatile accesses
-            $analytics = array_merge($analytics, $requestContext->getModuleVar(ModuleVars::VOLATILE_ANALYTICS));
-        }
+            // get default analytics definitions
+            $analytics = $this->analytics;
 
-        // check all analytics and check if the uri matches
-        foreach ($analytics as $analytic) {
+            // check if there are some volatile access definitions so use them and override global accesses
+            if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_ANALYTICS)) {
+                // reset by volatile accesses
+                $analytics = array_merge($analytics, $requestContext->getModuleVar(ModuleVars::VOLATILE_ANALYTICS));
+            }
 
-            // run through our connectors if the if the URI matches
-            if (preg_match('/' . $analytic['uri'] . '/', $requestContext->getServerVar(ServerVars::X_REQUEST_URI))) {
+            // check all analytics and check if the uri matches
+            foreach ($analytics as $analytic) {
 
-                foreach ($analytic['connectors'] as $connector) {
+                // run through our connectors if the if the URI matches
+                if (preg_match('/' . $analytic['uri'] . '/', $requestContext->getServerVar(ServerVars::X_REQUEST_URI))) {
 
-                    $connectorClass = str_replace('\\\\', '\\', $connector['type']);
-                    if (class_exists($connectorClass)) {
+                    foreach ($analytic['connectors'] as $connector) {
 
-                        // make a new connector instance, initialize it and make the call to its service
-                        $connectorInstance = new $connectorClass();
-                        $connectorInstance->init($connector['params']);
-                        $connectorInstance->call($requestContext);
+                        $connectorClass = str_replace('\\\\', '\\', $connector['type']);
+                        if (class_exists($connectorClass)) {
+
+                            // make a new connector instance, initialize it and make the call to its service
+                            $connectorInstance = new $connectorClass();
+                            $connectorInstance->init($connector['params']);
+                            $connectorInstance->call($requestContext);
+                        }
                     }
                 }
             }
+
+        } catch (\Exception $e) {
+
+            // Re-throw as a ModuleException
+            throw new ModuleException($e);
         }
     }
 }

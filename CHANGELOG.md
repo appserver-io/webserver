@@ -1,3 +1,13 @@
+# Version 0.3.1
+
+## Bugfixes
+
+* Updated dependencies for the webserver.json example configuration
+
+## Features
+
+* Added an analysis module
+
 # Version 0.3.0
 
 ## Bugfixes

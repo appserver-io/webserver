@@ -195,7 +195,7 @@ class AnalyticsModule implements HttpModuleInterface
 
                             $connectorInstance = new $connectorClass();
                             $connectorInstance->init($connector['params']);
-                            $connectorInstance->call($requestContext);
+                            $connectorInstance->call($request, $requestContext);
                         }
                     }
                 }

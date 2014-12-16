@@ -1,3 +1,13 @@
+# Version 0.3.2
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Allow for client IP forwarding within the analytics module measurement protocol connector
+
 # Version 0.3.1
 
 ## Bugfixes

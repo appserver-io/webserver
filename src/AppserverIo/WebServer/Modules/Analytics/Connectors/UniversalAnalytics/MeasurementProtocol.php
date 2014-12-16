@@ -20,9 +20,12 @@
 
 namespace AppserverIo\WebServer\Modules\Analytics\Connectors\UniversalAnalytics;
 
+use AppserverIo\Http\HttpProtocol;
 use AppserverIo\Server\Dictionaries\ServerVars;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\WebServer\Modules\Analytics\Connectors\ConnectorInterface;
+use AppserverIo\Psr\HttpMessage\RequestInterface;
+use Rhumsaa\Uuid\Uuid;
 
 /**
  * AppserverIo\WebServer\Modules\Analytics\Connectors\UniversalAnalytics\MeasurementProtocol
@@ -80,17 +83,23 @@ class MeasurementProtocol implements ConnectorInterface
     /**
      * Will call for the measurement protocol endpoint
      *
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
      * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
      *
      * @return null
      */
-    public function call(RequestContextInterface $requestContext)
+    public function call(RequestInterface $request, RequestContextInterface $requestContext)
     {
         // merge default and configured parameters into our list
         $parameters = array_merge($this->defaultParameters, $this->parameters);
 
         // make a CURL call to the service
         $ch = curl_init(self::SERVICE_BASE_URL);
+
+        // we want the request to be like it came from the same host, so we will reuse part of it
+        $parameters['ua'] = $request->getHeader(HttpProtocol::HEADER_USER_AGENT);
+        $parameters['uip'] = $requestContext->getServerVar(ServerVars::REMOTE_ADDR);
+
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $parameters);
@@ -120,6 +129,7 @@ class MeasurementProtocol implements ConnectorInterface
     public function init(array $params)
     {
         $this->parameters = $params;
-        $this->parameters['cid'] = uniqid();
+        $uuid4 = Uuid::uuid4();
+        $this->parameters['cid'] = $uuid4->toString();
     }
 }

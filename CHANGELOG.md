@@ -1,3 +1,13 @@
+# Version 0.3.4
+
+## Bugfixes
+
+* Wrong usage of CURLs POST fields
+
+## Features
+
+* None
+
 # Version 0.3.3
 
 ## Bugfixes

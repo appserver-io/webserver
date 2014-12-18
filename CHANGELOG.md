@@ -1,3 +1,14 @@
+# Version 0.3.3
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Added different hit types and extended error handling
+* Added GA cookie inclusion for the Client ID
+
 # Version 0.3.2
 
 ## Bugfixes

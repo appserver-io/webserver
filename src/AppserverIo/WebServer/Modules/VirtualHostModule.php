@@ -200,6 +200,15 @@ class VirtualHostModule implements HttpModuleInterface
                 );
             }
 
+            // add the analytics (if any) to the configuration's analytics pool
+            if (!empty($virtualHosts[$serverName]['analytics'])) {
+                // set the analytics we encountered as a temporary module var
+                $requestContext->setModuleVar(
+                    ModuleVars::VOLATILE_ANALYTICS,
+                    $virtualHosts[$serverName]['analytics']
+                );
+            }
+
             // Add the locations we have (if any) to the configuration's location pool
             if (!empty($virtualHosts[$serverName]['locations'])) {
                 // Set the locations we encountered as a temporary module var

@@ -26,6 +26,8 @@ use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\WebServer\Modules\Analytics\Connectors\ConnectorInterface;
 use AppserverIo\Psr\HttpMessage\RequestInterface;
 use Rhumsaa\Uuid\Uuid;
+use AppserverIo\Server\Interfaces\ServerContextInterface;
+use AppserverIo\Logger\LoggerUtils;
 
 /**
  * AppserverIo\WebServer\Modules\Analytics\Connectors\UniversalAnalytics\MeasurementProtocol
@@ -42,6 +44,13 @@ use Rhumsaa\Uuid\Uuid;
  */
 class MeasurementProtocol implements ConnectorInterface
 {
+
+    /**
+     * Default hit type we will use if there is none given
+     *
+     * @var string DEFAULT_HIT_TYPE
+     */
+    const DEFAULT_HIT_TYPE = 'event';
 
     /**
      * Base URL at which the measurement protocol service can be reached
@@ -69,9 +78,7 @@ class MeasurementProtocol implements ConnectorInterface
      *
      * @var array $defaultParameter
      */
-    protected $defaultParameters = array(
-        'v' => 1
-    );
+    protected $defaultParameters = array();
 
     /**
      * Holds parameters passed to the connector
@@ -79,6 +86,63 @@ class MeasurementProtocol implements ConnectorInterface
      * @var array $parameters
      */
     protected $parameters = array();
+
+    /**
+     * Holds required parameters for the different hit types
+     *
+     * @var array $requiredParameters
+     *
+     * @see https://developers.google.com/analytics/devguides/collection/protocol/v1/devguide
+     * @see https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
+     */
+    protected $requiredParameters = array();
+
+    /**
+     * The server's context instance which we preserve for later use
+     *
+     * @var \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext $serverContext
+     */
+    protected $serverContext;
+
+    /**
+     * The hit types we do support
+     *
+     * @var array $supportedHitTypes
+     *
+     * @see https://developers.google.com/analytics/devguides/collection/protocol/v1/devguide
+     */
+    protected $supportedHitTypes = array('event', 'screenview', 'item', 'social');
+
+    /**
+     * Default constructor
+     *
+     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext The server's context instance
+     */
+    public function __construct(ServerContextInterface $serverContext)
+    {
+        $this->serverContext = $serverContext;
+
+        // init the required parameters
+        $this->requiredParameters = array(
+            'event' => array(
+                'ec',
+                'ea'
+            ),
+            'screenview' => array(),
+            'item' => array(
+                'ti',
+                'in'
+            ),
+            'social' => array(
+                'sn',
+                'sa',
+                'st'
+            )
+        );
+
+        // set our default parameters
+        $this->defaultParameters = array('v' => 1);
+    }
 
     /**
      * Will call for the measurement protocol endpoint
@@ -99,6 +163,24 @@ class MeasurementProtocol implements ConnectorInterface
         // we want the request to be like it came from the same host, so we will reuse part of it
         $parameters['ua'] = $request->getHeader(HttpProtocol::HEADER_USER_AGENT);
         $parameters['uip'] = $requestContext->getServerVar(ServerVars::REMOTE_ADDR);
+
+        // the client will be a random UUID, at least if we do not get a matching cookie
+        if ($request->hasHeader(HttpProtocol::HEADER_COOKIE)) {
+
+            $cookie = $request->getHeader(HttpProtocol::HEADER_COOKIE);
+            $matches = array();
+            preg_match('/_ga=GA[0-9]\.[0-9]\.(.+)/', $cookie, $matches);
+            if (isset($matches[1])) {
+
+                $parameters['cid'] = $matches[1];
+            }
+
+        }
+        if (!isset($parameters['cid'])) {
+
+            $uuid4 = Uuid::uuid4();
+            $parameters['cid'] = $uuid4->toString();
+        }
 
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_POST, true);
@@ -128,8 +210,56 @@ class MeasurementProtocol implements ConnectorInterface
      */
     public function init(array $params)
     {
+
+        // first of all we have to check for the hit type
+        $supportedHitTypes = array_flip($this->supportedHitTypes);
+        if (!isset($params['t'])) {
+
+            $params['t'] = self::DEFAULT_HIT_TYPE;
+
+        } elseif (!isset($supportedHitTypes[$params['t']])) {
+
+            throw new \InvalidArgumentException(sprintf('Unsupported hit type "%s", please check configuration and module implementation.', $params['t']));
+        }
+
+        // we want to check our requirements
+        $this->checkInputParameters($params);
+
+        // set some params we already know
         $this->parameters = $params;
-        $uuid4 = Uuid::uuid4();
-        $this->parameters['cid'] = $uuid4->toString();
+    }
+
+    /**
+     * Will init the parameter mappings for our hit types
+     *
+     * @param array $params The parameters to check for requirements
+     *
+     * @return null
+     */
+    protected function checkInputParameters(array $params)
+    {
+        // we only check if we know the requirements
+        if (isset($this->requiredParameters[$params['t']])) {
+
+            foreach ($this->requiredParameters[$params['t']] as $requirement) {
+
+                if (!isset($params[$requirement])) {
+
+                    // do the logging, preferably by one of our loggers
+                    $message = 'We miss the required parameter "%s", you might not get proper analytics!';
+                    if ($this->serverContext->hasLogger(LoggerUtils::SYSTEM)) {
+
+                        $logger = $this->serverContext->getLogger(LoggerUtils::SYSTEM);
+                        $logger->warning(sprintf($message, $requirement));
+
+                    } else {
+
+                        error_log(sprintf($message, $requirement));
+                    }
+
+
+                }
+            }
+        }
     }
 }

@@ -193,7 +193,7 @@ class AnalyticsModule implements HttpModuleInterface
                         $connectorClass = str_replace('\\\\', '\\', $connector['type']);
                         if (class_exists($connectorClass)) {
 
-                            $connectorInstance = new $connectorClass();
+                            $connectorInstance = new $connectorClass($this->serverContext);
                             $connectorInstance->init($connector['params']);
                             $connectorInstance->call($request, $requestContext);
                         }

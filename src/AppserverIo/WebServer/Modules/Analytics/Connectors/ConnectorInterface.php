@@ -22,6 +22,7 @@ namespace AppserverIo\WebServer\Modules\Analytics\Connectors;
 
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Psr\HttpMessage\RequestInterface;
+use AppserverIo\Server\Interfaces\ServerContextInterface;
 
 /**
  * AppserverIo\WebServer\Modules\Analytics\Connectors\ConnectorInterface
@@ -38,6 +39,14 @@ use AppserverIo\Psr\HttpMessage\RequestInterface;
  */
 interface ConnectorInterface
 {
+
+    /**
+     * Default constructor
+     *
+     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext The server's context instance
+     */
+    public function __construct(ServerContextInterface $serverContext);
+
     /**
      * Will call the service the connector is used to communicate with
      *

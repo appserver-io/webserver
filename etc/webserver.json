@@ -45,8 +45,8 @@
             "type": "\\AppserverIo\\Server\\Servers\\MultiThreadedServer",
             "worker": "\\AppserverIo\\Server\\Workers\\ThreadWorker",
             "socket": "\\AppserverIo\\Server\\Sockets\\StreamSocket",
-            "serverContext": "\\AppserverIo\\Server\\ServerContext",
-            "requestContext": "\\AppserverIo\\Server\\RequestContext",
+            "serverContext": "\\AppserverIo\\Server\\Contexts\\ServerContext",
+            "requestContext": "\\AppserverIo\\Server\\Contexts\\RequestContext",
             "loggerName": "System",
             "workerNumber": 128,
             "workerAcceptMin": 8,
@@ -57,13 +57,13 @@
             "transport": "tcp",
             "address": "0.0.0.0",
             "port": "9080",
-            "documentRoot" : "var/www",
+            "documentRoot": "var/www",
             "directoryIndex": "index.php index.html index.htm",
             "keepAliveMax": 64,
             "keepAliveTimeout": 5,
             "errorsPageTemplatePath": "",
 
-            "authentications" : [
+            "authentications": [
                 {
                     "uri": "^\\/auth\\/basic\\/phpwebserver.*",
                     "realm": "PhpWebServer Basic Authentication System",
@@ -78,7 +78,7 @@
                 }
             ],
 
-            "accesses" : [
+            "accesses": [
                 {
                     "type": "allow",
                     "REQUEST_URI": ".*"
@@ -89,31 +89,31 @@
                 }
             ],
 
-            "rewrites" : [
+            "rewrites": [
                 {
-                    "condition" : "-f{OR}-l{OR}-d",
-                    "target" : "",
-                    "flag" : "L"
+                    "condition": "-f{OR}-l{OR}-d",
+                    "target": "",
+                    "flag": "L"
                 }
             ],
 
-            "virtualHosts" : [
+            "virtualHosts": [
                 {
                     "name": "phpwebserver.dev phpwebserver.local phpwebserver.test",
                     "admin": "admin@phpwebserver.dev",
                     "documentRoot": "var/www",
                     "errorsPageTemplatePath": "var/www/errors/error.phtml",
-                    "rewrites" : [
+                    "rewrites": [
                         {
-                            "condition" : "-f{OR}-l{OR}-d",
-                            "target" : "",
-                            "flag" : "L"
+                            "condition": "-f{OR}-l{OR}-d",
+                            "target": "",
+                            "flag": "L"
                         }
                     ],
-                    "environmentVariables" : [
+                    "environmentVariables": [
                         {
-                            "condition" : "",
-                            "definition" : "EXAMPLE_VARIABLE=test"
+                            "condition": "",
+                            "definition": "EXAMPLE_VARIABLE=test"
                         }
                     ]
                 },
@@ -122,27 +122,27 @@
                     "admin": "admin@phpwebserver.dev",
                     "documentRoot": "var/www/cgi",
                     "errorsPageTemplatePath": "var/www/errors/error.phtml",
-                    "rewrites" : [
+                    "rewrites": [
                         {
-                            "condition" : "-f{OR}-l{OR}-d",
-                            "target" : "",
-                            "flag" : "L"
+                            "condition": "-f{OR}-l{OR}-d",
+                            "target": "",
+                            "flag": "L"
                         }
                     ],
-                    "environmentVariables" : [
+                    "environmentVariables": [
                         {
-                            "condition" : "",
-                            "definition" : "EXAMPLE_VARIABLE=fastcgi"
+                            "condition": "",
+                            "definition": "EXAMPLE_VARIABLE=fastcgi"
                         }
                     ],
-                    "locations" : [
+                    "locations": [
                         {
-                            "condition" : "~*\\.php(\\\/|\\?|$",
-                            "handlers" : [
+                            "condition": "~*\\.php(\\\/|\\?|$",
+                            "handlers": [
                                 {
                                     "name": "fastcgi",
                                     "extension": ".php",
-                                    "params" : {
+                                    "params": {
                                         "host": "127.0.0.1",
                                         "port": 9000
                                     }
@@ -167,14 +167,14 @@
                             }
                         }
                     ],
-                    "rewrites" : [
+                    "rewrites": [
                         {
-                            "condition" : "-f{OR}-l{OR}-d",
-                            "target" : "",
-                            "flag" : "L"
+                            "condition": "-f{OR}-l{OR}-d",
+                            "target": "",
+                            "flag": "L"
                         }
                     ],
-                    "accesses" : [
+                    "accesses": [
                         {
                             "type": "allow",
                             "REQUEST_URI": "^\\/(media|skin|js|index\\.php).*"
@@ -183,15 +183,15 @@
                 }
             ],
 
-            "environmentVariables" : [
+            "environmentVariables": [
                 {
-                    "condition" : "(\\s.*WebKit?|Gecko)@$User-Agent",
-                    "definition" : "BROWSER_ENGINE=$1"
+                    "condition": "(\\s.*WebKit?|Gecko)@$User-Agent",
+                    "definition": "BROWSER_ENGINE=$1"
                 }
             ],
 
             "connectionHandlers": [
-                "\\AppserverIo\\Http\\HttpConnectionHandler"
+                "\\AppserverIo\\WebServer\\ConnectionHandlers\\HttpConnectionHandler"
             ],
 
             "modules": [
@@ -209,9 +209,9 @@
             ],
 
             "handlers": [
-                { "name": "php", "extension": ".php" },
-                { "name": "php", "extension": ".phtml" },
-                { "name": "servlet", "extension": ".do" }
+                {"name": "php", "extension": ".php"},
+                {"name": "php", "extension": ".phtml"},
+                {"name": "servlet", "extension": ".do"}
             ]
         },
         {
@@ -219,8 +219,8 @@
             "type": "\\AppserverIo\\Server\\Servers\\MultiThreadedServer",
             "worker": "\\AppserverIo\\Server\\Workers\\ThreadWorker",
             "socket": "\\AppserverIo\\Server\\Sockets\\StreamSocket",
-            "serverContext" : "\\AppserverIo\\Server\\ServerContext",
-            "requestContext": "\\AppserverIo\\Server\\RequestContext",
+            "serverContext": "\\AppserverIo\\Server\\Contexts\\ServerContext",
+            "requestContext": "\\AppserverIo\\Server\\Contexts\\RequestContext",
             "loggerName": "System",
             "workerNumber": 128,
             "workerAcceptMin": 8,
@@ -233,13 +233,13 @@
             "port": "9443",
             "certPath": "etc/phpwebserver.pem",
             "passphrase": "passphrase",
-            "documentRoot" : "var/www",
+            "documentRoot": "var/www",
             "directoryIndex": "index.php index.html index.htm",
             "keepAliveMax": 64,
             "keepAliveTimeout": 5,
             "errorsPageTemplatePath": "",
 
-            "authentications" : [
+            "authentications": [
                 {
                     "uri": "^\\/auth\\/basic\\/phpwebserver.*",
                     "realm": "PhpWebServer Basic Authentication System",
@@ -254,7 +254,7 @@
                 }
             ],
 
-            "accesses" : [
+            "accesses": [
                 {
                     "type": "allow",
                     "REQUEST_URI": ".*"
@@ -265,31 +265,31 @@
                 }
             ],
 
-            "rewrites" : [
+            "rewrites": [
                 {
-                    "condition" : "-f{OR}-l{OR}-d",
-                    "target" : "",
-                    "flag" : "L"
+                    "condition": "-f{OR}-l{OR}-d",
+                    "target": "",
+                    "flag": "L"
                 }
             ],
 
-            "virtualHosts" : [
+            "virtualHosts": [
                 {
                     "name": "phpwebserver.dev phpwebserver.local phpwebserver.test",
                     "admin": "admin@phpwebserver.dev",
                     "documentRoot": "var/www",
                     "errorsPageTemplatePath": "var/www/errors/error.phtml",
-                    "rewrites" : [
+                    "rewrites": [
                         {
-                            "condition" : "-f{OR}-l{OR}-d",
-                            "target" : "",
-                            "flag" : "L"
+                            "condition": "-f{OR}-l{OR}-d",
+                            "target": "",
+                            "flag": "L"
                         }
                     ],
-                    "environmentVariables" : [
+                    "environmentVariables": [
                         {
-                            "condition" : "",
-                            "definition" : "EXAMPLE_VARIABLE=test"
+                            "condition": "",
+                            "definition": "EXAMPLE_VARIABLE=test"
                         }
                     ]
                 },
@@ -298,27 +298,27 @@
                     "admin": "admin@phpwebserver.dev",
                     "documentRoot": "var/www/cgi",
                     "errorsPageTemplatePath": "var/www/errors/error.phtml",
-                    "rewrites" : [
+                    "rewrites": [
                         {
-                            "condition" : "-f{OR}-l{OR}-d",
-                            "target" : "",
-                            "flag" : "L"
+                            "condition": "-f{OR}-l{OR}-d",
+                            "target": "",
+                            "flag": "L"
                         }
                     ],
-                    "environmentVariables" : [
+                    "environmentVariables": [
                         {
-                            "condition" : "",
-                            "definition" : "EXAMPLE_VARIABLE=fastcgi"
+                            "condition": "",
+                            "definition": "EXAMPLE_VARIABLE=fastcgi"
                         }
                     ],
-                    "locations" : [
+                    "locations": [
                         {
-                            "condition" : "~*\\.php(\\\/|\\?|$",
-                            "handlers" : [
+                            "condition": "~*\\.php(\\\/|\\?|$",
+                            "handlers": [
                                 {
                                     "name": "fastcgi",
                                     "extension": ".php",
-                                    "params" : {
+                                    "params": {
                                         "host": "127.0.0.1",
                                         "port": 9000
                                     }
@@ -341,14 +341,14 @@
                             "password": "pass"
                         }
                     ],
-                    "rewrites" : [
+                    "rewrites": [
                         {
-                            "condition" : "-f{OR}-l{OR}-d",
-                            "target" : "",
-                            "flag" : "L"
+                            "condition": "-f{OR}-l{OR}-d",
+                            "target": "",
+                            "flag": "L"
                         }
                     ],
-                    "accesses" : [
+                    "accesses": [
                         {
                             "type": "allow",
                             "REQUEST_URI": "^\\/(media|skin|js|index\\.php).*"
@@ -357,15 +357,15 @@
                 }
             ],
 
-            "environmentVariables" : [
+            "environmentVariables": [
                 {
-                    "condition" : "(\\s.*WebKit?|Gecko)@$User-Agent",
-                    "definition" : "BROWSER_ENGINE=$1"
+                    "condition": "(\\s.*WebKit?|Gecko)@$User-Agent",
+                    "definition": "BROWSER_ENGINE=$1"
                 }
             ],
 
             "connectionHandlers": [
-                "\\AppserverIo\\Http\\HttpConnectionHandler"
+                "\\AppserverIo\\WebServer\\ConnectionHandlers\\HttpConnectionHandler"
             ],
 
             "modules": [
@@ -383,9 +383,9 @@
             ],
 
             "handlers": [
-                { "name": "php", "extension": ".php" },
-                { "name": "php", "extension": ".phtml" },
-                { "name": "servlet", "extension": ".do" }
+                {"name": "php", "extension": ".php"},
+                {"name": "php", "extension": ".phtml"},
+                {"name": "servlet", "extension": ".do"}
             ]
         }
     ]

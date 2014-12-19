@@ -22,6 +22,7 @@ namespace AppserverIo\WebServer\Modules\Analytics\Connectors;
 
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Psr\HttpMessage\RequestInterface;
+use AppserverIo\Psr\HttpMessage\ResponseInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
 
 /**
@@ -51,11 +52,12 @@ interface ConnectorInterface
      * Will call the service the connector is used to communicate with
      *
      * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
      * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
      *
      * @return null
      */
-    public function call(RequestInterface $request, RequestContextInterface $requestContext);
+    public function call(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext);
 
     /**
      * Will return the name of the service the connector is used for

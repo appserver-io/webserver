@@ -175,6 +175,12 @@ class AnalyticsModule implements HttpModuleInterface
 
                     // we only need the matching parts of the URI
                     unset($matches[0]);
+                    // prepare the matches for later usage
+                    $backreferenceKeys = array();
+                    foreach ($matches as $key => $match) {
+
+                        $backreferenceKeys[] = '$' . $key;
+                    }
 
                     // iterate over all connectors and call their services
                     foreach ($analytic['connectors'] as $connector) {
@@ -182,10 +188,10 @@ class AnalyticsModule implements HttpModuleInterface
                         // iterate all params and fill in the regex backreferences
                         foreach ($connector['params'] as $key => $param) {
 
-                            $param = str_replace('$', '', $param);
-                            if (isset($matches[$param])) {
+                            // if the param might contain backreferences we will replace them
+                            if (strpos($param, '$') !== false) {
 
-                                $connector['params'][$key] = $matches[$param];
+                                $connector['params'][$key] = str_replace($backreferenceKeys, $matches, $param);
                             }
                         }
 
@@ -195,7 +201,7 @@ class AnalyticsModule implements HttpModuleInterface
 
                             $connectorInstance = new $connectorClass($this->serverContext);
                             $connectorInstance->init($connector['params']);
-                            $connectorInstance->call($request, $requestContext);
+                            $connectorInstance->call($request, $response, $requestContext);
                         }
                     }
                 }

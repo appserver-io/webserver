@@ -1,3 +1,14 @@
+# Version 0.3.5
+
+## Bugfixes
+
+* Fixed poblem with plain integer values within param values
+
+## Features
+
+* Usage of several backreferences per param value are now possible
+* Added MPEventConversion connector which allows for the tracking of unique users within event hit types
+
 # Version 0.3.4
 
 ## Bugfixes

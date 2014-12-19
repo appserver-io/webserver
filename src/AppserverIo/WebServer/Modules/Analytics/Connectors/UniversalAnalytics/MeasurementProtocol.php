@@ -26,6 +26,7 @@ use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\WebServer\Modules\Analytics\Connectors\ConnectorInterface;
 use AppserverIo\Psr\HttpMessage\RequestInterface;
 use Rhumsaa\Uuid\Uuid;
+use AppserverIo\Psr\HttpMessage\ResponseInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
 use AppserverIo\Logger\LoggerUtils;
 
@@ -148,17 +149,15 @@ class MeasurementProtocol implements ConnectorInterface
      * Will call for the measurement protocol endpoint
      *
      * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
      * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
      *
      * @return null
      */
-    public function call(RequestInterface $request, RequestContextInterface $requestContext)
+    public function call(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext)
     {
         // merge default and configured parameters into our list
         $parameters = array_merge($this->defaultParameters, $this->parameters);
-
-        // make a CURL call to the service
-        $ch = curl_init(self::SERVICE_BASE_URL);
 
         // we want the request to be like it came from the same host, so we will reuse part of it
         $parameters['ua'] = $request->getHeader(HttpProtocol::HEADER_USER_AGENT);
@@ -174,7 +173,6 @@ class MeasurementProtocol implements ConnectorInterface
 
                 $parameters['cid'] = $matches[1];
             }
-
         }
         if (!isset($parameters['cid'])) {
 
@@ -182,13 +180,40 @@ class MeasurementProtocol implements ConnectorInterface
             $parameters['cid'] = $uuid4->toString();
         }
 
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_POST, count($parameters));
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
-        curl_setopt($ch, CURLOPT_USERAGENT, self::USER_AGENT);
+        // make the actual call
+        $this->sendToService($parameters);
+    }
 
-        curl_exec($ch);
-        curl_close($ch);
+    /**
+     * Will init the parameter mappings for our hit types
+     *
+     * @param array $params The parameters to check for requirements
+     *
+     * @return null
+     */
+    protected function checkInputParameters(array $params)
+    {
+        // we only check if we know the requirements
+        if (isset($this->requiredParameters[$params['t']])) {
+
+            foreach ($this->requiredParameters[$params['t']] as $requirement) {
+
+                if (!isset($params[$requirement])) {
+
+                    // do the logging, preferably by one of our loggers
+                    $message = 'We miss the required parameter "%s", you might not get proper analytics!';
+                    if ($this->serverContext->hasLogger(LoggerUtils::SYSTEM)) {
+
+                        $logger = $this->serverContext->getLogger(LoggerUtils::SYSTEM);
+                        $logger->warning(sprintf($message, $requirement));
+
+                    } else {
+
+                        error_log(sprintf($message, $requirement));
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -230,36 +255,23 @@ class MeasurementProtocol implements ConnectorInterface
     }
 
     /**
-     * Will init the parameter mappings for our hit types
+     * Will send gathered parameters to the service URL using a POST request
      *
-     * @param array $params The parameters to check for requirements
+     * @param array $parameters The parameters to send
      *
      * @return null
      */
-    protected function checkInputParameters(array $params)
+    protected function sendToService(array $parameters)
     {
-        // we only check if we know the requirements
-        if (isset($this->requiredParameters[$params['t']])) {
+        // make a CURL call to the service
+        $ch = curl_init(self::SERVICE_BASE_URL);
 
-            foreach ($this->requiredParameters[$params['t']] as $requirement) {
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_POST, count($parameters));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
+        curl_setopt($ch, CURLOPT_USERAGENT, self::USER_AGENT);
 
-                if (!isset($params[$requirement])) {
-
-                    // do the logging, preferably by one of our loggers
-                    $message = 'We miss the required parameter "%s", you might not get proper analytics!';
-                    if ($this->serverContext->hasLogger(LoggerUtils::SYSTEM)) {
-
-                        $logger = $this->serverContext->getLogger(LoggerUtils::SYSTEM);
-                        $logger->warning(sprintf($message, $requirement));
-
-                    } else {
-
-                        error_log(sprintf($message, $requirement));
-                    }
-
-
-                }
-            }
-        }
+        curl_exec($ch);
+        curl_close($ch);
     }
 }

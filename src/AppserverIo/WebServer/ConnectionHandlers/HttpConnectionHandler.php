@@ -454,7 +454,10 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
 
             } catch (\Exception $e) {
                 // set status code given by exception
-                $response->setStatusCode($e->getCode());
+                // if 0 is comming set 500 by default
+                $response->setStatusCode(
+                    $e->getCode() ? $e->getCode() : 500
+                );
                 $this->renderErrorPage($e->__toString());
             }
 

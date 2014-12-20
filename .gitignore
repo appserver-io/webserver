@@ -2,6 +2,7 @@ php.ini
 composer.lock
 composer.phar
 .idea
+.c9
 /var/log/*.log
 /target
 /reports

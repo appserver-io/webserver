@@ -1,3 +1,13 @@
+# Version 0.3.6
+
+## Bugfixes
+
+* Fixed exception handling in connection handler to map exception code 0 to response code 500 by default
+
+## Features
+
+* None
+
 # Version 0.3.5
 
 ## Bugfixes

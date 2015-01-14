@@ -28,13 +28,13 @@ Usage
 If you can satisfy the requirements it is very simple to use the webserver. Just do this:
 ```bash
 git clone https://github.com/appserver-io/webserver
-cd webserver/src
+cd webserver
 PHP_BIN=/path/to/your/threadsafe/php-binary bin/webserver
 ```
 
 If you're using [`appserver.io`](<http://www.appserver.io>) the start line will be:
 ```bash
-PHP_BIN=/opt/appserver/bin/php bin/webserver
+bin/webserver
 ```
 
 Goto http://127.0.0.1:9080 and if all went good, you will see the welcome page of the php webserver.

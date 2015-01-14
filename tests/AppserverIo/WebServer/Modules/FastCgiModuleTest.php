@@ -84,7 +84,11 @@ class FastCgiModuleTest extends \PHPUnit_Framework_TestCase
         $sockets = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);
 
         // create the mock connection, pass the client socket to the constructor
-        $mockFastCgiConnection = $this->getMock('Crunch\FastCGI\Connection', array('newRequest', 'request'), array(array_shift($sockets)));
+        $mockFastCgiConnection = $this->getMock(
+            'Crunch\FastCGI\Connection',
+            array('newRequest', 'request'),
+            array(array_shift($sockets), '127.0.0.1', '9000')
+        );
         $mockFastCgiConnection->expects($this->once())
             ->method('newRequest')
             ->will($this->returnValue($mockFastCgiRequest));
@@ -108,14 +112,14 @@ class FastCgiModuleTest extends \PHPUnit_Framework_TestCase
         $serverVars = array(
             array(ServerVars::SERVER_HANDLER,  FastCgiModule::MODULE_NAME),
             array(ServerVars::REQUEST_METHOD,  Protocol::METHOD_POST),
-            array(ServerVars::SCRIPT_FILENAME, '/opt/appserver-0.8.2-alpha.48/webapps/test.php'),
+            array(ServerVars::SCRIPT_FILENAME, '/opt/appserver/webapps/test.php'),
             array(ServerVars::QUERY_STRING,    'test=test'),
             array(ServerVars::SCRIPT_NAME,     '/index.php'),
             array(ServerVars::REQUEST_URI,     '/test.php/test?test=test'),
-            array(ServerVars::DOCUMENT_ROOT,   '/opt/appserver-0.8.2-alpha.48/webapps'),
+            array(ServerVars::DOCUMENT_ROOT,   '/opt/appserver/webapps'),
             array(ServerVars::SERVER_PROTOCOL, 'HTTP/1.1'),
             array(ServerVars::HTTPS,           'off'),
-            array(ServerVars::SERVER_SOFTWARE, 'appserver/0.8.2 (mac) (PHP 5.5.10)'),
+            array(ServerVars::SERVER_SOFTWARE, 'appserver'),
             array(ServerVars::REMOTE_ADDR,     '127.0.0.1'),
             array(ServerVars::REMOTE_PORT,      63752),
             array(ServerVars::SERVER_ADDR,     '127.0.0.1'),

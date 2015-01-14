@@ -57,8 +57,6 @@ interface AuthenticationInterface
     /**
      * Try to authenticate
      *
-     * @param array $credentialData The credential data the auth implementation expects
-     *
      * @return bool If auth was successful return true if no false will be returned
      */
     public function auth();

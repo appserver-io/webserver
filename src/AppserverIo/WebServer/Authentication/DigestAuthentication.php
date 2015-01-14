@@ -126,8 +126,6 @@ class DigestAuthentication extends AbstractAuthentication implements Authenticat
     /**
      * Try to authenticate
      *
-     * @param array $credentialData The credential data to auth against
-     *
      * @return bool If auth was successful return true if no false will be returned
      */
     public function auth()
@@ -154,5 +152,4 @@ class DigestAuthentication extends AbstractAuthentication implements Authenticat
         // compare response with valid response
         return $authData['response'] === $validResponse;
     }
-
 }

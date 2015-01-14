@@ -92,10 +92,7 @@ class BasicAuthentication extends AbstractAuthentication implements Authenticati
     /**
      * Try to authenticate
      *
-     * @param array $credentialData The credential data to auth against
-     *
      * @return bool If auth was successful return true if no false will be returned
-     * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
     public function auth()
     {

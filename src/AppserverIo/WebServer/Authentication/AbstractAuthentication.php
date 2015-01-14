@@ -101,9 +101,10 @@ class AbstractAuthentication
     }
 
     /**
-     * Initialise by the authentication data given by client
+     * Initialise by the auth content got from client
      *
-     * @param string $authData The content of authentication header sent by client
+     * @param string $authData  The content of authentication data sent by client
+     * @param string $reqMethod The https request method as string
      *
      * @return void
      */

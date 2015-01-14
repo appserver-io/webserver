@@ -22,6 +22,7 @@
 
 namespace AppserverIo\WebServer\Authentication;
 
+use AppserverIo\Server\Exceptions\ModuleException;
 use AppserverIo\WebServer\Interfaces\AuthenticationInterface;
 
 /**
@@ -35,7 +36,7 @@ use AppserverIo\WebServer\Interfaces\AuthenticationInterface;
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/appserver-io/webserver
  */
-class BasicAuthentication implements AuthenticationInterface
+class BasicAuthentication extends AbstractAuthentication implements AuthenticationInterface
 {
     /**
      * Defines the auth type which should match the client request type definition
@@ -43,34 +44,6 @@ class BasicAuthentication implements AuthenticationInterface
      * @var string
      */
     const AUTH_TYPE = 'Basic';
-
-    /**
-     * The parsed username given by header content payload
-     *
-     * @var string
-     */
-    protected $username;
-
-    /**
-     * The password given by header content payload
-     *
-     * @var string
-     */
-    protected $password;
-
-    /**
-     * Hold's the auth data got from http authentication header
-     *
-     * @var string
-     */
-    protected $authData;
-
-    /**
-     * Hold's the auth hash to compare with auth information given by system
-     *
-     * @var string
-     */
-    protected $authHash;
 
     /**
      * Parses the header content set in init before
@@ -91,72 +64,46 @@ class BasicAuthentication implements AuthenticationInterface
     }
 
     /**
-     * Initialise by the authentication data given by client
-     *
-     * @param string $authData The content of authentication header sent by client
-     *
-     * @return void
-     */
-    public function init($authData)
-    {
-        $this->authData = $authData;
-        $this->parse();
-    }
-
-    /**
-     * Return's the authentication data content
-     *
-     * @return string The authentication data content
-     */
-    public function getAuthData()
-    {
-        return $this->authData;
-    }
-
-    /**
-     * Return's the auth hash got from request parsing
+     * Returns the authentication header for response to set
      *
      * @return string
      */
-    public function getAuthHash()
+    public function getAuthenticateHeader()
     {
-        return $this->authHash;
+        return $this->getType() . ' realm="' . $this->configData["realm"] . "'";
+    }
+
+    /**
+     * Inits the credentials by given file in config
+     *
+     * @return void
+     */
+    public function initCredentials()
+    {
+        // get file content
+        $fileLines = file($this->configData['file']);
+        // iterate all lines and set credentials
+        foreach ($fileLines as $fileLine) {
+            list($user, $pass) = explode(':', $fileLine);
+            $this->credentials[trim($user)] = trim($pass);
+        }
     }
 
     /**
      * Try to authenticate
      *
-     * @param array $credentialData The credential data to auth against
-     *
      * @return bool If auth was successful return true if no false will be returned
      */
-    public function auth(array $credentialData)
+    public function auth()
     {
-        if ($this->getAuthHash() === $credentialData["hash"]) {
-            return true;
+        // set internal var refs
+        $credentials = $this->getCredentials();
+
+        // check request header data does not contains exact username requested
+        if (!isset($credentials[$this->getUsername()])) {
+            return false;
         }
-        // todo: check if hashFile is given and try to auth against
-        // todo: check if username password combination is given and try to auth against
-        return false;
-    }
 
-    /**
-     * Return's the authentication type token
-     *
-     * @return string
-     */
-    public function getType()
-    {
-        return self::AUTH_TYPE;
-    }
-
-    /**
-     * Return's the parsed username
-     *
-     * @return string
-     */
-    public function getUsername()
-    {
-        return $this->username;
+        return (password_verify($this->getPassword(), $credentials[$this->getUsername()]));
     }
 }

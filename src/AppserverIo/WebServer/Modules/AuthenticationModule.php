@@ -143,18 +143,18 @@ class AuthenticationModule implements HttpModuleInterface
      * @param string $type The authentication type
      * @param string $data The data got from client for authentication process
      *
-     * @return \AppserverIo\Server\Interfaces\AuthenticationInterface
+     * @return \AppserverIo\WebServer\Interfaces\AuthenticationInterface
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
     public function getAuthenticationTypeInstance($type, array $data = array())
     {
-        if (!is_object($this->typeInstances[$type])) {
+        if (!isset($this->typeInstances[$type])) {
             // check if type class does not exist
             if (!class_exists($type)) {
                 throw new ModuleException("No auth type found for '$type'", 500);
             }
             // init type by given class definition and data
-            $this->typeInstances[$type] = new $type();
+            $this->typeInstances[$type] = new $type($data);
         }
         return $this->typeInstances[$type];
     }
@@ -209,31 +209,38 @@ class AuthenticationModule implements HttpModuleInterface
             if (preg_match(
                 '/' . $uriPattern . '/',
                 $requestContext->getServerVar(ServerVars::X_REQUEST_URI)
-            )
-            ) {
+            )) {
+
                 // set type Instance to local ref
                 $typeInstance = $this->getAuthenticationTypeInstance($data["type"]);
-                // check if client sends an authentication header
-                if ($authHeader = $request->getHeader(Protocol::HEADER_AUTHORIZATION)) {
-                    // init type instance by auth header
-                    $typeInstance->init($authHeader);
-                    // check if auth works
-                    if ($typeInstance->auth($data)) {
-                        // set server vars
-                        $requestContext->setServerVar(ServerVars::REMOTE_USER, $typeInstance->getUsername());
-                        // break out because everything is fine at this point
-                        return true;
-                    }
+
+                // check if auth header is not set in comming request headers
+                if (!$request->hasHeader(Protocol::HEADER_AUTHORIZATION)) {
+                    // send header for challenge authentication against client
+                    $response->addHeader(Protocol::HEADER_WWW_AUTHENTICATE, $typeInstance->getAuthenticateHeader());
+                    // throw exception for auth required
+                    throw new ModuleException(null, 401);
                 }
-                // send header for challenge authentication against client
-                $response->addHeader(
-                    Protocol::HEADER_WWW_AUTHENTICATE,
-                    $typeInstance->getType() . ' realm="' . $data["realm"] . "'"
-                );
-                // throw exception for auth required
-                throw new ModuleException(null, 401);
+
+                // init type instance by request
+                $typeInstance->init($request->getHeader(Protocol::HEADER_AUTHORIZATION), $request->getMethod());
+
+                // check if auth works
+                if ($typeInstance->auth()) {
+                    // set server vars
+                    $requestContext->setServerVar(ServerVars::REMOTE_USER, $typeInstance->getUsername());
+                    // break out because everything is fine at this point
+                    break;
+
+                } else {
+                    // send header for challenge authentication against client
+                    $response->addHeader(Protocol::HEADER_WWW_AUTHENTICATE, $typeInstance->getAuthenticateHeader());
+                    // throw exception for auth required
+                    throw new ModuleException(null, 401);
+                }
             }
         }
+
     }
 
     /**

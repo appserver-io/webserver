@@ -90,24 +90,18 @@
             </params>
 
             <authentications>
-                <authentication uri="^\/auth\/basic\/phpwebserver.*">
+                <authentication uri="^\/auth\/basic\/.*">
                     <params>
                         <param name="type" type="string">\AppserverIo\WebServer\Authentication\BasicAuthentication</param>
                         <param name="realm" type="string">PhpWebServer Basic Authentication System</param>
-                        <param name="hash" type="string">cGhwd2Vic2VydmVyOnBocHdlYnNlcnZlci5pMA==</param>
-                        <!-- <param name="file" type="string">var/www/auth/basic/phpwebserver</param> -->
-                        <!-- <param name="username" type="string">phpwebserver</param> -->
-                        <!-- <param name="password" type="string">wURpZpgIT.w1I</param> -->
+                        <param name="file" type="string">var/www/auth/basic/.htpasswd</param>
                     </params>
                 </authentication>
-                <authentication uri="^\/auth\/basic\/appserver.*">
+                <authentication uri="^\/auth\/digest\/.*">
                     <params>
-                        <param name="type" type="string">\AppserverIo\WebServer\Authentication\BasicAuthentication</param>
-                        <param name="realm" type="string">appserver.io Basic Authentication System</param>
-                        <param name="hash" type="string">YXBwc2VydmVyOmFwcHNlcnZlci5pMA==</param>
-                        <!-- <param name="file" type="string">var/www/auth/basic/appserver</param> -->
-                        <!-- <param name="username" type="string">appserver</param> -->
-                        <!-- <param name="password" type="string">wURpZpgIT.w1I</param> -->
+                        <param name="type" type="string">\AppserverIo\WebServer\Authentication\DigestAuthentication</param>
+                        <param name="realm" type="string">appserver.io Digest Authentication System</param>
+                        <param name="file" type="string">var/www/auth/digest/.htpasswd</param>
                     </params>
                 </authentication>
             </authentications>
@@ -397,24 +391,18 @@
             </rewrites>
 
             <authentications>
-                <authentication uri="^\/auth\/basic\/phpwebserver.*">
+                <authentication uri="^\/auth\/basic\/.*">
                     <params>
                         <param name="type" type="string">\AppserverIo\WebServer\Authentication\BasicAuthentication</param>
                         <param name="realm" type="string">PhpWebServer Basic Authentication System</param>
-                        <param name="hash" type="string">cGhwd2Vic2VydmVyOnBocHdlYnNlcnZlci5pMA==</param>
-                        <!-- <param name="file" type="string">var/www/auth/basic/phpwebserver</param> -->
-                        <!-- <param name="username" type="string">phpwebserver</param> -->
-                        <!-- <param name="password" type="string">wURpZpgIT.w1I</param> -->
+                        <param name="file" type="string">var/www/auth/basic/.htpasswd</param>
                     </params>
                 </authentication>
-                <authentication uri="^\/auth\/basic\/appserver.*">
+                <authentication uri="^\/auth\/digest\/.*">
                     <params>
-                        <param name="type" type="string">\AppserverIo\WebServer\Authentication\BasicAuthentication</param>
-                        <param name="realm" type="string">appserver.io Basic Authentication System</param>
-                        <param name="hash" type="string">YXBwc2VydmVyOmFwcHNlcnZlci5pMA==</param>
-                        <!-- <param name="file" type="string">var/www/auth/basic/appserver</param> -->
-                        <!-- <param name="username" type="string">appserver</param> -->
-                        <!-- <param name="password" type="string">wURpZpgIT.w1I</param> -->
+                        <param name="type" type="string">\AppserverIo\WebServer\Authentication\DigestAuthentication</param>
+                        <param name="realm" type="string">appserver.io Digest Authentication System</param>
+                        <param name="file" type="string">var/www/auth/digest/.htpasswd</param>
                     </params>
                 </authentication>
             </authentications>

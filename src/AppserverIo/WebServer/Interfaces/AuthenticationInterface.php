@@ -37,15 +37,22 @@ use AppserverIo\Server\Exceptions\ModuleException;
  */
 interface AuthenticationInterface
 {
+    /**
+     * Constructs the authentication type
+     *
+     * @param array $configData The configuration data for auth type instance
+     */
+    public function __construct(array $configData = array());
 
     /**
      * Initialise by the auth content got from client
      *
-     * @param string $authData The content of authentication data sent by client
+     * @param string $authData  The content of authentication data sent by client
+     * @param string $reqMethod The https request method as string
      *
      * @return void
      */
-    public function init($authData);
+    public function init($authData, $reqMethod);
 
     /**
      * Try to authenticate
@@ -54,7 +61,7 @@ interface AuthenticationInterface
      *
      * @return bool If auth was successful return true if no false will be returned
      */
-    public function auth(array $credentialData);
+    public function auth();
 
     /**
      * Return's the authentication type token to compare with request header
@@ -69,4 +76,11 @@ interface AuthenticationInterface
      * @return string
      */
     public function getUsername();
+
+    /**
+     * Returns the authentication header for response to set
+     *
+     * @return string
+     */
+    public function getAuthenticateHeader();
 }

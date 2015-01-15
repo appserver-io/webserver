@@ -93,17 +93,17 @@ class BasicAuthentication extends AbstractAuthentication implements Authenticati
      * Try to authenticate
      *
      * @return bool If auth was successful return true if no false will be returned
+     * @throws AuthenticationException
      */
     public function auth()
     {
         // set internal var refs
         $credentials = $this->getCredentials();
-
-        // check request header data does not contains exact username requested
-        if (!isset($credentials[$this->getUsername()])) {
+        // verify everything to be ready for auth if not return false
+        if (!$this->verify()) {
             return false;
-        }
-
+        };
+        // do auth check
         return (password_verify($this->getPassword(), $credentials[$this->getUsername()]));
     }
 }

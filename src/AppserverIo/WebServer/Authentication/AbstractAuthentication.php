@@ -96,8 +96,24 @@ class AbstractAuthentication
     {
         // set vars internally
         $this->configData = $configData;
-        // init credentials
-        $this->initCredentials();
+    }
+
+    /**
+     * Verifies configuration setting and throws exception
+     *
+     * @return void
+     * @throws AuthenticationException
+     */
+    public function verifyConfig()
+    {
+        // get config data to local var
+        $configData = $this->configData;
+        // check auth config entry and file existence
+        if (empty($configData) || !isset($configData['file']) || !is_file($configData['file'])) {
+            throw new AuthenticationException(
+                sprintf(AuthenticationException::MESSAGE_AUTHFILE_INVALID, $configData['file'])
+            );
+        }
     }
 
     /**
@@ -116,6 +132,32 @@ class AbstractAuthentication
 
         // parse auth data
         $this->parse();
+    }
+
+    /**
+     * Verifies everything to be ready for authenticate for specific type
+     *
+     * @return bool
+     * @throws \AppserverIo\WebServer\Authentication\AuthenticationException
+     */
+    public function verify()
+    {
+        // set internal var refs
+        $credentials = $this->getCredentials();
+
+        // check if credentials are empty
+        if (empty($credentials)) {
+            throw new AuthenticationException(
+                sprintf(AuthenticationException::MESSAGE_AUTHFILE_INVALID, $this->configData['file'])
+            );
+        }
+
+        // check request header data does not contains exact username requested
+        if (!isset($credentials[$this->getUsername()])) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

@@ -35,7 +35,8 @@
         "psr/log": "*",
         "appserver-io/server": "0.2.*",
         "appserver-io/http": "0.2.*",
-        "appserver-io/fastcgi": "0.1.*"
+        "appserver-io/fastcgi": "0.1.*",
+        "appserver-io/logger": "0.1.*"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*",

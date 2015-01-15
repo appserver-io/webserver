@@ -22,6 +22,7 @@
 
 namespace AppserverIo\WebServer\Modules;
 
+use AppserverIo\Logger\LoggerUtils;
 use AppserverIo\Psr\HttpMessage\Protocol;
 use AppserverIo\Psr\HttpMessage\RequestInterface;
 use AppserverIo\Psr\HttpMessage\ResponseInterface;
@@ -115,14 +116,21 @@ class AuthenticationModule implements HttpModuleInterface
     {
         $this->serverContext = $serverContext;
         $this->authentications = $serverContext->getServerConfig()->getAuthentications();
+        $systemLogger = $serverContext->getLogger(LoggerUtils::SYSTEM);
 
         // check if authentication are given
         if (is_array($this->authentications)) {
             // init all uri patterns
             foreach ($this->authentications as $uri => $params) {
                 $this->uriPatterns[$uri] = $params;
-                // pre init types by calling getter in init
-                $this->getAuthenticationTypeInstance($params["type"], $params);
+                // try ti get authentication type instance
+                try {
+                    // pre init types by calling getter in init
+                    $this->getAuthenticationTypeInstance($params["type"], $params);
+                } catch (\Exception $e) {
+                    // log exception as warning to not end up with a server break
+                    $systemLogger->warning($e->getMessage());
+                }
             }
         }
     }
@@ -153,8 +161,12 @@ class AuthenticationModule implements HttpModuleInterface
             if (!class_exists($type)) {
                 throw new ModuleException("No auth type found for '$type'", 500);
             }
-            // init type by given class definition and data
-            $this->typeInstances[$type] = new $type($data);
+            // construct type by given class definition and data
+            $this->typeInstances[$type] = $typeInstance = new $type($data);
+            // verify configuration
+            $typeInstance->verifyConfig();
+            // init credentials
+            $typeInstance->initCredentials();
         }
         return $this->typeInstances[$type];
     }
@@ -190,8 +202,14 @@ class AuthenticationModule implements HttpModuleInterface
         $this->request = $request;
         $this->response = $response;
 
-        // Get teh authentications locally so we do not mess with inter-request configuration
+        // get server context to local var
+        $serverContext = $this->getServerContext();
+
+        // Get the authentications locally so we do not mess with inter-request configuration
         $authentications = $this->authentications;
+
+        // get system logger
+        $systemLogger = $serverContext->getLogger(LoggerUtils::SYSTEM);
 
         // check if there are some volatile rewrite map definitions so add them
         if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_AUTHENTICATIONS)) {
@@ -225,19 +243,24 @@ class AuthenticationModule implements HttpModuleInterface
                 // init type instance by request
                 $typeInstance->init($request->getHeader(Protocol::HEADER_AUTHORIZATION), $request->getMethod());
 
-                // check if auth works
-                if ($typeInstance->auth()) {
-                    // set server vars
-                    $requestContext->setServerVar(ServerVars::REMOTE_USER, $typeInstance->getUsername());
-                    // break out because everything is fine at this point
-                    break;
+                try {
+                    // check if auth works
+                    if ($typeInstance->auth()) {
+                        // set server vars
+                        $requestContext->setServerVar(ServerVars::REMOTE_USER, $typeInstance->getUsername());
+                        // break out because everything is fine at this point
+                        break;
 
-                } else {
-                    // send header for challenge authentication against client
-                    $response->addHeader(Protocol::HEADER_WWW_AUTHENTICATE, $typeInstance->getAuthenticateHeader());
-                    // throw exception for auth required
-                    throw new ModuleException(null, 401);
+                    }
+                } catch (\Exception $e) {
+                    // log exception as warning to not end up with a 500 response which is not wanted here
+                    $systemLogger->warning($e->getMessage());
                 }
+
+                // send header for challenge authentication against client
+                $response->addHeader(Protocol::HEADER_WWW_AUTHENTICATE, $typeInstance->getAuthenticateHeader());
+                // throw exception for auth required
+                throw new ModuleException(null, 401);
             }
         }
 

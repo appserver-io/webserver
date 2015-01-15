@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * \AppserverIo\WebServer\Authentication\AuthenticationException
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * PHP version 5
+ *
+ * @category   Server
+ * @package    WebServer
+ * @subpackage Authentication
+ * @author     Johann Zelger <jz@appserver.io>
+ * @copyright  2015 TechDivision GmbH <info@appserver.io>
+ * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link       https://github.com/appserver-io/webserver
+ */
+
+namespace AppserverIo\WebServer\Authentication;
+
+/**
+ * Class AuthenticationException
+ *
+ * @category   Server
+ * @package    WebServer
+ * @subpackage Authentication
+ * @author     Johann Zelger <jz@appserver.io>
+ * @copyright  2015 TechDivision GmbH <info@appserver.io>
+ * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link       https://github.com/appserver-io/webserver
+ */
+class AuthenticationException extends \Exception
+{
+    /**
+     * Defines message for invalid or missing auth file
+     *
+     * @var string
+     */
+    const MESSAGE_AUTHFILE_INVALID = "Invalid or missing auth file given in configuration '%s'";
+
+    /**
+     * Default response code of authentication exceptions
+     *
+     * @var int
+     */
+    protected $code = 401;
+}

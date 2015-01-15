@@ -134,11 +134,10 @@ class DigestAuthentication extends AbstractAuthentication implements Authenticat
         $credentials = $this->getCredentials();
         $authData = $this->getAuthData();
 
-        // check request header data does not contains exact username requested
-        if (!$this->getAuthData() || !isset($credentials[$authData['username']])) {
+        // verify everything to be ready for auth if not return false
+        if (!$this->verify()) {
             return false;
-        }
-
+        };
         // create valid response data
         $ha1 = $credentials[$this->getUsername()];
         $ha2 = md5(

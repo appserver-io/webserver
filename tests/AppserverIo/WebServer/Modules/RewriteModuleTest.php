@@ -94,8 +94,6 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
      * Tests the getRequestContext() method
      *
      * @return void
-     *
-     * @depends testProcess
      */
     public function testGetRequestContext()
     {
@@ -183,9 +181,6 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
      * Tests the fillHeaderBackreferences() method
      *
      * @return void
-     *
-     * @depends testProcessWithException
-     * @depends testProcessWithWrongHook
      */
     public function testFillHeaderBackreferences()
     {

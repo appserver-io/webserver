@@ -113,8 +113,6 @@ class RuleTest extends \PHPUnit_Framework_TestCase
      * Test for a path through the apply() method
      *
      * @return void
-     *
-     * @depends testSortFlags
      */
     public function testApplyWithMismatchedMap()
     {
@@ -133,8 +131,6 @@ class RuleTest extends \PHPUnit_Framework_TestCase
      * Test for a path through the apply() method
      *
      * @return void
-     *
-     * @depends testSortFlags
      */
     public function testApplyWithMatchingMap()
     {
@@ -152,8 +148,6 @@ class RuleTest extends \PHPUnit_Framework_TestCase
      * Test for a path through the apply() method
      *
      * @return void
-     *
-     * @depends testSortFlags
      */
     public function testApplyWithBackrefMap()
     {

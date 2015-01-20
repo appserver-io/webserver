@@ -45,9 +45,6 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
      * Tests the constructor
      *
      * @return void
-     *
-     * @depends testGetOperand
-     * @depends testGetType
      */
     public function testConstruct()
     {
@@ -125,8 +122,6 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
      * Tests the resolve() method
      *
      * @return void
-     *
-     * @depends testGetOperand
      */
     public function testResolve()
     {

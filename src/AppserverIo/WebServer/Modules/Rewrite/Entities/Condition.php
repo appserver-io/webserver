@@ -144,14 +144,28 @@ class Condition
         $this->additionalOperand = '';
 
         // Check if we have a negation
-        if (strpos($this->action, '!') === 0) {
-            // Tell them we have to negate the check
-            $this->isNegated = true;
-            // Remove the "!" as it might kill the regex otherwise
-            $this->action = ltrim($this->action, '!');
-        }
+        $this->preparePossibleNegation();
 
-        // Are we able to find any of the additions htaccess syntax offers? Per default it's regex
+        // check what type we have. Per default it's regex
+        $this->prepareOperandAdditions();
+
+        // If we got a regex we have to re-organize a few things
+        if ($this->type !== 'check') {
+            // we have to set the type correctly, collect the regex as additional operand and set the regex flag as
+            // action to allow proper switching of functions later
+            $this->type = 'regex';
+            $this->additionalOperand = $this->action;
+            $this->action = ConditionActions::REGEX;
+        }
+    }
+
+    /**
+     * Checks if we are we able to find any of the additions htaccess syntax offers.
+     *
+     * @return null
+     */
+    protected function prepareOperandAdditions()
+    {
         foreach ($this->htaccessAdditions as $addition) {
             // The string has to start with an addition (any negating ! was cut of before)
             if (strpos($this->action, $addition) === 0) {
@@ -163,11 +177,6 @@ class Condition
                     // our additional operand string
                     $this->additionalOperand = substr($this->action, 1);
                     $this->action = substr($this->action, 0, 1);
-
-                } elseif (!is_readable(strstr($this->operand, '?', true))) {
-                    // Set the placeholder for the document root, it will be resolved anyway
-                    // If we got ourselves a complete path, we do not need the document root
-                    $this->additionalOperand = '$' . ServerVars::DOCUMENT_ROOT . DIRECTORY_SEPARATOR;
                 }
 
                 // If we reach this point we are of the check type
@@ -175,18 +184,21 @@ class Condition
                 break;
             }
         }
+    }
 
-        // If we got a regex we have to re-organize a few things
-        if ($this->type !== 'check') {
-            // we have to set the type correctly, collect the regex as additional operand and set the regex flag as
-            // action to allow proper switching of functions later
-            $this->type = 'regex';
-            $this->additionalOperand = $this->action;
-            $this->action = ConditionActions::REGEX;
-
-        } else {
-            // prepare our operand to be usable for filesystem checks
-            $this->prepareFilesystemOperand();
+    /**
+     * Will check if we have a possible negation and act accordingly
+     *
+     * @return null
+     */
+    protected function preparePossibleNegation()
+    {
+        // Check if we have a negation
+        if (strpos($this->action, '!') === 0) {
+            // Tell them we have to negate the check
+            $this->isNegated = true;
+            // Remove the "!" as it might kill the regex otherwise
+            $this->action = ltrim($this->action, '!');
         }
     }
 
@@ -235,6 +247,9 @@ class Condition
 
         // Substitute the backreferences in our operand and additionalOperand
         $this->operand = str_replace($backreferenceHolders, $backreferenceValues, $this->operand);
+
+        // prepare our operand to be usable for filesystem checks
+        $this->prepareFilesystemOperand();
         $this->additionalOperand = str_replace($backreferenceHolders, $backreferenceValues, $this->additionalOperand);
     }
 
@@ -277,8 +292,8 @@ class Condition
         } elseif ($this->action === ConditionActions::IS_USED_FILE) {
             // Is it a real file which has a size greater 0?
 
-            $result = is_file($this->additionalOperand . $this->operand) &&
-                filesize($this->additionalOperand . $this->operand) > 0;
+            $result = (is_file($this->additionalOperand . $this->operand) &&
+                (int) filesize($this->additionalOperand . $this->operand) > 0);
 
         } elseif ($this->action === ConditionActions::STR_EQUAL) {
             // Or the compared strings equal
@@ -318,7 +333,16 @@ class Condition
             $this->action === ConditionActions::IS_LINK ||
             $this->action === ConditionActions::IS_USED_FILE
         ) {
-            $this->operand = strstr($this->operand, '?', true);
+
+            if (strpos($this->operand, '?') !== false) {
+                $this->operand = strstr($this->operand, '?', true);
+            }
+
+            if (!is_readable($this->additionalOperand . $this->operand)) {
+                // Set the placeholder for the document root, it will be resolved anyway
+                // If we got ourselves a complete path, we do not need the document root
+                $this->additionalOperand = '$' . ServerVars::DOCUMENT_ROOT;
+            }
         }
     }
 

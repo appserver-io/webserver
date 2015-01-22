@@ -58,8 +58,11 @@ $ruleSets = array(
         'map' => array(
             '/html/index.html' => '/html/index.html',
             '/html/test.gif' => '/html/test.gif',
+            '/html/test.gif?123345' => '/html/test.gif?123345',
+            '/html/test.gif?q=testset' => '/html/test.gif?q=testset',
             '/html/symlink.html' => '/html/symlink.html',
-            '/html/failing_test.gif' => '/ERROR'
+            '/html/failing_test.gif' => '/ERROR',
+            '/html/failing_test.gif?12234' => '/ERROR'
         )
     ),
     'realDir' => array(
@@ -77,6 +80,7 @@ $ruleSets = array(
         ),
         'map' => array(
             '/html' => '/html',
+            '/html?123456' => '/html?123456',
             '/html/test.gif' => '/ERROR',
             '/html/symlink.html' => '/ERROR',
             '/failing_dir' => '/ERROR'

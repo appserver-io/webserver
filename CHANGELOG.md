@@ -1,3 +1,33 @@
+# Version 0.3.9
+
+## Bugfixes
+
+* Fixed wrong checks against file system within rewrite conditions
+
+## Features
+
+* None
+
+# Version 0.3.8
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Added warning logging on invalid configuration for authentication feature
+
+# Version 0.3.7
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Added digest auth type, will fix #182 on appserver repo
+
 # Version 0.3.6
 
 ## Bugfixes

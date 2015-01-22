@@ -134,7 +134,6 @@ class Condition
 
         // Check if the passed modifier is valid (or empty)
         if (!isset(array_flip($this->allowedModifiers)[$modifier]) && !empty($modifier)) {
-
             throw new \InvalidArgumentException($modifier . ' is not an allowed condition modifier.');
         }
 
@@ -146,7 +145,6 @@ class Condition
 
         // Check if we have a negation
         if (strpos($this->action, '!') === 0) {
-
             // Tell them we have to negate the check
             $this->isNegated = true;
             // Remove the "!" as it might kill the regex otherwise
@@ -155,22 +153,18 @@ class Condition
 
         // Are we able to find any of the additions htaccess syntax offers? Per default it's regex
         foreach ($this->htaccessAdditions as $addition) {
-
             // The string has to start with an addition (any negating ! was cut of before)
             if (strpos($this->action, $addition) === 0) {
-
                 // If we have a string comparing action we have to cut it to know what to compare to, otherwise we
                 // need the document root as an additional operand
                 $tmp = substr($this->action, 0, 1);
                 if ($tmp === '<' || $tmp === '>' || $tmp === '=') {
-
                     // We have to extract the needed parts of our operation and refill it into
                     // our additional operand string
                     $this->additionalOperand = substr($this->action, 1);
                     $this->action = substr($this->action, 0, 1);
 
-                } elseif (!is_readable($this->operand)) {
-
+                } elseif (!is_readable(strstr($this->operand, '?', true))) {
                     // Set the placeholder for the document root, it will be resolved anyway
                     // If we got ourselves a complete path, we do not need the document root
                     $this->additionalOperand = '$' . ServerVars::DOCUMENT_ROOT . DIRECTORY_SEPARATOR;
@@ -184,12 +178,15 @@ class Condition
 
         // If we got a regex we have to re-organize a few things
         if ($this->type !== 'check') {
-
             // we have to set the type correctly, collect the regex as additional operand and set the regex flag as
             // action to allow proper switching of functions later
             $this->type = 'regex';
             $this->additionalOperand = $this->action;
             $this->action = ConditionActions::REGEX;
+
+        } else {
+            // prepare our operand to be usable for filesystem checks
+            $this->prepareFilesystemOperand();
         }
     }
 
@@ -297,7 +294,6 @@ class Condition
             // Is the operand smaller?
 
             $result = strcmp($this->operand, $this->additionalOperand) < 0;
-
         }
 
         // If the check got negated we will just negate what we got from our preceding checks
@@ -307,6 +303,23 @@ class Condition
         }
 
         return $result;
+    }
+
+    /**
+     * Will prepare a filesystem enabled operand by cutting of any traces of a query string
+     *
+     * @return null
+     */
+    protected function prepareFilesystemOperand()
+    {
+        if ($this->action === ConditionActions::IS_DIR ||
+            $this->action === ConditionActions::IS_EXECUTABLE ||
+            $this->action === ConditionActions::IS_FILE ||
+            $this->action === ConditionActions::IS_LINK ||
+            $this->action === ConditionActions::IS_USED_FILE
+        ) {
+            $this->operand = strstr($this->operand, '?', true);
+        }
     }
 
     /**

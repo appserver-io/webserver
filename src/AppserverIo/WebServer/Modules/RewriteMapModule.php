@@ -11,13 +11,11 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 
 namespace AppserverIo\WebServer\Modules;
@@ -37,16 +35,15 @@ use AppserverIo\Server\Dictionaries\ServerVars;
 /**
  * Class RewriteMapModule
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 class RewriteMapModule implements HttpModuleInterface
 {
+
     /**
      * Defines the module name
      *
@@ -84,14 +81,15 @@ class RewriteMapModule implements HttpModuleInterface
     /**
      * Initiates the module
      *
-     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext The server's context instance
-     *
+     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext
+     *            The server's context instance
+     *            
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
     public function init(ServerContextInterface $serverContext)
     {
-        $this->serverContext= $serverContext;
+        $this->serverContext = $serverContext;
         $this->rewriteMaps = $serverContext->getServerConfig()->getRewriteMaps();
     }
 
@@ -108,69 +106,70 @@ class RewriteMapModule implements HttpModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
-     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
-     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
-     * @param int                                                    $hook           The current hook to process logic for
-     *
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface $request
+     *            A request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface $response
+     *            A response object
+     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext
+     *            A requests context instance
+     * @param int $hook
+     *            The current hook to process logic for
+     *            
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
-    public function process(
-        RequestInterface $request,
-        ResponseInterface $response,
-        RequestContextInterface $requestContext,
-        $hook
-    ) {
+    public function process(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext, $hook)
+    {
         // In php an interface is, by definition, a fixed contract. It is immutable.
         // So we have to declair the right ones afterwards...
-        /** @var $request \AppserverIo\Psr\HttpMessage\RequestInterface */
-        /** @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface */
-
+        /**
+         * @var $request \AppserverIo\Psr\HttpMessage\RequestInterface
+         */
+        /**
+         * @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface
+         */
+        
         // if false hook is comming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
             return;
         }
-
+        
         // set req and res object internally
         $this->request = $request;
         $this->response = $response;
-
+        
         // get default rewrite maps definitions
         $rewriteMaps = $this->rewriteMaps;
-
+        
         // check if there are some volatile rewrite map definitions so add them
         if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_REWRITE_MAPS)) {
             $volatileRewriteMaps = $requestContext->getModuleVar(ModuleVars::VOLATILE_REWRITE_MAPS);
             // merge rewrite maps
-            $rewriteMaps = array_merge(
-                $volatileRewriteMaps,
-                $this->rewriteMaps
-            );
+            $rewriteMaps = array_merge($volatileRewriteMaps, $this->rewriteMaps);
         }
-
+        
         // check protocol to be either http or https when secure is going on
         $protocol = 'http://';
         if ($requestContext->getServerVar(ServerVars::HTTPS) === ServerVars::VALUE_HTTPS_ON) {
             $protocol = 'https://';
         }
-
+        
         // get clean request path without query string etc...
         $requestPath = parse_url($requestContext->getServerVar(ServerVars::X_REQUEST_URI), PHP_URL_PATH);
-
+        
         // init all rewrite mappers by types and do look up
         foreach ($rewriteMaps as $rewriteMapType => $rewriteMapParams) {
-
+            
             // Include the requested hostname as a param, some mappers might need it
             $rewriteMapParams['headerHost'] = $request->getHeader(Protocol::HEADER_HOST);
             // Same for the protocol
             $rewriteMapParams['protocol'] = $protocol;
-
+            
             // Get ourselves a rewriteMapper of the right type
             $rewriteMapper = new $rewriteMapType($rewriteMapParams);
             // lookup by request path
             if ($targetUrl = $rewriteMapper->lookup($requestPath)) {
-
+                
                 // set enhance uri to response
                 $response->addHeader(Protocol::HEADER_LOCATION, $targetUrl);
                 // send redirect status
@@ -179,7 +178,7 @@ class RewriteMapModule implements HttpModuleInterface
                 $response->addHeader('X-Rewritten-By', __CLASS__);
                 // set response state to be dispatched after this without calling other modules process
                 $response->setState(HttpResponseStates::DISPATCH);
-
+                
                 // We found something, stop the loop
                 break;
             }

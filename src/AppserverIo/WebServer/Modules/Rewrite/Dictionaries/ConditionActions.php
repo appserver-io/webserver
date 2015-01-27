@@ -11,13 +11,11 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Bernhard Wick <bw@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Bernhard Wick <bw@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 
 namespace AppserverIo\WebServer\Modules\Rewrite\Dictionaries;
@@ -28,22 +26,21 @@ namespace AppserverIo\WebServer\Modules\Rewrite\Dictionaries;
  * A dictionary for actions a condition might use for testing if it matches.
  * Basic stuff used parallel to htaccess features
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Bernhard Wick <bw@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Bernhard Wick <bw@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 class ConditionActions
 {
+
     /**
      * Lexical string comparison where $operand is less than the given second string
      *
      * @var string
      */
-    const STR_LESS= '<';
+    const STR_LESS = '<';
 
     /**
      * Lexical string comparison where $operand is greater than the given second string
@@ -64,7 +61,7 @@ class ConditionActions
      *
      * @var string
      */
-    const IS_DIR= '-d';
+    const IS_DIR = '-d';
 
     /**
      * Tests if $operand is a real file

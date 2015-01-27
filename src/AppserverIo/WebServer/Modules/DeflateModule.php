@@ -11,13 +11,11 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 
 namespace AppserverIo\WebServer\Modules;
@@ -34,16 +32,15 @@ use AppserverIo\Server\Interfaces\ServerContextInterface;
 /**
  * Class DeflateModule
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 class DeflateModule implements HttpModuleInterface
 {
+
     /**
      * Defines the module name
      *
@@ -71,8 +68,9 @@ class DeflateModule implements HttpModuleInterface
     /**
      * Check's if given mime type is relevant for compression
      *
-     * @param string $mimeType The mime type to check
-     *
+     * @param string $mimeType
+     *            The mime type to check
+     *            
      * @return boolean
      */
     protected function isRelevantMimeType($mimeType)
@@ -84,8 +82,9 @@ class DeflateModule implements HttpModuleInterface
     /**
      * Initiates the module
      *
-     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext The server's context instance
-     *
+     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext
+     *            The server's context instance
+     *            
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
@@ -97,31 +96,35 @@ class DeflateModule implements HttpModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
-     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
-     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
-     * @param int                                                    $hook           The current hook to process logic for
-     *
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface $request
+     *            A request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface $response
+     *            A response object
+     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext
+     *            A requests context instance
+     * @param int $hook
+     *            The current hook to process logic for
+     *            
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
-    public function process(
-        RequestInterface $request,
-        ResponseInterface $response,
-        RequestContextInterface $requestContext,
-        $hook
-    ) {
+    public function process(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext, $hook)
+    {
         // In php an interface is, by definition, a fixed contract. It is immutable.
         // So we have to declair the right ones afterwards...
-        /** @var $request \AppserverIo\Psr\HttpMessage\RequestInterface */
-        /** @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface */
-
+        /**
+         * @var $request \AppserverIo\Psr\HttpMessage\RequestInterface
+         */
+        /**
+         * @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface
+         */
+        
         // if false hook is comming do nothing
         if (ModuleHooks::RESPONSE_PRE !== $hook) {
             return;
         }
         // check if no accept encoding headers are sent
-        if (!$request->hasHeader(Protocol::HEADER_ACCEPT_ENCODING)) {
+        if (! $request->hasHeader(Protocol::HEADER_ACCEPT_ENCODING)) {
             return;
         }
         // check if response was encoded before and exit than
@@ -130,10 +133,10 @@ class DeflateModule implements HttpModuleInterface
         }
         // check if request accepts deflate
         if (strpos($request->getHeader(Protocol::HEADER_ACCEPT_ENCODING), 'deflate') !== false) {
-
+            
             // get stream meta data
             $streamMetaData = stream_get_meta_data($response->getBodyStream());
-
+            
             /**
              * Currently it's not possible to apply zlib.deflate filter on memory (php://memory) or
              * temp (php://temp) streams due to a bug in that zlib library.,
@@ -143,8 +146,7 @@ class DeflateModule implements HttpModuleInterface
              *
              * @link https://bugs.php.net/bug.php?id=48725
              */
-            if (($streamMetaData['stream_type'] !== 'MEMORY')
-                && ($this->isRelevantMimeType($response->getHeader(Protocol::HEADER_CONTENT_TYPE)))) {
+            if (($streamMetaData['stream_type'] !== 'MEMORY') && ($this->isRelevantMimeType($response->getHeader(Protocol::HEADER_CONTENT_TYPE)))) {
                 // apply encoding filter to response body stream
                 stream_filter_append($response->getBodyStream(), 'zlib.deflate', STREAM_FILTER_READ);
                 // rewind current body stream

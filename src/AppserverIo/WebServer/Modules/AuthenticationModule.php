@@ -11,13 +11,11 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 
 namespace AppserverIo\WebServer\Modules;
@@ -39,16 +37,15 @@ use AppserverIo\WebServer\Authentication\BasicAuthentication;
 /**
  * Class AuthenticationModule
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 class AuthenticationModule implements HttpModuleInterface
 {
+
     /**
      * Defines the module name
      *
@@ -107,8 +104,9 @@ class AuthenticationModule implements HttpModuleInterface
     /**
      * Initiates the module
      *
-     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext The server's context instance
-     *
+     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext
+     *            The server's context instance
+     *            
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
@@ -117,7 +115,7 @@ class AuthenticationModule implements HttpModuleInterface
         $this->serverContext = $serverContext;
         $this->authentications = $serverContext->getServerConfig()->getAuthentications();
         $systemLogger = $serverContext->getLogger(LoggerUtils::SYSTEM);
-
+        
         // check if authentication are given
         if (is_array($this->authentications)) {
             // init all uri patterns
@@ -148,17 +146,19 @@ class AuthenticationModule implements HttpModuleInterface
     /**
      * Return's pre initiated auth type instance by given type
      *
-     * @param string $type The authentication type
-     * @param string $data The data got from client for authentication process
-     *
+     * @param string $type
+     *            The authentication type
+     * @param string $data
+     *            The data got from client for authentication process
+     *            
      * @return \AppserverIo\WebServer\Interfaces\AuthenticationInterface
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
     public function getAuthenticationTypeInstance($type, array $data = array())
     {
-        if (!isset($this->typeInstances[$type])) {
+        if (! isset($this->typeInstances[$type])) {
             // check if type class does not exist
-            if (!class_exists($type)) {
+            if (! class_exists($type)) {
                 throw new ModuleException("No auth type found for '$type'", 500);
             }
             // construct type by given class definition and data
@@ -174,75 +174,73 @@ class AuthenticationModule implements HttpModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
-     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
-     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
-     * @param int                                                    $hook           The current hook to process logic for
-     *
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface $request
+     *            A request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface $response
+     *            A response object
+     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext
+     *            A requests context instance
+     * @param int $hook
+     *            The current hook to process logic for
+     *            
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
-    public function process(
-        RequestInterface $request,
-        ResponseInterface $response,
-        RequestContextInterface $requestContext,
-        $hook
-    ) {
+    public function process(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext, $hook)
+    {
         // In php an interface is, by definition, a fixed contract. It is immutable.
         // So we have to declair the right ones afterwards...
-        /** @var $request \AppserverIo\Psr\HttpMessage\RequestInterface */
-        /** @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface */
-
+        /**
+         * @var $request \AppserverIo\Psr\HttpMessage\RequestInterface
+         */
+        /**
+         * @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface
+         */
+        
         // if false hook is coming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
             return;
         }
-
+        
         // set req and res object internally
         $this->request = $request;
         $this->response = $response;
-
+        
         // get server context to local var
         $serverContext = $this->getServerContext();
-
+        
         // Get the authentications locally so we do not mess with inter-request configuration
         $authentications = $this->authentications;
-
+        
         // get system logger
         $systemLogger = $serverContext->getLogger(LoggerUtils::SYSTEM);
-
+        
         // check if there are some volatile rewrite map definitions so add them
         if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_AUTHENTICATIONS)) {
             $volatileAuthentications = $requestContext->getModuleVar(ModuleVars::VOLATILE_AUTHENTICATIONS);
             // merge rewrite maps
-            $authentications = array_merge(
-                $volatileAuthentications,
-                $authentications
-            );
+            $authentications = array_merge($volatileAuthentications, $authentications);
         }
-
+        
         // check authentication information if something matches
         foreach ($authentications as $uriPattern => $data) {
             // check if pattern matches uri
-            if (preg_match(
-                '/' . $uriPattern . '/',
-                $requestContext->getServerVar(ServerVars::X_REQUEST_URI)
-            )) {
-
+            if (preg_match('/' . $uriPattern . '/', $requestContext->getServerVar(ServerVars::X_REQUEST_URI))) {
+                
                 // set type Instance to local ref
                 $typeInstance = $this->getAuthenticationTypeInstance($data["type"]);
-
+                
                 // check if auth header is not set in comming request headers
-                if (!$request->hasHeader(Protocol::HEADER_AUTHORIZATION)) {
+                if (! $request->hasHeader(Protocol::HEADER_AUTHORIZATION)) {
                     // send header for challenge authentication against client
                     $response->addHeader(Protocol::HEADER_WWW_AUTHENTICATE, $typeInstance->getAuthenticateHeader());
                     // throw exception for auth required
                     throw new ModuleException(null, 401);
                 }
-
+                
                 // init type instance by request
                 $typeInstance->init($request->getHeader(Protocol::HEADER_AUTHORIZATION), $request->getMethod());
-
+                
                 try {
                     // check if auth works
                     if ($typeInstance->auth()) {
@@ -250,20 +248,18 @@ class AuthenticationModule implements HttpModuleInterface
                         $requestContext->setServerVar(ServerVars::REMOTE_USER, $typeInstance->getUsername());
                         // break out because everything is fine at this point
                         break;
-
                     }
                 } catch (\Exception $e) {
                     // log exception as warning to not end up with a 500 response which is not wanted here
                     $systemLogger->warning($e->getMessage());
                 }
-
+                
                 // send header for challenge authentication against client
                 $response->addHeader(Protocol::HEADER_WWW_AUTHENTICATE, $typeInstance->getAuthenticateHeader());
                 // throw exception for auth required
                 throw new ModuleException(null, 401);
             }
         }
-
     }
 
     /**

@@ -19,7 +19,6 @@
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link       https://github.com/appserver-io/webserver
  */
-
 namespace AppserverIo\WebServer\Modules;
 
 use AppserverIo\Psr\HttpMessage\Protocol;
@@ -40,16 +39,17 @@ use AppserverIo\Server\Dictionaries\ModuleVars;
  * This class implements a module which is able to control server environment variables.
  * These can be conditionally set, unset and copied in form an OS context.
  *
- * @category   Server
- * @package    WebServer
+ * @category Server
+ * @package WebServer
  * @subpackage Modules
- * @author     Bernhard Wick <bw@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author Bernhard Wick <bw@appserver.io>
+ * @copyright 2014 TechDivision GmbH <info@appserver.io>
+ * @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link https://github.com/appserver-io/webserver
  */
 class EnvironmentVariableModule implements HttpModuleInterface
 {
+
     /**
      * Server variables we support and need
      *
@@ -103,6 +103,7 @@ class EnvironmentVariableModule implements HttpModuleInterface
     protected $serverBackreferences = array();
 
     /**
+     *
      * @var array $dependencies The modules we depend on
      */
     protected $dependencies = array();
@@ -124,8 +125,9 @@ class EnvironmentVariableModule implements HttpModuleInterface
     /**
      * Initiates the module
      *
-     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext The server's context instance
-     *
+     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext
+     *            The server's context instance
+     *            
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
@@ -133,15 +135,15 @@ class EnvironmentVariableModule implements HttpModuleInterface
     {
         // We have to throw a ModuleException on failure, so surround the body with a try...catch block
         try {
-
+            
             // Save the server context for later re-use
             $this->serverContext = $serverContext;
-
+            
             // Register our dependencies
             $this->dependencies = array(
                 'virtualHost'
             );
-
+            
             $this->supportedServerVars = array(
                 'headers' => array(
                     Protocol::HEADER_STATUS,
@@ -181,7 +183,7 @@ class EnvironmentVariableModule implements HttpModuleInterface
                     Protocol::STATUS_REASONPHRASE_UNASSIGNED
                 )
             );
-
+            
             $this->supportedSslEnvironmentVars = array(
                 EnvVars::HTTPS,
                 EnvVars::SSL_PROTOCOL,
@@ -220,13 +222,12 @@ class EnvironmentVariableModule implements HttpModuleInterface
                 EnvVars::SSL_SERVER_CERT,
                 EnvVars::SSL_TLS_SNI
             );
-
+            
             // Get the variables which came from our configuration. There might be more coming from preceding modules
             // which we will load within the process() method.
             $this->configuredVariables = $this->serverContext->getServerConfig()->getEnvironmentVariables();
-
         } catch (\Exception $e) {
-
+            
             // Re-throw as a ModuleException
             throw new ModuleException($e);
         }
@@ -245,39 +246,43 @@ class EnvironmentVariableModule implements HttpModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
-     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
-     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
-     * @param int                                                    $hook           The current hook to process logic for
-     *
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface $request
+     *            A request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface $response
+     *            A response object
+     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext
+     *            A requests context instance
+     * @param int $hook
+     *            The current hook to process logic for
+     *            
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
-    public function process(
-        RequestInterface $request,
-        ResponseInterface $response,
-        RequestContextInterface $requestContext,
-        $hook
-    ) {
+    public function process(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext, $hook)
+    {
         // In php an interface is, by definition, a fixed contract. It is immutable.
         // So we have to declair the right ones afterwards...
-        /** @var $request \AppserverIo\Psr\HttpMessage\RequestInterface */
-        /** @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface */
-
+        /**
+         * @var $request \AppserverIo\Psr\HttpMessage\RequestInterface
+         */
+        /**
+         * @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface
+         */
+        
         // if false hook is comming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
             return;
         }
-
+        
         // We have to throw a ModuleException on failure, so surround the body with a try...catch block
         try {
-
+            
             // set request context as member property for further usage
             $this->requestContext = $requestContext;
-
+            
             // Reset the $serverBackreferences array to avoid mixups of different requests
             $this->serverBackreferences = array();
-
+            
             // Resolve all used backreferences which are NOT linked to the query string.
             // We will resolve query string related backreferences separately as we are not able to cache them
             // as easily as, say, the URI
@@ -287,118 +292,101 @@ class EnvironmentVariableModule implements HttpModuleInterface
             $this->fillContextBackreferences();
             $this->fillHeaderBackreferences($request);
             $this->fillSslEnvironmentBackreferences();
-
+            
             // Get the environment variables as the array they are within the config.
             // We have to also collect any volative rules which might be set on request base.
             // We might not even get anything, so prepare our rules accordingly
             $volatileEnvironmentVariables = array();
             if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_ENVIRONMENT_VARIABLES)) {
-
-                $volatileEnvironmentVariables = $requestContext->getModuleVar(
-                    ModuleVars::VOLATILE_ENVIRONMENT_VARIABLES
-                );
+                
+                $volatileEnvironmentVariables = $requestContext->getModuleVar(ModuleVars::VOLATILE_ENVIRONMENT_VARIABLES);
             }
-
+            
             // Build up the complete ruleset, volatile rules up front
-            $variables = array_merge(
-                $volatileEnvironmentVariables,
-                $this->configuredVariables
-            );
-
+            $variables = array_merge($volatileEnvironmentVariables, $this->configuredVariables);
+            
             // Only act if we got something
             if (is_array($variables)) {
-
+                
                 // Convert the rules to our internally used objects
                 foreach ($variables as $variable) {
-
+                    
                     // Make that condition handling only if there even are conditions
-                    if (!empty($variable['condition'])) {
-
+                    if (! empty($variable['condition'])) {
+                        
                         // Get the operand
                         $condition = $variable['condition'] . $this->getDefaultOperand();
                         if (strpos($condition, '@') !== false) {
-
+                            
                             // Get the pieces of the condition
                             $conditionPieces = array();
                             preg_match_all('`(.*?)@(\$[0-9a-zA-Z_\-]+)`', $condition, $conditionPieces);
-
+                            
                             // Check the condition and continue for the next variable if we do not match
-                            if (!isset($this->serverBackreferences[$conditionPieces[2][0]])) {
-
+                            if (! isset($this->serverBackreferences[$conditionPieces[2][0]])) {
+                                
                                 continue;
                             }
-
+                            
                             // Do we have a match? Get the potential backreferences
                             $conditionBackreferences = array();
-                            if (preg_match(
-                                '`' . $conditionPieces[1][0] . '`',
-                                $this->serverBackreferences[$conditionPieces[2][0]],
-                                $conditionBackreferences
-                            )
-                                !== 1
-                            ) {
-
+                            if (preg_match('`' . $conditionPieces[1][0] . '`', $this->serverBackreferences[$conditionPieces[2][0]], $conditionBackreferences) !== 1) {
+                                
                                 continue;
                             }
                         }
                     }
-
+                    
                     // We have to split up the definition string, if we do not find a equal character we have to fail
-                    if (!strpos($variable['definition'], '=')) {
-
+                    if (! strpos($variable['definition'], '=')) {
+                        
                         throw new ModuleException('Invalid definition ' . $variable['definition'] . 'missing "=".');
                     }
-
+                    
                     // Get the variable name and its value from the definition string
                     $varName = $this->filterVariableName(strstr($variable['definition'], '=', true));
                     $value = substr(strstr($variable['definition'], '='), 1);
-
+                    
                     // We also have to resolve backreferences for the value part of the definition, as people might want
                     // to pass OS environment vars to the server vars
                     if (strpos($value, '$') !== false) {
-
+                        
                         // Get the possible backreference (might as well be something else) and resolve it if needed
                         // TODO tell them if we do not find a backreference to resolve, might be a problem
                         $possibleBackreferences = array();
                         preg_match('`\$.+?`', $value, $possibleBackreferences);
                         foreach ($possibleBackreferences as $possibleBackreference) {
-
+                            
                             if ($backrefValue = getenv($possibleBackreference)) {
                                 // Do we have a backreference which is a server or env var?
-
+                                
                                 $value = str_replace($possibleBackreference, $backrefValue, $value);
-
                             } elseif (isset($conditionBackreferences[(int) substr($possibleBackreference, 1)])) {
                                 // We got no backreference from any of the server or env vars, so maybe we got
                                 // something from the preg_match
-                                $value = str_replace(
-                                    $possibleBackreference,
-                                    $conditionBackreferences[(int) substr($possibleBackreference, 1)],
-                                    $value
-                                );
+                                $value = str_replace($possibleBackreference, $conditionBackreferences[(int) substr($possibleBackreference, 1)], $value);
                             }
                         }
                     }
-
+                    
                     // If the value is "null" we will unset the variable
                     if ($value === 'null') {
-
+                        
                         // Unset the variable and continue with the next environment variable
                         if ($requestContext->hasEnvVar($varName)) {
-
+                            
                             $requestContext->unsetEnvVar($varName);
                         }
-
+                        
                         continue;
                     }
-
+                    
                     // Take action according to the needed definition
                     $requestContext->setEnvVar($varName, $value);
                 }
             }
-
         } catch (\Exception $e) {
-
+            
             // Re-throw as a ModuleException
             throw new ModuleException($e);
         }
@@ -417,22 +405,22 @@ class EnvironmentVariableModule implements HttpModuleInterface
     /**
      * Will fill the header variables into our pre-collected $serverVars array
      *
-     * @param \AppserverIo\Psr\HttpMessage\RequestInterface $request The request instance
-     *
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface $request
+     *            The request instance
+     *            
      * @return void
      */
-    protected function fillHeaderBackreferences(
-        RequestInterface $request
-    ) {
+    protected function fillHeaderBackreferences(RequestInterface $request)
+    {
         $headerArray = $request->getHeaders();
-
+        
         // Iterate over all header vars we know and add them to our serverBackreferences array
         foreach ($this->supportedServerVars['headers'] as $supportedServerVar) {
-
+            
             // As we got them with another name, we have to rename them, so we will not have to do this on the fly
             if (@isset($headerArray[$supportedServerVar])) {
                 $this->serverBackreferences['$' . $supportedServerVar] = $headerArray[$supportedServerVar];
-
+                
                 // Also create for the "dynamic" substitution syntax
                 $this->serverBackreferences['$' . $supportedServerVar] = $headerArray[$supportedServerVar];
             }
@@ -443,15 +431,13 @@ class EnvironmentVariableModule implements HttpModuleInterface
      * Will fill the SSL environment variables into the backreferences.
      * These are empty as long as the SSL module is not loaded.
      *
-     * @return void
-     *
-     * TODO Get this vars from the SSL module as soon as it exists
+     * @return void TODO Get this vars from the SSL module as soon as it exists
      */
     protected function fillSslEnvironmentBackreferences()
     {
         // Iterate over all SSL environment variables and fill them into our backreferences
         foreach ($this->supportedSslEnvironmentVars as $supportedSslEnvironmentVar) {
-
+            
             $this->serverBackreferences['$' . $supportedSslEnvironmentVar . ''] = '';
         }
     }
@@ -466,7 +452,7 @@ class EnvironmentVariableModule implements HttpModuleInterface
     protected function fillContextBackreferences()
     {
         foreach ($this->getRequestContext()->getServerVars() as $varName => $serverVar) {
-
+            
             // Prefill the value
             $this->serverBackreferences['$' . $varName] = $serverVar;
         }
@@ -495,18 +481,19 @@ class EnvironmentVariableModule implements HttpModuleInterface
     /**
      * Will filter a given var name and sanitize it
      *
-     * @param string $varName The name of the variable to filter
-     *
+     * @param string $varName
+     *            The name of the variable to filter
+     *            
      * @return string
      */
     protected function filterVariableName($varName)
     {
         // Strtoupper it for a start
         $tmp = strtoupper($varName);
-
+        
         // Replace all the characters we do not want with and underscore (as Apache does it)
         $tmp = preg_replace('/[^A-Z0-9_]/', '_', $tmp);
-
+        
         return $tmp;
     }
 

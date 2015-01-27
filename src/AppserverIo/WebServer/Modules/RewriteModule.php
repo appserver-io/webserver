@@ -11,15 +11,12 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Bernhard Wick <bw@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Bernhard Wick <bw@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
-
 namespace AppserverIo\WebServer\Modules;
 
 use AppserverIo\Psr\HttpMessage\RequestInterface;
@@ -37,16 +34,15 @@ use AppserverIo\WebServer\Modules\Rewrite\Entities\Rule;
 /**
  * Class RewriteModule
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Bernhard Wick <bw@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Bernhard Wick <bw@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 class RewriteModule implements HttpModuleInterface
 {
+
     /**
      * Server variables we support and need
      *
@@ -62,7 +58,8 @@ class RewriteModule implements HttpModuleInterface
     protected $supportedEnvVars = array();
 
     /**
-     * This array will hold all locations (e.g. /example/websocket) we ever encountered in our live time.
+     * This array will hold all locations (e.g.
+     * /example/websocket) we ever encountered in our live time.
      * It will provide a mapping to the $configs array, as several locations can share one config
      * (e.g. a "global" .htaccess or nginx config).
      *
@@ -116,6 +113,7 @@ class RewriteModule implements HttpModuleInterface
     protected $serverBackreferences = array();
 
     /**
+     *
      * @var array $dependencies The modules we depend on
      */
     protected $dependencies = array();
@@ -144,8 +142,9 @@ class RewriteModule implements HttpModuleInterface
     /**
      * Initiates the module
      *
-     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext The server's context instance
-     *
+     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext
+     *            The server's context instance
+     *            
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
@@ -153,15 +152,15 @@ class RewriteModule implements HttpModuleInterface
     {
         // We have to throw a ModuleException on failure, so surround the body with a try...catch block
         try {
-
+            
             // Save the server context for later re-use
             $this->serverContext = $serverContext;
-
+            
             // Register our dependencies
             $this->dependencies = array(
                 'virtualHost'
             );
-
+            
             $this->supportedServerVars = array(
                 'headers' => array(
                     ServerVars::HTTP_USER_AGENT,
@@ -173,15 +172,14 @@ class RewriteModule implements HttpModuleInterface
                     ServerVars::HTTP_ACCEPT
                 )
             );
-
+            
             $this->supportedEnvVars = EnvVars::all();
-
+            
             // Get the rules as the array they are within the config
             // We might not even get anything, so prepare our rules accordingly
             $this->configuredRules = $this->serverContext->getServerConfig()->getRewrites();
-
         } catch (\Exception $e) {
-
+            
             // Re-throw as a ModuleException
             throw new ModuleException($e);
         }
@@ -190,45 +188,47 @@ class RewriteModule implements HttpModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
-     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
-     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
-     * @param int                                                    $hook           The current hook to process logic for
-     *
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface $request
+     *            A request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface $response
+     *            A response object
+     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext
+     *            A requests context instance
+     * @param int $hook
+     *            The current hook to process logic for
+     *            
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
-    public function process(
-        RequestInterface $request,
-        ResponseInterface $response,
-        RequestContextInterface $requestContext,
-        $hook
-    ) {
+    public function process(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext, $hook)
+    {
         // In php an interface is, by definition, a fixed contract. It is immutable.
         // So we have to declare the right ones afterwards...
-        /** @var $request \AppserverIo\Psr\HttpMessage\RequestInterface */
-        /** @var $request \AppserverIo\Psr\HttpMessage\ResponseInterface */
-
+        /**
+         * @var $request \AppserverIo\Psr\HttpMessage\RequestInterface
+         */
+        /**
+         * @var $request \AppserverIo\Psr\HttpMessage\ResponseInterface
+         */
+        
         // if false hook is coming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
             return;
         }
-
+        
         // set member ref for request context
         $this->requestContext = $requestContext;
-
+        
         // We have to throw a ModuleException on failure, so surround the body with a try...catch block
         try {
-
-            $requestUrl = $requestContext->getServerVar(
-                ServerVars::HTTP_HOST
-            ) . $requestContext->getServerVar(ServerVars::X_REQUEST_URI);
-
-            if (!isset($this->rules[$requestUrl])) {
-
+            
+            $requestUrl = $requestContext->getServerVar(ServerVars::HTTP_HOST) . $requestContext->getServerVar(ServerVars::X_REQUEST_URI);
+            
+            if (! isset($this->rules[$requestUrl])) {
+                
                 // Reset the $serverBackreferences array to avoid mixups of different requests
                 $this->serverBackreferences = array();
-
+                
                 // Resolve all used backreferences which are NOT linked to the query string.
                 // We will resolve query string related backreferences separately as we are not able to cache them
                 // as easily as, say, the URI
@@ -236,29 +236,26 @@ class RewriteModule implements HttpModuleInterface
                 // IN the loop.
                 $this->fillContextBackreferences();
                 $this->fillHeaderBackreferences($request);
-
+                
                 // Get the rules as the array they are within the config.
                 // We have to also collect any volatile rules which might be set on request base.
                 // We might not even get anything, so prepare our rules accordingly
                 $volatileRewrites = array();
                 if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_REWRITES)) {
-
+                    
                     $volatileRewrites = $requestContext->getModuleVar(ModuleVars::VOLATILE_REWRITES);
                 }
-
+                
                 // Build up the complete ruleset, volatile rules up front
-                $rules = array_merge(
-                    $volatileRewrites,
-                    $this->configuredRules
-                );
+                $rules = array_merge($volatileRewrites, $this->configuredRules);
                 $this->rules[$requestUrl] = array();
-
+                
                 // Only act if we got something
                 if (is_array($rules)) {
-
+                    
                     // Convert the rules to our internally used objects
                     foreach ($rules as $rule) {
-
+                        
                         // Add the rule as a Rule object
                         $rule = new Rule($rule['condition'], $rule['target'], $rule['flag']);
                         $rule->resolve($this->serverBackreferences);
@@ -266,23 +263,22 @@ class RewriteModule implements HttpModuleInterface
                     }
                 }
             }
-
+            
             // Iterate over all rules, resolve vars and apply the rule (if needed)
             foreach ($this->rules[$requestUrl] as $rule) {
-
+                
                 // Check if the rule matches, and if, apply the rule
                 if ($rule->matches()) {
-
+                    
                     // Apply the rule. If apply() returns false this means this was the last rule to process
                     if ($rule->apply($requestContext, $response, $this->serverBackreferences) === false) {
-
+                        
                         break;
                     }
                 }
             }
-
         } catch (\Exception $e) {
-
+            
             // Re-throw as a ModuleException
             throw new ModuleException($e);
         }
@@ -291,30 +287,25 @@ class RewriteModule implements HttpModuleInterface
     /**
      * Will fill the header variables into our pre-collected $serverVars array
      *
-     * @param \AppserverIo\Psr\HttpMessage\RequestInterface $request The request instance
-     *
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface $request
+     *            The request instance
+     *            
      * @return void
      */
     protected function fillHeaderBackreferences(RequestInterface $request)
     {
         $headerArray = $request->getHeaders();
-
+        
         // Iterate over all header vars we know and add them to our serverBackreferences array
         foreach ($this->supportedServerVars['headers'] as $supportedServerVar) {
-
+            
             // As we got them with another name, we have to rename them, so we will not have to do this on the fly
             $tmp = strtoupper(str_replace('HTTP', 'HEADER', $supportedServerVar));
             if (@isset($headerArray[constant("AppserverIo\\Psr\\HttpMessage\\Protocol::$tmp")])) {
-                $this->serverBackreferences['$' . $supportedServerVar] = $headerArray[constant(
-                    "AppserverIo\\Psr\\HttpMessage\\Protocol::$tmp"
-                )];
-
+                $this->serverBackreferences['$' . $supportedServerVar] = $headerArray[constant("AppserverIo\\Psr\\HttpMessage\\Protocol::$tmp")];
+                
                 // Also create for the "dynamic" substitution syntax
-                $this->serverBackreferences['$' . constant(
-                    "AppserverIo\\Psr\\HttpMessage\\Protocol::$tmp"
-                )] = $headerArray[constant(
-                    "AppserverIo\\Psr\\HttpMessage\\Protocol::$tmp"
-                )];
+                $this->serverBackreferences['$' . constant("AppserverIo\\Psr\\HttpMessage\\Protocol::$tmp")] = $headerArray[constant("AppserverIo\\Psr\\HttpMessage\\Protocol::$tmp")];
             }
         }
     }
@@ -331,17 +322,17 @@ class RewriteModule implements HttpModuleInterface
     {
         // get local ref of request context
         $requestContext = $this->getRequestContext();
-
+        
         // Iterate over all server variables and add them to the backreference array
         foreach ($requestContext->getServerVars() as $varName => $serverVar) {
-
+            
             // Prefill the value
             $this->serverBackreferences['$' . $varName] = $serverVar;
         }
-
+        
         // Do the same for environment variables
         foreach ($requestContext->getEnvVars() as $varName => $envVar) {
-
+            
             // Prefill the value
             $this->serverBackreferences['$' . $varName] = $envVar;
         }

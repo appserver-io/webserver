@@ -11,13 +11,11 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 
 namespace AppserverIo\WebServer\Modules;
@@ -36,16 +34,15 @@ use AppserverIo\Server\Dictionaries\ServerVars;
 /**
  * Class DirectoryModule
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 class DirectoryModule implements HttpModuleInterface
 {
+
     /**
      * Defines the module name
      *
@@ -83,14 +80,15 @@ class DirectoryModule implements HttpModuleInterface
     /**
      * Initiates the module
      *
-     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext The server's context instance
-     *
+     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext
+     *            The server's context instance
+     *            
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
     public function init(ServerContextInterface $serverContext)
     {
-        $this->serverContext= $serverContext;
+        $this->serverContext = $serverContext;
         // save directory index as array got space separated from config
         $this->directoryIndex = explode(' ', $serverContext->getServerConfig()->getDirectoryIndex());
     }
@@ -108,50 +106,54 @@ class DirectoryModule implements HttpModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
-     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
-     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
-     * @param int                                                    $hook           The current hook to process logic for
-     *
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface $request
+     *            A request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface $response
+     *            A response object
+     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext
+     *            A requests context instance
+     * @param int $hook
+     *            The current hook to process logic for
+     *            
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
-    public function process(
-        RequestInterface $request,
-        ResponseInterface $response,
-        RequestContextInterface $requestContext,
-        $hook
-    ) {
+    public function process(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext, $hook)
+    {
         // In php an interface is, by definition, a fixed contract. It is immutable.
         // So we have to declair the right ones afterwards...
-        /** @var $request \AppserverIo\Psr\HttpMessage\RequestInterface */
-        /** @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface */
-
+        /**
+         * @var $request \AppserverIo\Psr\HttpMessage\RequestInterface
+         */
+        /**
+         * @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface
+         */
+        
         // if false hook is comming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
             return;
         }
-
+        
         // set req and res object internally
         $this->request = $request;
         $this->response = $response;
         // get server context ref to local func
         $serverContext = $this->getServerContext();
-
+        
         // get document root
         $documentRoot = $requestContext->getServerVar(ServerVars::DOCUMENT_ROOT);
         // get url
         $url = parse_url($requestContext->getServerVar(ServerVars::X_REQUEST_URI), PHP_URL_PATH);
         // get query string with asterisk
         $queryString = strstr($requestContext->getServerVar(ServerVars::X_REQUEST_URI), '?');
-
+        
         // get read path to requested uri
         $realPath = $documentRoot . $url;
-
+        
         // check if it's a dir
-        if (is_dir($realPath)|| $url === '/') {
+        if (is_dir($realPath) || $url === '/') {
             // check if uri has trailing slash
-            if (substr($url, -1) !== '/') {
+            if (substr($url, - 1) !== '/') {
                 // set enhance uri with trailing slash to response
                 $response->addHeader(Protocol::HEADER_LOCATION, $url . '/' . $queryString);
                 // send redirect status
@@ -159,7 +161,7 @@ class DirectoryModule implements HttpModuleInterface
                 // set response state to be dispatched after this without calling other modules process
                 $response->setState(HttpResponseStates::DISPATCH);
             } else {
-
+                
                 // check directory index definitions
                 foreach ($this->getDirectoryIndex() as $index) {
                     // check if defined index files are found in directory

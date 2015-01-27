@@ -11,15 +11,12 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Interfaces
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io
  */
-
 namespace AppserverIo\WebServer\Interfaces;
 
 use AppserverIo\Server\Exceptions\ModuleException;
@@ -27,29 +24,31 @@ use AppserverIo\Server\Exceptions\ModuleException;
 /**
  * Interface AuthenticationInterface
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Interfaces
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link https://github.com/appserver-io/webserver
+ * @link http://www.appserver.io
  */
 interface AuthenticationInterface
 {
+
     /**
      * Constructs the authentication type
      *
-     * @param array $configData The configuration data for auth type instance
+     * @param array $configData
+     *            The configuration data for auth type instance
      */
     public function __construct(array $configData = array());
 
     /**
      * Initialise by the auth content got from client
      *
-     * @param string $authData  The content of authentication data sent by client
-     * @param string $reqMethod The https request method as string
-     *
+     * @param string $authData
+     *            The content of authentication data sent by client
+     * @param string $reqMethod
+     *            The https request method as string
+     *            
      * @return void
      */
     public function init($authData, $reqMethod);

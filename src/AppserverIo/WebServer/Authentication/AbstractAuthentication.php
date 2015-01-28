@@ -11,15 +11,12 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Authentication
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io
  */
-
 namespace AppserverIo\WebServer\Authentication;
 
 use AppserverIo\Server\Exceptions\ModuleException;
@@ -28,62 +25,61 @@ use AppserverIo\WebServer\Interfaces\AuthenticationInterface;
 /**
  * Class AbstractAuthentication
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Authentication
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link https://github.com/appserver-io/webserver
+ * @link http://www.appserver.io
  */
 class AbstractAuthentication
 {
+
     /**
      * Holds the valid credentials given in passwd file
      *
-     * @var array
+     * @var array $credentials
      */
     protected $credentials;
 
     /**
      * The parsed username given by header content payload
      *
-     * @var string
+     * @var string $username
      */
     protected $username;
 
     /**
      * The password given by header content payload
      *
-     * @var string
+     * @var string $password
      */
     protected $password;
 
     /**
-     * Hold's the auth data got from http authentication header
+     * Holds the auth data got from http authentication header
      *
-     * @var string
+     * @var string $authData
      */
     protected $authData;
 
     /**
-     * Hold's the auth hash to compare with auth information given by system
+     * Holds the auth hash to compare with auth information given by system
      *
-     * @var string
+     * @var string $authHash
      */
     protected $authHash;
 
     /**
-     * Hold's the requests method
+     * Holds the requests method
      *
-     * @var string
+     * @var string $reqMethod
      */
     protected $reqMethod;
 
     /**
-     * Hold's the configuration data given for authentication type
+     * Holds the configuration data given for authentication type
      *
-     * @var array
+     * @var array $configData
      */
     protected $configData;
 
@@ -109,10 +105,8 @@ class AbstractAuthentication
         // get config data to local var
         $configData = $this->configData;
         // check auth config entry and file existence
-        if (empty($configData) || !isset($configData['file']) || !is_file($configData['file'])) {
-            throw new AuthenticationException(
-                sprintf(AuthenticationException::MESSAGE_AUTHFILE_INVALID, $configData['file'])
-            );
+        if (empty($configData) || ! isset($configData['file']) || ! is_file($configData['file'])) {
+            throw new AuthenticationException(sprintf(AuthenticationException::MESSAGE_AUTHFILE_INVALID, $configData['file']));
         }
     }
 
@@ -147,13 +141,11 @@ class AbstractAuthentication
 
         // check if credentials are empty
         if (empty($credentials)) {
-            throw new AuthenticationException(
-                sprintf(AuthenticationException::MESSAGE_AUTHFILE_INVALID, $this->configData['file'])
-            );
+            throw new AuthenticationException(sprintf(AuthenticationException::MESSAGE_AUTHFILE_INVALID, $this->configData['file']));
         }
 
         // check request header data does not contains exact username requested
-        if (!isset($credentials[$this->getUsername()])) {
+        if (! isset($credentials[$this->getUsername()])) {
             return false;
         }
 

@@ -11,15 +11,12 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage ConnectionHandlers
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io
  */
-
 namespace AppserverIo\WebServer\ConnectionHandlers;
 
 use AppserverIo\Server\Dictionaries\EnvVars;
@@ -45,13 +42,11 @@ use AppserverIo\Http\HttpResponseStates;
 /**
  * Class HttpConnectionHandler
  *
- * @category   Server
- * @package    WebServer
- * @subpackage ConnectionHandlers
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link https://github.com/appserver-io/webserver
+ * @link http://www.appserver.io
  */
 class HttpConnectionHandler implements ConnectionHandlerInterface
 {
@@ -64,49 +59,49 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     const HTTP_CONNECTION_READ_LENGTH = 2048;
 
     /**
-     * Hold's parser instance
+     * Holds parser instance
      *
      * @var \AppserverIo\Http\HttpRequestParserInterface
      */
     protected $parser;
 
     /**
-     * Hold's the server context instance
+     * Holds the server context instance
      *
      * @var \AppserverIo\Server\Interfaces\ServerContextInterface
      */
     protected $serverContext;
 
     /**
-     * Hold's the request's context instance
+     * Holds the request's context instance
      *
      * @var \AppserverIo\Server\Interfaces\RequestContextInterface
      */
     protected $requestContext;
 
     /**
-     * Hold's an array of modules to use for connection handler
+     * Holds an array of modules to use for connection handler
      *
      * @var array
      */
     protected $modules;
 
     /**
-     * Hold's errors page template
+     * Holds errors page template
      *
      * @var string
      */
     protected $errorsPageTemplate;
 
     /**
-     * Hold's the connection instance
+     * Holds the connection instance
      *
-     * @var \AppserverIo\Server\Sockets\SocketInterface
+     * @var \AppserverIo\Psr\Socket\SocketInterface
      */
     protected $connection;
 
     /**
-     * Hold's the worker instance
+     * Holds the worker instance
      *
      * @var \AppserverIo\Server\Interfaces\WorkerInterface
      */
@@ -141,12 +136,11 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         // init http response object
         $httpResponse = new HttpResponse();
         // set default response headers
-        $httpResponse->setDefaultHeaders(
-            array(
-                Protocol::HEADER_SERVER => $this->getServerConfig()->getSoftware(),
-                Protocol::HEADER_CONNECTION => Protocol::HEADER_CONNECTION_VALUE_CLOSE
-            )
-        );
+        $httpResponse->setDefaultHeaders(array(
+            Protocol::HEADER_SERVER => $this->getServerConfig()
+                ->getSoftware(),
+            Protocol::HEADER_CONNECTION => Protocol::HEADER_CONNECTION_VALUE_CLOSE
+        ));
 
         // setup http parser
         $this->parser = new HttpRequestParser($httpRequest, $httpResponse);
@@ -158,7 +152,9 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         // get request context type
         $requestContextType = $this->getServerConfig()->getRequestContextType();
 
-        /** @var RequestContextInterface $requestContext */
+        /**
+         * @var \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext
+         */
         // instantiate and init request context
         $this->requestContext = new $requestContextType();
         $this->requestContext->init($this->getServerConfig());
@@ -177,7 +173,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     }
 
     /**
-     * Return's all needed modules as array for connection handler to process
+     * Returns all needed modules as array for connection handler to process
      *
      * @return array An array of Modules
      */
@@ -187,7 +183,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     }
 
     /**
-     * Return's a specific module instance by given name
+     * Returns a specific module instance by given name
      *
      * @param string $name The modules name to return an instance for
      *
@@ -201,7 +197,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     }
 
     /**
-     * Return's the server context instance
+     * Returns the server context instance
      *
      * @return \AppserverIo\Server\Interfaces\ServerContextInterface
      */
@@ -211,7 +207,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     }
 
     /**
-     * Return's the request's context instance
+     * Returns the request's context instance
      *
      * @return \AppserverIo\Server\Interfaces\RequestContextInterface
      */
@@ -221,7 +217,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     }
 
     /**
-     * Return's the server's configuration
+     * Returns the server's configuration
      *
      * @return \AppserverIo\Server\Interfaces\ServerConfigurationInterface
      */
@@ -231,7 +227,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     }
 
     /**
-     * Return's the parser instance
+     * Returns the parser instance
      *
      * @return \AppserverIo\Http\HttpRequestParserInterface
      */
@@ -241,7 +237,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     }
 
     /**
-     * Return's the connection used to handle with
+     * Returns the connection used to handle with
      *
      * @return \AppserverIo\Psr\Socket\SocketInterface
      */
@@ -251,7 +247,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     }
 
     /**
-     * Return's the worker instance which starte this worker thread
+     * Returns the worker instance which starte this worker thread
      *
      * @return \AppserverIo\Server\Interfaces\WorkerInterface
      */
@@ -261,7 +257,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     }
 
     /**
-     * Return's the template for errors page to render
+     * Returns the template for errors page to render
      *
      * @return string
      */
@@ -303,8 +299,8 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         $response = $parser->getResponse();
 
         // init keep alive settings
-        $keepAliveTimeout = (int)$serverConfig->getKeepAliveTimeout();
-        $keepAliveMax = (int)$serverConfig->getKeepAliveMax();
+        $keepAliveTimeout = (int) $serverConfig->getKeepAliveTimeout();
+        $keepAliveMax = (int) $serverConfig->getKeepAliveMax();
         // init keep alive connection flag
         $keepAliveConnection = false;
 
@@ -314,11 +310,9 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         do {
             // try to handle request if its a http request
             try {
-
                 // reset connection infos to server vars
                 $requestContext->setServerVar(ServerVars::REMOTE_ADDR, $connection->getAddress());
                 $requestContext->setServerVar(ServerVars::REMOTE_PORT, $connection->getPort());
-
 
                 // start time measurement for keep-alive timeout
                 $keepaliveStartTime = microtime(true);
@@ -351,7 +345,8 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
 
                 /**
                  * In the interest of robustness, servers SHOULD ignore any empty
-                 * line(s) received where a Request-Line is expected. In other words, if
+                 * line(s) received where a Request-Line is expected.
+                 * In other words, if
                  * the server is reading the protocol stream at the beginning of a
                  * message and receives a CRLF first, it should ignore the CRLF.
                  *
@@ -382,10 +377,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                 $parser->parseHeaders($messageHeaders);
 
                 // process connection type keep-alive
-                if (strcasecmp(
-                    $request->getHeader(Protocol::HEADER_CONNECTION),
-                    Protocol::HEADER_CONNECTION_VALUE_KEEPALIVE
-                ) === 0) {
+                if (strcasecmp($request->getHeader(Protocol::HEADER_CONNECTION), Protocol::HEADER_CONNECTION_VALUE_KEEPALIVE) === 0) {
                     // calculate keep-alive idle time for comparison with keep-alive timeout
                     $keepAliveIdleTime = microtime(true) - $keepaliveStartTime;
                     // only if max connections or keep-alive timeout not reached yet
@@ -396,14 +388,14 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                         $response->addHeader(Protocol::HEADER_CONNECTION, Protocol::HEADER_CONNECTION_VALUE_KEEPALIVE);
                         $response->addHeader(Protocol::HEADER_KEEP_ALIVE, "timeout: $keepAliveTimeout, max: $keepAliveMax");
                         // decrease keep-alive max
-                        --$keepAliveMax;
+                        -- $keepAliveMax;
                     }
                 }
 
                 // check if message body will be transmitted
                 if ($request->hasHeader(Protocol::HEADER_CONTENT_LENGTH)) {
                     // get content-length header
-                    if (($contentLength = (int)$request->getHeader(Protocol::HEADER_CONTENT_LENGTH)) > 0) {
+                    if (($contentLength = (int) $request->getHeader(Protocol::HEADER_CONTENT_LENGTH)) > 0) {
                         // copy connection stream to body stream by given content length
                         $request->copyBodyStream($connection->getConnectionResource(), $contentLength);
                         // get content out for oldschool query parsing todo: refactor query parsing
@@ -433,31 +425,25 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                 $this->processModules(ModuleHooks::REQUEST_POST);
 
                 // if no module dispatched response throw internal server error 500
-                if (!$response->hasState(HttpResponseStates::DISPATCH)) {
+                if (! $response->hasState(HttpResponseStates::DISPATCH)) {
                     throw new \Exception('Response state is not dispatched', 500);
                 }
 
                 // process modules by hook RESPONSE_PRE
                 $this->processModules(ModuleHooks::RESPONSE_PRE);
-
             } catch (SocketReadTimeoutException $e) {
                 // break the request processing due to client timeout
                 break;
-
             } catch (SocketReadException $e) {
                 // break the request processing due to peer reset
                 break;
-
             } catch (SocketServerException $e) {
                 // break the request processing
                 break;
-
             } catch (\Exception $e) {
                 // set status code given by exception
                 // if 0 is comming set 500 by default
-                $response->setStatusCode(
-                    $e->getCode() ? $e->getCode() : 500
-                );
+                $response->setStatusCode($e->getCode() ? $e->getCode() : 500);
                 $this->renderErrorPage($e->__toString());
             }
 
@@ -484,7 +470,6 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
 
             // init the request parser for next request
             $parser->init();
-
         } while ($keepAliveConnection === true);
 
         // close connection if not closed yet
@@ -531,24 +516,21 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         // get response ref to local var for template rendering
         $response = $this->getParser()->getResponse();
         // check if template is given and exists
-        if (($errorsPageTemplatePath = $this->getRequestContext()->getServerVar(ServerVars::SERVER_ERRORS_PAGE_TEMPLATE_PATH))
-            && is_file($errorsPageTemplatePath)) {
+        if (($errorsPageTemplatePath = $this->getRequestContext()->getServerVar(ServerVars::SERVER_ERRORS_PAGE_TEMPLATE_PATH)) && is_file($errorsPageTemplatePath)) {
             // render errors page
             ob_start();
             require $errorsPageTemplatePath;
             $errorsPage = ob_get_clean();
         } else {
             // build up error message manually without template
-            $errorsPage = $response->getStatusCode() . ' ' . $response->getStatusReasonPhrase() .
-                PHP_EOL . PHP_EOL . $errorMessage .
-                PHP_EOL . PHP_EOL . strip_tags($this->getRequestContext()->getServerVar(ServerVars::SERVER_SIGNATURE));
+            $errorsPage = $response->getStatusCode() . ' ' . $response->getStatusReasonPhrase() . PHP_EOL . PHP_EOL . $errorMessage . PHP_EOL . PHP_EOL . strip_tags($this->getRequestContext()->getServerVar(ServerVars::SERVER_SIGNATURE));
         }
         // append errors page to response body
         $response->appendBodyStream($errorsPage);
     }
 
     /**
-     * Prepare's the response object to be ready for delivery
+     * Prepares the response object to be ready for delivery
      *
      * @return void
      */
@@ -561,7 +543,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     }
 
     /**
-     * Send's response to connected client
+     * Sends response to connected client
      *
      * @return void
      */
@@ -579,7 +561,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     }
 
     /**
-     * Log's access information from request and response
+     * Logs access information from request and response
      *
      * @return void
      */
@@ -595,16 +577,13 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
 
         // lookup for dynamic logger configuration or take default access logger
         if ($requestContext->hasEnvVar(EnvVars::LOGGER_ACCESS)) {
-            $accessLogger = $serverContext->getLogger(
-                $requestContext->getEnvVar(EnvVars::LOGGER_ACCESS)
-            );
+            $accessLogger = $serverContext->getLogger($requestContext->getEnvVar(EnvVars::LOGGER_ACCESS));
         } else {
             $accessLogger = $serverContext->getLogger();
         }
 
         // log access information if AccessLogger exists
         if ($accessLogger) {
-
             // init datetime instance with current time and timezone
             $datetime = new \DateTime('now');
 
@@ -628,7 +607,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     }
 
     /**
-     * Init's the server vars by parsed request
+     * Inits the server vars by parsed request
      *
      * @return void
      */
@@ -659,22 +638,10 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         }
 
         // set request method, query-string, uris and scheme
-        $requestContext->setServerVar(
-            ServerVars::REQUEST_METHOD,
-            $request->getMethod()
-        );
-        $requestContext->setServerVar(
-            ServerVars::QUERY_STRING,
-            $request->getQueryString()
-        );
-        $requestContext->setServerVar(
-            ServerVars::REQUEST_URI,
-            $request->getUri()
-        );
-        $requestContext->setServerVar(
-            ServerVars::X_REQUEST_URI,
-            $request->getUri()
-        );
+        $requestContext->setServerVar(ServerVars::REQUEST_METHOD, $request->getMethod());
+        $requestContext->setServerVar(ServerVars::QUERY_STRING, $request->getQueryString());
+        $requestContext->setServerVar(ServerVars::REQUEST_URI, $request->getUri());
+        $requestContext->setServerVar(ServerVars::X_REQUEST_URI, $request->getUri());
         // this is the http connection handler, therefor we will rely on the https flag
         if ($requestContext->hasServerVar(ServerVars::HTTPS) && $requestContext->getServerVar(ServerVars::HTTPS) === ServerVars::VALUE_HTTPS_ON) {
             $requestContext->setServerVar(ServerVars::REQUEST_SCHEME, 'https');
@@ -692,7 +659,10 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     {
         // register shutdown handler once to avoid strange memory consumption problems
         if ($this->hasRegisteredShutdown === false) {
-            register_shutdown_function(array(&$this, "shutdown"));
+            register_shutdown_function(array(
+                &$this,
+                "shutdown"
+            ));
             $this->hasRegisteredShutdown = true;
         }
     }
@@ -713,7 +683,6 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
 
         // check if connections is still alive
         if ($connection) {
-
             // call current fileahandler module's shutdown hook if exists
             if ($fileHandleModule = $this->getModule($requestContext->getServerVar(ServerVars::SERVER_HANDLER))) {
                 $fileHandleModule->process($request, $response, $requestContext, ModuleHooks::SHUTDOWN);
@@ -721,7 +690,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
 
             // check if filehandle module has not handled the shutdown and set the response state to dispatched
             // so do default shutdown / error handling for current worker process
-            if (!$response->hasState(HttpResponseStates::DISPATCH)) {
+            if (! $response->hasState(HttpResponseStates::DISPATCH)) {
                 // set response code to 500 Internal Server Error
                 $response->setStatusCode(appserver_get_http_response_code());
 
@@ -734,12 +703,10 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                 $lastError = error_get_last();
 
                 // check if it was a fatal error
-                if (!is_null($lastError) && $lastError['type'] === 1) {
-
+                if (! is_null($lastError) && $lastError['type'] === 1) {
                     // set response code to 500 Internal Server Error
                     $response->setStatusCode(500);
-                    $errorMessage = 'PHP Fatal error: ' . $lastError['message'] .
-                        ' in ' . $lastError['file'] . ' on line ' . $lastError['line'];
+                    $errorMessage = 'PHP Fatal error: ' . $lastError['message'] . ' in ' . $lastError['file'] . ' on line ' . $lastError['line'];
                     $this->renderErrorPage($errorMessage);
                 }
 

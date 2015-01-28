@@ -11,13 +11,11 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 
 namespace AppserverIo\WebServer\Modules;
@@ -36,16 +34,15 @@ use AppserverIo\Server\Dictionaries\ServerVars;
 /**
  * Class DirectoryModule
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 class DirectoryModule implements HttpModuleInterface
 {
+
     /**
      * Defines the module name
      *
@@ -54,14 +51,14 @@ class DirectoryModule implements HttpModuleInterface
     const MODULE_NAME = 'directory';
 
     /**
-     * Hold's the server context instance
+     * Holds the server context instance
      *
      * @var \AppserverIo\Server\Interfaces\ServerContextInterface
      */
     protected $serverContext;
 
     /**
-     * Return's the request instance
+     * Returns the request instance
      *
      * @return \AppserverIo\Psr\HttpMessage\RequestInterface The request instance
      */
@@ -90,7 +87,7 @@ class DirectoryModule implements HttpModuleInterface
      */
     public function init(ServerContextInterface $serverContext)
     {
-        $this->serverContext= $serverContext;
+        $this->serverContext = $serverContext;
         // save directory index as array got space separated from config
         $this->directoryIndex = explode(' ', $serverContext->getServerConfig()->getDirectoryIndex());
     }
@@ -116,16 +113,16 @@ class DirectoryModule implements HttpModuleInterface
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
-    public function process(
-        RequestInterface $request,
-        ResponseInterface $response,
-        RequestContextInterface $requestContext,
-        $hook
-    ) {
+    public function process(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext, $hook)
+    {
         // In php an interface is, by definition, a fixed contract. It is immutable.
         // So we have to declair the right ones afterwards...
-        /** @var $request \AppserverIo\Psr\HttpMessage\RequestInterface */
-        /** @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface */
+        /**
+         * @var $request \AppserverIo\Psr\HttpMessage\RequestInterface
+         */
+        /**
+         * @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface
+         */
 
         // if false hook is comming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
@@ -149,9 +146,9 @@ class DirectoryModule implements HttpModuleInterface
         $realPath = $documentRoot . $url;
 
         // check if it's a dir
-        if (is_dir($realPath)|| $url === '/') {
+        if (is_dir($realPath) || $url === '/') {
             // check if uri has trailing slash
-            if (substr($url, -1) !== '/') {
+            if (substr($url, - 1) !== '/') {
                 // set enhance uri with trailing slash to response
                 $response->addHeader(Protocol::HEADER_LOCATION, $url . '/' . $queryString);
                 // send redirect status
@@ -159,7 +156,6 @@ class DirectoryModule implements HttpModuleInterface
                 // set response state to be dispatched after this without calling other modules process
                 $response->setState(HttpResponseStates::DISPATCH);
             } else {
-
                 // check directory index definitions
                 foreach ($this->getDirectoryIndex() as $index) {
                     // check if defined index files are found in directory

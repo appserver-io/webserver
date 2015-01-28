@@ -11,15 +11,12 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Authentication
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io
  */
-
 namespace AppserverIo\WebServer\Authentication;
 
 use AppserverIo\Server\Exceptions\ModuleException;
@@ -28,16 +25,15 @@ use AppserverIo\WebServer\Interfaces\AuthenticationInterface;
 /**
  * Class DigestAuthentication
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Authentication
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link https://github.com/appserver-io/webserver
+ * @link http://www.appserver.io
  */
 class DigestAuthentication extends AbstractAuthentication implements AuthenticationInterface
 {
+
     /**
      * Defines the auth type which should match the client request type definition
      *
@@ -70,16 +66,10 @@ class DigestAuthentication extends AbstractAuthentication implements Authenticat
         $key = implode('|', array_keys($requiredData));
 
         // parse header value
-        preg_match_all(
-            '@(' . $key . ')=(?:([\'"])([^\2]+?)\2|([^\s,]+))@',
-            $this->authData,
-            $matches,
-            PREG_SET_ORDER
-        );
+        preg_match_all('@(' . $key . ')=(?:([\'"])([^\2]+?)\2|([^\s,]+))@', $this->authData, $matches, PREG_SET_ORDER);
 
         // iterate all found values for header value
         foreach ($matches as $match) {
-
             // check if match could be found
             if ($match[3]) {
                 $data[$match[1]] = $match[3];
@@ -107,7 +97,7 @@ class DigestAuthentication extends AbstractAuthentication implements Authenticat
         $fileLines = file($this->configData['file']);
         // iterate all lines and set credentials
         foreach ($fileLines as $fileLine) {
-            list($user, $realm, $pass) = explode(':', $fileLine);
+            list ($user, $realm, $pass) = explode(':', $fileLine);
             $this->credentials[trim($user)] = trim($pass);
         }
     }
@@ -119,8 +109,7 @@ class DigestAuthentication extends AbstractAuthentication implements Authenticat
      */
     public function getAuthenticateHeader()
     {
-        return $this->getType() . ' realm="' . $this->configData["realm"] .
-            '",qop="auth",nonce="' . uniqid() . '",opaque="' . md5($this->configData["realm"]) . '"';
+        return $this->getType() . ' realm="' . $this->configData["realm"] . '",qop="auth",nonce="' . uniqid() . '",opaque="' . md5($this->configData["realm"]) . '"';
     }
 
     /**
@@ -135,19 +124,25 @@ class DigestAuthentication extends AbstractAuthentication implements Authenticat
         $authData = $this->getAuthData();
 
         // verify everything to be ready for auth if not return false
-        if (!$this->verify()) {
+        if (! $this->verify()) {
             return false;
-        };
+        }
+        ;
         // create valid response data
         $ha1 = $credentials[$this->getUsername()];
-        $ha2 = md5(
-            implode(':', array($this->getReqMethod() . ':' . $authData['uri']))
-        );
+        $ha2 = md5(implode(':', array(
+            $this->getReqMethod() . ':' . $authData['uri']
+        )));
 
         // create valid response to compare with auth data response
-        $validResponse = md5(
-            implode(':', array($ha1, $authData['nonce'], $authData['nc'], $authData['cnonce'], $authData['qop'], $ha2))
-        );
+        $validResponse = md5(implode(':', array(
+            $ha1,
+            $authData['nonce'],
+            $authData['nc'],
+            $authData['cnonce'],
+            $authData['qop'],
+            $ha2
+        )));
         // compare response with valid response
         return $authData['response'] === $validResponse;
     }

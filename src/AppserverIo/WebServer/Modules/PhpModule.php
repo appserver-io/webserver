@@ -11,13 +11,11 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 
 namespace AppserverIo\WebServer\Modules;
@@ -37,16 +35,15 @@ use AppserverIo\WebServer\Modules\Php\ProcessThread;
 /**
  * Class PhpModule
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 class PhpModule implements HttpModuleInterface
 {
+
     /**
      * Defines the module name
      *
@@ -118,7 +115,7 @@ class PhpModule implements HttpModuleInterface
     }
 
     /**
-     * Return's the server's context
+     * Returns the server's context
      *
      * @return \AppserverIo\Server\Interfaces\ServerContextInterface
      */
@@ -128,7 +125,7 @@ class PhpModule implements HttpModuleInterface
     }
 
     /**
-     * Return's the request instance
+     * Returns the request instance
      *
      * @return \AppserverIo\Psr\HttpMessage\RequestInterface
      */
@@ -138,7 +135,7 @@ class PhpModule implements HttpModuleInterface
     }
 
     /**
-     * Return's the response instance
+     * Returns the response instance
      *
      * @return \AppserverIo\Psr\HttpMessage\ResponseInterface
      */
@@ -159,7 +156,7 @@ class PhpModule implements HttpModuleInterface
     }
 
     /**
-     * Return's the request's context instance
+     * Returns the request's context instance
      *
      * @return \AppserverIo\Server\Interfaces\RequestContextInterface
      */
@@ -179,16 +176,16 @@ class PhpModule implements HttpModuleInterface
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
-    public function process(
-        RequestInterface $request,
-        ResponseInterface $response,
-        RequestContextInterface $requestContext,
-        $hook
-    ) {
+    public function process(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext, $hook)
+    {
         // In php an interface is, by definition, a fixed contract. It is immutable.
         // So we have to declair the right ones afterwards...
-        /** @var $request \AppserverIo\Psr\HttpMessage\RequestInterface */
-        /** @var $request \AppserverIo\Psr\HttpMessage\ResponseInterface */
+        /**
+         * @var $request \AppserverIo\Psr\HttpMessage\RequestInterface
+         */
+        /**
+         * @var $request \AppserverIo\Psr\HttpMessage\ResponseInterface
+         */
 
         // check if shutdown hook is comming
         if (ModuleHooks::SHUTDOWN === $hook) {
@@ -209,9 +206,8 @@ class PhpModule implements HttpModuleInterface
 
         // check if server handler sais php modules should react on this request as file handler
         if ($requestContext->getServerVar(ServerVars::SERVER_HANDLER) === self::MODULE_NAME) {
-
             // check if file does not exist
-            if (!$requestContext->hasServerVar(ServerVars::SCRIPT_FILENAME)) {
+            if (! $requestContext->hasServerVar(ServerVars::SCRIPT_FILENAME)) {
                 // send 404
                 $response->setStatusCode(404);
                 throw new ModuleException(null, 404);
@@ -224,7 +220,7 @@ class PhpModule implements HttpModuleInterface
              * Check if script name exists on filesystem
              * This is necessary because of seq faults if a non existing file will be required.
              */
-            if (!file_exists($scriptFilename)) {
+            if (! file_exists($scriptFilename)) {
                 // send 404
                 $response->setStatusCode(404);
                 throw new ModuleException(null, 404);
@@ -245,11 +241,7 @@ class PhpModule implements HttpModuleInterface
             $this->initGlobals();
 
             // start new php process
-            $process = new ProcessThread(
-                $scriptFilename,
-                $this->globals,
-                $this->uploadedFiles
-            );
+            $process = new ProcessThread($scriptFilename, $this->globals, $this->uploadedFiles);
 
             // start process
             $process->start(PTHREADS_INHERIT_ALL | PTHREADS_ALLOW_HEADERS);
@@ -264,8 +256,7 @@ class PhpModule implements HttpModuleInterface
                     // check if output buffer was set by the application executed by the php process
                     // so do not override content by exception stack trace
                     if (strlen($errorMessage = $process->getOutputBuffer()) === 0) {
-                        $errorMessage = 'PHP Fatal error: ' . $lastError['message'] .
-                            ' in ' . $lastError['file'] . ' on line ' . $lastError['line'];
+                        $errorMessage = 'PHP Fatal error: ' . $lastError['message'] . ' in ' . $lastError['file'] . ' on line ' . $lastError['line'];
                     }
                     // set internal server error code with error message to exception
                     throw new ModuleException($errorMessage, 500);
@@ -276,9 +267,7 @@ class PhpModule implements HttpModuleInterface
             $this->prepareResponse($process);
 
             // store the file's contents in the response
-            $response->appendBodyStream(
-                $process->getOutputBuffer()
-            );
+            $response->appendBodyStream($process->getOutputBuffer());
 
             // set response state to be dispatched after this without calling other modules process
             $response->setState(HttpResponseStates::DISPATCH);
@@ -366,10 +355,7 @@ class PhpModule implements HttpModuleInterface
 
         // initialize the globals
         $globals['server'] = $requestContext->getServerVars();
-        $globals['env'] = array_merge(
-            (array)$requestContext->getEnvVars(),
-            appserver_get_envs()
-        );
+        $globals['env'] = array_merge((array) $requestContext->getEnvVars(), appserver_get_envs());
         $globals['request'] = $request->getParams();
 
         // init post / get. default init vars as GET method case
@@ -440,18 +426,13 @@ class PhpModule implements HttpModuleInterface
             }
             // check if file has array info
             if (preg_match('/^([^\[]+)(\[.+)?/', $part->getName(), $matches)) {
-
                 // get first part group name and array definition if exists
                 $partGroup = $matches[1];
                 $partArrayDefinition = '';
                 if (isset($matches[2])) {
                     $partArrayDefinition = $matches[2];
                 }
-                $queryStr .= $partGroup . '[name]' . $partArrayDefinition . '=' . $part->getFilename() .
-                    '&' . $partGroup . '[type]' . $partArrayDefinition . '=' . $part->getContentType() .
-                    '&' . $partGroup . '[tmp_name]' . $partArrayDefinition . '=' . $tempName .
-                    '&' . $partGroup . '[error]' . $partArrayDefinition . '=' . $errorState .
-                    '&' . $partGroup . '[size]' . $partArrayDefinition . '=' . $part->getSize() . '&';
+                $queryStr .= $partGroup . '[name]' . $partArrayDefinition . '=' . $part->getFilename() . '&' . $partGroup . '[type]' . $partArrayDefinition . '=' . $part->getContentType() . '&' . $partGroup . '[tmp_name]' . $partArrayDefinition . '=' . $tempName . '&' . $partGroup . '[error]' . $partArrayDefinition . '=' . $errorState . '&' . $partGroup . '[size]' . $partArrayDefinition . '=' . $part->getSize() . '&';
             }
         }
         // parse query string to array
@@ -478,7 +459,7 @@ class PhpModule implements HttpModuleInterface
     }
 
     /**
-     * Return's an array of module names which should be executed first
+     * Returns an array of module names which should be executed first
      *
      * @return array The array of module names
      */

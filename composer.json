@@ -1,63 +1,63 @@
 {
-    "name": "appserver-io/webserver",
-    "description": "Multithreaded webserver for php written in php",
-    "homepage": "https://github.com/appserver-io/webserver",
-    "license": "OSL-3.0",
-    "keywords": [
-        "php",
-        "server",
-        "webserver",
-        "httpd",
-        "http-server"
-    ],
-    "authors": [
-        {
-            "name": "Johann Zelger",
-            "email": "jz@appserver.io",
-            "homepage": "http://www.appserver.io",
-            "role": "Developer"
-        }, {
-            "name": "Tim Wagner",
-            "email": "tw@appserver.io",
-            "homepage": "http://www.appserver.io",
-            "role": "Developer"
-        }, {
-            "name": "Bernhard Wick",
-            "email": "bw@appserver.io",
-            "homepage": "http://www.appserver.io",
-            "role": "Developer"
-        }
-    ],
-    "require": {
-        "php": ">=5.4.0",
-        "monolog/monolog": "1.10.*",
-        "rhumsaa/uuid" : "~2.8",
-        "psr/log": "*",
-        "appserver-io/server": "0.2.*",
-        "appserver-io/http": "0.2.*",
-        "appserver-io/fastcgi": "0.1.*",
-        "appserver-io/logger": "0.1.*"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "3.7.*",
-        "appserver-io/build": "0.1.*"
-    },
-    "autoload": {
-        "psr-0": {
-            "AppserverIo\\WebServer": [
-                "src/",
-                "tests/"
-            ]
-        }
-    },
-    "config": {
-        "github-oauth": {
-            "github.com": "604a3b5943228e434a5b52c2ba3cf72286d30db9"
-        }
-    },
-    "support": {
-        "email": "jz@appserver.io",
-        "issues": "https://github.com/appserver-io/webserver/issues",
-        "source": "https://github.com/appserver-io/webserver"
-    }
+	"name" : "appserver-io/webserver",
+	"description" : "Multithreaded webserver for php written in php",
+	"homepage" : "https://github.com/appserver-io/webserver",
+	"license" : "OSL-3.0",
+	"keywords" : [
+		"php",
+		"server",
+		"webserver",
+		"httpd",
+		"http-server"
+	],
+	"authors" : [{
+			"name" : "Johann Zelger",
+			"email" : "jz@appserver.io",
+			"homepage" : "http://www.appserver.io",
+			"role" : "Developer"
+		}, {
+			"name" : "Tim Wagner",
+			"email" : "tw@appserver.io",
+			"homepage" : "http://www.appserver.io",
+			"role" : "Developer"
+		}, {
+			"name" : "Bernhard Wick",
+			"email" : "bw@appserver.io",
+			"homepage" : "http://www.appserver.io",
+			"role" : "Developer"
+		}
+	],
+	"require" : {
+		"php" : ">=5.4.0",
+		"monolog/monolog" : "1.10.*",
+		"rhumsaa/uuid" : "~2.8",
+		"psr/log" : "*",
+		"appserver-io/server" : "0.2.*",
+		"appserver-io/http" : "0.2.*",
+		"appserver-io/fastcgi" : "0.1.*",
+		"appserver-io/logger" : "0.1.*",
+		"appserver-io-psr/socket" : "0.2.*",
+		"appserver-io-psr/http-message" : "0.2.*"
+	},
+	"require-dev" : {
+		"appserver-io/build" : "0.2.*"
+	},
+	"autoload" : {
+		"psr-0" : {
+			"AppserverIo\\WebServer" : [
+				"src/",
+				"tests/"
+			]
+		}
+	},
+	"config" : {
+		"github-oauth" : {
+			"github.com" : "604a3b5943228e434a5b52c2ba3cf72286d30db9"
+		}
+	},
+	"support" : {
+		"email" : "jz@appserver.io",
+		"issues" : "https://github.com/appserver-io/webserver/issues",
+		"source" : "https://github.com/appserver-io/webserver"
+	}
 }

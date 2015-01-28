@@ -11,13 +11,12 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Bernhard Wick <bw@appserver.io>
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 
 namespace AppserverIo\WebServer\Modules;
@@ -36,17 +35,16 @@ use AppserverIo\Server\Interfaces\ServerContextInterface;
 /**
  * Class VirtualHostModule
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Johann Zelger <jz@appserver.io>
- * @author     Bernhard Wick <bw@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Bernhard Wick <bw@appserver.io>
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 class VirtualHostModule implements HttpModuleInterface
 {
+
     /**
      * Defines the module name
      *
@@ -117,7 +115,7 @@ class VirtualHostModule implements HttpModuleInterface
     }
 
     /**
-     * Implement's module logic for given hook
+     * Implements module logic for given hook
      *
      * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
      * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
@@ -127,16 +125,16 @@ class VirtualHostModule implements HttpModuleInterface
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
-    public function process(
-        RequestInterface $request,
-        ResponseInterface $response,
-        RequestContextInterface $requestContext,
-        $hook
-    ) {
+    public function process(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext, $hook)
+    {
         // In php an interface is, by definition, a fixed contract. It is immutable.
         // So we have to declair the right ones afterwards...
-        /** @var $request \AppserverIo\Psr\HttpMessage\RequestInterface */
-        /** @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface */
+        /**
+         * @var $request \AppserverIo\Psr\HttpMessage\RequestInterface
+         */
+        /**
+         * @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface
+         */
 
         // if false hook is comming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
@@ -147,7 +145,9 @@ class VirtualHostModule implements HttpModuleInterface
         $this->request = $request;
         $this->response = $response;
 
-        $virtualHosts = $this->getServerContext()->getServerConfig()->getVirtualHosts();
+        $virtualHosts = $this->getServerContext()
+            ->getServerConfig()
+            ->getVirtualHosts();
         $serverName = $requestContext->getServerVar(ServerVars::SERVER_NAME);
 
         // check if current host matches any virtual host configuration
@@ -166,77 +166,52 @@ class VirtualHostModule implements HttpModuleInterface
                         }
                     }
                     // set server var
-                    $requestContext->setServerVar(
-                        $this->paramServerVarsMap[$paramName],
-                        $paramValue
-                    );
+                    $requestContext->setServerVar($this->paramServerVarsMap[$paramName], $paramValue);
                 }
             }
 
             // Add the rewrites we have (if any) to the configuration's rewrite pool
-            if (!empty($virtualHosts[$serverName]['rewrites'])) {
+            if (! empty($virtualHosts[$serverName]['rewrites'])) {
                 // Set the rewrites we encountered as a temporary module var
-                $requestContext->setModuleVar(
-                    ModuleVars::VOLATILE_REWRITES,
-                    $virtualHosts[$serverName]['rewrites']
-                );
+                $requestContext->setModuleVar(ModuleVars::VOLATILE_REWRITES, $virtualHosts[$serverName]['rewrites']);
             }
 
             // Add the environment vars we have (if any) to the configuration's environment variable pool
-            if (!empty($virtualHosts[$serverName]['environmentVariables'])) {
+            if (! empty($virtualHosts[$serverName]['environmentVariables'])) {
                 // Set the environment variables we encountered as a temporary module var
-                $requestContext->setModuleVar(
-                    ModuleVars::VOLATILE_ENVIRONMENT_VARIABLES,
-                    $virtualHosts[$serverName]['environmentVariables']
-                );
+                $requestContext->setModuleVar(ModuleVars::VOLATILE_ENVIRONMENT_VARIABLES, $virtualHosts[$serverName]['environmentVariables']);
             }
 
             // Add the accesses (if any) to the configuration's access pool
-            if (!empty($virtualHosts[$serverName]['accesses'])) {
+            if (! empty($virtualHosts[$serverName]['accesses'])) {
                 // Set the environment variables we encountered as a temporary module var
-                $requestContext->setModuleVar(
-                    ModuleVars::VOLATILE_ACCESSES,
-                    $virtualHosts[$serverName]['accesses']
-                );
+                $requestContext->setModuleVar(ModuleVars::VOLATILE_ACCESSES, $virtualHosts[$serverName]['accesses']);
             }
 
             // add the analytics (if any) to the configuration's analytics pool
-            if (!empty($virtualHosts[$serverName]['analytics'])) {
+            if (! empty($virtualHosts[$serverName]['analytics'])) {
                 // set the analytics we encountered as a temporary module var
-                $requestContext->setModuleVar(
-                    ModuleVars::VOLATILE_ANALYTICS,
-                    $virtualHosts[$serverName]['analytics']
-                );
+                $requestContext->setModuleVar(ModuleVars::VOLATILE_ANALYTICS, $virtualHosts[$serverName]['analytics']);
             }
 
             // Add the locations we have (if any) to the configuration's location pool
-            if (!empty($virtualHosts[$serverName]['locations'])) {
+            if (! empty($virtualHosts[$serverName]['locations'])) {
                 // Set the locations we encountered as a temporary module var
-                $requestContext->setModuleVar(
-                    ModuleVars::VOLATILE_LOCATIONS,
-                    $virtualHosts[$serverName]['locations']
-                );
+                $requestContext->setModuleVar(ModuleVars::VOLATILE_LOCATIONS, $virtualHosts[$serverName]['locations']);
             }
 
             // Add the rewriteMaps we have (if any) to the configuration's rewriteMaps pool
-            if (!empty($virtualHosts[$serverName]['rewriteMaps'])) {
+            if (! empty($virtualHosts[$serverName]['rewriteMaps'])) {
                 // Set the rewriteMaps we encountered as a temporary module var
-                $requestContext->setModuleVar(
-                    ModuleVars::VOLATILE_REWRITE_MAPS,
-                    $virtualHosts[$serverName]['rewriteMaps']
-                );
+                $requestContext->setModuleVar(ModuleVars::VOLATILE_REWRITE_MAPS, $virtualHosts[$serverName]['rewriteMaps']);
             }
 
             // Add the authentications we have (if any) to the configuration's authentications pool
-            if (!empty($virtualHosts[$serverName]['authentications'])) {
+            if (! empty($virtualHosts[$serverName]['authentications'])) {
                 // Set the authentications we encountered as a temporary module var
-                $requestContext->setModuleVar(
-                    ModuleVars::VOLATILE_AUTHENTICATIONS,
-                    $virtualHosts[$serverName]['authentications']
-                );
+                $requestContext->setModuleVar(ModuleVars::VOLATILE_AUTHENTICATIONS, $virtualHosts[$serverName]['authentications']);
             }
         }
-
     }
 
     /**

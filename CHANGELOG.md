@@ -1,3 +1,14 @@
+# Version 0.4.0
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Removed obsolete ModuleParserInterface
+* Applied new file name and comment conventions
+
 # Version 0.3.9
 
 ## Bugfixes

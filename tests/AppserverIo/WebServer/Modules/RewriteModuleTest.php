@@ -11,13 +11,11 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Bernhard Wick <bw@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Bernhard Wick <bw@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 
 namespace AppserverIo\WebServer\Modules;
@@ -29,24 +27,20 @@ use AppserverIo\WebServer\Mock\MockRewriteModule;
 use AppserverIo\WebServer\Mock\MockServerConfig;
 use AppserverIo\WebServer\Mock\MockRequestContext;
 use AppserverIo\WebServer\Mock\MockServerContext;
-use AppserverIo\WebServer\Modules\RewriteModule;
 use AppserverIo\Server\Contexts\ServerContext;
 use AppserverIo\Server\Dictionaries\EnvVars;
 use AppserverIo\Server\Dictionaries\ModuleHooks;
-use AppserverIo\WebServer\Mock\MockHttpRequest;
 
 /**
  * Class RewriteModuleTest
  *
  * Basic test class for the RewriteModule class.
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Bernhard Wick <bw@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Bernhard Wick <bw@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 class RewriteModuleTest extends \PHPUnit_Framework_TestCase
 {

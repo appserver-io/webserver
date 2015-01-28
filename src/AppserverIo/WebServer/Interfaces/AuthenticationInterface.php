@@ -36,19 +36,16 @@ interface AuthenticationInterface
     /**
      * Constructs the authentication type
      *
-     * @param array $configData
-     *            The configuration data for auth type instance
+     * @param array $configData The configuration data for auth type instance
      */
     public function __construct(array $configData = array());
 
     /**
      * Initialise by the auth content got from client
      *
-     * @param string $authData
-     *            The content of authentication data sent by client
-     * @param string $reqMethod
-     *            The https request method as string
-     *            
+     * @param string $authData  The content of authentication data sent by client
+     * @param string $reqMethod The https request method as string
+     *
      * @return void
      */
     public function init($authData, $reqMethod);
@@ -61,14 +58,14 @@ interface AuthenticationInterface
     public function auth();
 
     /**
-     * Return's the authentication type token to compare with request header
+     * Returns the authentication type token to compare with request header
      *
      * @return string
      */
     public function getType();
 
     /**
-     * Return's the parsed username
+     * Returns the parsed username
      *
      * @return string
      */

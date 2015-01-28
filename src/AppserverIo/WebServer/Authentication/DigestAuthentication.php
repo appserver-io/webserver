@@ -50,7 +50,7 @@ class DigestAuthentication extends AbstractAuthentication implements Authenticat
     {
         // init data var
         $data = array();
-        
+
         // define required data
         $requiredData = array(
             'nonce' => 1,
@@ -61,27 +61,26 @@ class DigestAuthentication extends AbstractAuthentication implements Authenticat
             'uri' => 1,
             'response' => 1
         );
-        
+
         // prepare key for parsing logic
         $key = implode('|', array_keys($requiredData));
-        
+
         // parse header value
         preg_match_all('@(' . $key . ')=(?:([\'"])([^\2]+?)\2|([^\s,]+))@', $this->authData, $matches, PREG_SET_ORDER);
-        
+
         // iterate all found values for header value
         foreach ($matches as $match) {
-            
             // check if match could be found
             if ($match[3]) {
                 $data[$match[1]] = $match[3];
             } else {
                 $data[$match[1]] = $match[4];
             }
-            
+
             // unset required value because we got it processed
             unset($requiredData[$match[1]]);
         }
-        
+
         // set if all required data was processed
         $this->authData = $requiredData ? false : $data;
         $this->username = $this->authData["username"];
@@ -123,7 +122,7 @@ class DigestAuthentication extends AbstractAuthentication implements Authenticat
         // set internal var refs
         $credentials = $this->getCredentials();
         $authData = $this->getAuthData();
-        
+
         // verify everything to be ready for auth if not return false
         if (! $this->verify()) {
             return false;
@@ -134,7 +133,7 @@ class DigestAuthentication extends AbstractAuthentication implements Authenticat
         $ha2 = md5(implode(':', array(
             $this->getReqMethod() . ':' . $authData['uri']
         )));
-        
+
         // create valid response to compare with auth data response
         $validResponse = md5(implode(':', array(
             $ha1,

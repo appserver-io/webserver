@@ -94,9 +94,8 @@ class VirtualHostModule implements HttpModuleInterface
     /**
      * Initiates the module
      *
-     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext
-     *            The server's context instance
-     *            
+     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext The server's context instance
+     *
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
@@ -116,17 +115,13 @@ class VirtualHostModule implements HttpModuleInterface
     }
 
     /**
-     * Implement's module logic for given hook
+     * Implements module logic for given hook
      *
-     * @param \AppserverIo\Psr\HttpMessage\RequestInterface $request
-     *            A request object
-     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface $response
-     *            A response object
-     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext
-     *            A requests context instance
-     * @param int $hook
-     *            The current hook to process logic for
-     *            
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
+     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
+     * @param int                                                    $hook           The current hook to process logic for
+     *
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
@@ -140,21 +135,21 @@ class VirtualHostModule implements HttpModuleInterface
         /**
          * @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface
          */
-        
+
         // if false hook is comming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
             return;
         }
-        
+
         // set req and res object internally
         $this->request = $request;
         $this->response = $response;
-        
+
         $virtualHosts = $this->getServerContext()
             ->getServerConfig()
             ->getVirtualHosts();
         $serverName = $requestContext->getServerVar(ServerVars::SERVER_NAME);
-        
+
         // check if current host matches any virtual host configuration
         if (isset($virtualHosts[$serverName])) {
             // read out params
@@ -174,43 +169,43 @@ class VirtualHostModule implements HttpModuleInterface
                     $requestContext->setServerVar($this->paramServerVarsMap[$paramName], $paramValue);
                 }
             }
-            
+
             // Add the rewrites we have (if any) to the configuration's rewrite pool
             if (! empty($virtualHosts[$serverName]['rewrites'])) {
                 // Set the rewrites we encountered as a temporary module var
                 $requestContext->setModuleVar(ModuleVars::VOLATILE_REWRITES, $virtualHosts[$serverName]['rewrites']);
             }
-            
+
             // Add the environment vars we have (if any) to the configuration's environment variable pool
             if (! empty($virtualHosts[$serverName]['environmentVariables'])) {
                 // Set the environment variables we encountered as a temporary module var
                 $requestContext->setModuleVar(ModuleVars::VOLATILE_ENVIRONMENT_VARIABLES, $virtualHosts[$serverName]['environmentVariables']);
             }
-            
+
             // Add the accesses (if any) to the configuration's access pool
             if (! empty($virtualHosts[$serverName]['accesses'])) {
                 // Set the environment variables we encountered as a temporary module var
                 $requestContext->setModuleVar(ModuleVars::VOLATILE_ACCESSES, $virtualHosts[$serverName]['accesses']);
             }
-            
+
             // add the analytics (if any) to the configuration's analytics pool
             if (! empty($virtualHosts[$serverName]['analytics'])) {
                 // set the analytics we encountered as a temporary module var
                 $requestContext->setModuleVar(ModuleVars::VOLATILE_ANALYTICS, $virtualHosts[$serverName]['analytics']);
             }
-            
+
             // Add the locations we have (if any) to the configuration's location pool
             if (! empty($virtualHosts[$serverName]['locations'])) {
                 // Set the locations we encountered as a temporary module var
                 $requestContext->setModuleVar(ModuleVars::VOLATILE_LOCATIONS, $virtualHosts[$serverName]['locations']);
             }
-            
+
             // Add the rewriteMaps we have (if any) to the configuration's rewriteMaps pool
             if (! empty($virtualHosts[$serverName]['rewriteMaps'])) {
                 // Set the rewriteMaps we encountered as a temporary module var
                 $requestContext->setModuleVar(ModuleVars::VOLATILE_REWRITE_MAPS, $virtualHosts[$serverName]['rewriteMaps']);
             }
-            
+
             // Add the authentications we have (if any) to the configuration's authentications pool
             if (! empty($virtualHosts[$serverName]['authentications'])) {
                 // Set the authentications we encountered as a temporary module var

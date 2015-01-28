@@ -51,14 +51,14 @@ class DirectoryModule implements HttpModuleInterface
     const MODULE_NAME = 'directory';
 
     /**
-     * Hold's the server context instance
+     * Holds the server context instance
      *
      * @var \AppserverIo\Server\Interfaces\ServerContextInterface
      */
     protected $serverContext;
 
     /**
-     * Return's the request instance
+     * Returns the request instance
      *
      * @return \AppserverIo\Psr\HttpMessage\RequestInterface The request instance
      */
@@ -80,9 +80,8 @@ class DirectoryModule implements HttpModuleInterface
     /**
      * Initiates the module
      *
-     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext
-     *            The server's context instance
-     *            
+     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext The server's context instance
+     *
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
@@ -106,15 +105,11 @@ class DirectoryModule implements HttpModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \AppserverIo\Psr\HttpMessage\RequestInterface $request
-     *            A request object
-     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface $response
-     *            A response object
-     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext
-     *            A requests context instance
-     * @param int $hook
-     *            The current hook to process logic for
-     *            
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
+     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
+     * @param int                                                    $hook           The current hook to process logic for
+     *
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
@@ -128,28 +123,28 @@ class DirectoryModule implements HttpModuleInterface
         /**
          * @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface
          */
-        
+
         // if false hook is comming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
             return;
         }
-        
+
         // set req and res object internally
         $this->request = $request;
         $this->response = $response;
         // get server context ref to local func
         $serverContext = $this->getServerContext();
-        
+
         // get document root
         $documentRoot = $requestContext->getServerVar(ServerVars::DOCUMENT_ROOT);
         // get url
         $url = parse_url($requestContext->getServerVar(ServerVars::X_REQUEST_URI), PHP_URL_PATH);
         // get query string with asterisk
         $queryString = strstr($requestContext->getServerVar(ServerVars::X_REQUEST_URI), '?');
-        
+
         // get read path to requested uri
         $realPath = $documentRoot . $url;
-        
+
         // check if it's a dir
         if (is_dir($realPath) || $url === '/') {
             // check if uri has trailing slash
@@ -161,7 +156,6 @@ class DirectoryModule implements HttpModuleInterface
                 // set response state to be dispatched after this without calling other modules process
                 $response->setState(HttpResponseStates::DISPATCH);
             } else {
-                
                 // check directory index definitions
                 foreach ($this->getDirectoryIndex() as $index) {
                     // check if defined index files are found in directory

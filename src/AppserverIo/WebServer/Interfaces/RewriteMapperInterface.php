@@ -34,9 +34,8 @@ interface RewriteMapperInterface
     /**
      * Looks up a target url for given request url
      *
-     * @param string $requestUri
-     *            The requested url without query params
-     *            
+     * @param string $requestUri The requested url without query params
+     *
      * @return null|string
      */
     public function lookup($requestUri);

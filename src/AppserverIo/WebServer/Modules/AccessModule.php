@@ -97,9 +97,8 @@ class AccessModule implements HttpModuleInterface
     /**
      * Initiates the module
      *
-     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext
-     *            The server's context instance
-     *            
+     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext The server's context instance
+     *
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
@@ -112,15 +111,11 @@ class AccessModule implements HttpModuleInterface
     /**
      * Implement's module logic for given hook
      *
-     * @param \AppserverIo\Psr\HttpMessage\RequestInterface $request
-     *            A request object
-     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface $response
-     *            A response object
-     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext
-     *            A requests context instance
-     * @param int $hook
-     *            The current hook to process logic for
-     *            
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
+     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
+     * @param int                                                    $hook           The current hook to process logic for
+     *
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
@@ -134,38 +129,36 @@ class AccessModule implements HttpModuleInterface
         /**
          * @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface
          */
-        
+
         // if false hook is comming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
             return;
         }
-        
+
         // set req and res object internally
         $this->request = $request;
         $this->response = $response;
-        
+
         // get default access definitions
         $accesses = $this->accesses;
-        
+
         // check if there are some volatile access definitions so use them and override global accesses
         if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_ACCESSES)) {
             // reset by volatile accesses
             $accesses = $requestContext->getModuleVar(ModuleVars::VOLATILE_ACCESSES);
         }
-        
+
         // generally everything is not allowed
         $allowed = false;
-        
+
         if ($accesses['allow']) {
             // check allow accesses informations if something matches
             foreach ($accesses['allow'] as $accessData) {
-                
                 // we are optimistic an initial say data will match
                 $matchAllow = true;
-                
+
                 // check if accessData matches server vars
                 foreach ($accessData as $serverVar => $varPattern) {
-                    
                     // check if server var exists
                     if ($requestContext->hasServerVar($serverVar)) {
                         // check if pattern matches
@@ -176,7 +169,7 @@ class AccessModule implements HttpModuleInterface
                         }
                     }
                 }
-                
+
                 if ($matchAllow) {
                     // set allowed flag true
                     $allowed = true;
@@ -185,18 +178,15 @@ class AccessModule implements HttpModuleInterface
                 }
             }
         }
-        
+
         if (isset($accesses['deny'])) {
-            
             // check deny accesses informations if something matches
             foreach ($accesses['deny'] as $accessData) {
-                
                 // initial nothing denies the request
                 $matchDeny = false;
-                
+
                 // check if accessData matches server vars
                 foreach ($accessData as $serverVar => $varPattern) {
-                    
                     // check if server var exists
                     if ($requestContext->hasServerVar($serverVar)) {
                         // check if pattern matches
@@ -207,7 +197,7 @@ class AccessModule implements HttpModuleInterface
                         }
                     }
                 }
-                
+
                 if ($matchDeny) {
                     // set allowed flag false
                     $allowed = false;
@@ -216,7 +206,7 @@ class AccessModule implements HttpModuleInterface
                 }
             }
         }
-        
+
         // check if it's finally not allowed
         if (! $allowed) {
             throw new ModuleException('This request is forbidden', 403);

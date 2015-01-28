@@ -38,17 +38,13 @@ interface HttpModuleInterface extends ModuleInterface
 {
 
     /**
-     * Implement's module logic for given hook
+     * Implements module logic for given hook
      *
-     * @param \AppserverIo\Psr\HttpMessage\RequestInterface $request
-     *            A request object
-     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface $response
-     *            A response object
-     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext
-     *            A requests context instance
-     * @param int $hook
-     *            The current hook to process logic for
-     *            
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
+     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
+     * @param int                                                    $hook           The current hook to process logic for
+     *
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */

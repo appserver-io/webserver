@@ -77,12 +77,9 @@ class ProcessThread extends \Thread
     /**
      * Constructs the process
      *
-     * @param string $scriptFilename
-     *            The script filename to execute
-     * @param array $globals
-     *            The globals array access object
-     * @param array $uploadedFiles
-     *            The uploaded files as array
+     * @param string $scriptFilename The script filename to execute
+     * @param array  $globals        The globals array access object
+     * @param array  $uploadedFiles  The uploaded files as array
      */
     public function __construct($scriptFilename, array $globals = array(), array $uploadedFiles = array())
     {
@@ -103,36 +100,36 @@ class ProcessThread extends \Thread
             &$this,
             "shutdown"
         ));
-        
+
         // init globals to local var
         $globals = $this->globals;
-        
+
         // set globals
         $_SERVER = $globals['server'];
         $_ENV = $globals['env'];
-        
+
         $_REQUEST = $globals['request'];
         $_POST = $globals['post'];
         $_GET = $globals['get'];
         $_COOKIE = $globals['cookie'];
         $_FILES = $globals['files'];
-        
+
         // check if http war post data is set
         if (isset($globals['httpRawPostData'])) {
             // set raw post data to be available in php://input stream and $HTTP_RAW_POST_DATA var
             appserver_set_raw_post_data($globals['httpRawPostData']);
         }
-        
+
         // register uploaded files for thread process context internal hashmap
         foreach ($this->uploadedFiles as $uploadedFile) {
             appserver_register_file_upload($uploadedFile);
         }
-        
+
         // change dir to be in real php process context
         chdir(dirname($this->scriptFilename));
         // reset headers sent
         appserver_set_headers_sent(false);
-        
+
         try {
             // start output buffering
             ob_start();
@@ -163,20 +160,19 @@ class ProcessThread extends \Thread
         }
         // get php output buffer
         if (strlen($outputBuffer = ob_get_clean()) === 0) {
-            
             $errorMessage = '';
             if ($this->lastError['type'] === E_ERROR || $this->lastError['type'] === E_USER_ERROR) {
                 $errorMessage = 'PHP Fatal error: ' . $this->lastError['message'] . ' in ' . $this->lastError['file'] . ' on line ' . $this->lastError['line'];
             }
             $outputBuffer = $errorMessage;
         }
-        
+
         // set http response code set by scrip inclusion
         $this->httpResponseCode = appserver_get_http_response_code();
-        
+
         // set headers set by script inclusion
         $this->httpHeaders = appserver_get_headers(true);
-        
+
         // set output buffer set by script inclusion
         $this->outputBuffer = $outputBuffer;
     }

@@ -35,9 +35,8 @@ interface DirectiveInterface
      * Will fill an empty directive object with vital information delivered via an array.
      * This is mostly useful as an interface for different parsers
      *
-     * @param array $parts
-     *            The array to extract information from
-     *            
+     * @param array $parts The array to extract information from
+     *
      * @return null
      * @throws \InvalidArgumentException
      */

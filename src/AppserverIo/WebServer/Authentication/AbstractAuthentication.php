@@ -37,57 +37,56 @@ class AbstractAuthentication
     /**
      * Holds the valid credentials given in passwd file
      *
-     * @var array
+     * @var array $credentials
      */
     protected $credentials;
 
     /**
      * The parsed username given by header content payload
      *
-     * @var string
+     * @var string $username
      */
     protected $username;
 
     /**
      * The password given by header content payload
      *
-     * @var string
+     * @var string $password
      */
     protected $password;
 
     /**
-     * Hold's the auth data got from http authentication header
+     * Holds the auth data got from http authentication header
      *
-     * @var string
+     * @var string $authData
      */
     protected $authData;
 
     /**
-     * Hold's the auth hash to compare with auth information given by system
+     * Holds the auth hash to compare with auth information given by system
      *
-     * @var string
+     * @var string $authHash
      */
     protected $authHash;
 
     /**
-     * Hold's the requests method
+     * Holds the requests method
      *
-     * @var string
+     * @var string $reqMethod
      */
     protected $reqMethod;
 
     /**
-     * Hold's the configuration data given for authentication type
+     * Holds the configuration data given for authentication type
      *
-     * @var array
+     * @var array $configData
      */
     protected $configData;
 
     /**
      * Constructs the authentication type
      *
-     * @param array $configData
-     *            The configuration data for auth type instance
+     * @param array $configData The configuration data for auth type instance
      */
     public function __construct(array $configData = array())
     {
@@ -114,11 +113,9 @@ class AbstractAuthentication
     /**
      * Initialise by the auth content got from client
      *
-     * @param string $authData
-     *            The content of authentication data sent by client
-     * @param string $reqMethod
-     *            The https request method as string
-     *            
+     * @param string $authData  The content of authentication data sent by client
+     * @param string $reqMethod The https request method as string
+     *
      * @return void
      */
     public function init($authData, $reqMethod)
@@ -126,7 +123,7 @@ class AbstractAuthentication
         // set vars internally
         $this->authData = $authData;
         $this->reqMethod = $reqMethod;
-        
+
         // parse auth data
         $this->parse();
     }
@@ -141,17 +138,17 @@ class AbstractAuthentication
     {
         // set internal var refs
         $credentials = $this->getCredentials();
-        
+
         // check if credentials are empty
         if (empty($credentials)) {
             throw new AuthenticationException(sprintf(AuthenticationException::MESSAGE_AUTHFILE_INVALID, $this->configData['file']));
         }
-        
+
         // check request header data does not contains exact username requested
         if (! isset($credentials[$this->getUsername()])) {
             return false;
         }
-        
+
         return true;
     }
 

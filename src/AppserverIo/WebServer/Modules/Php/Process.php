@@ -56,12 +56,9 @@ class Process
     /**
      * Constructs the process
      *
-     * @param string $scriptFilename
-     *            The script filename to execute
-     * @param array $globals
-     *            The globals instance
-     * @param array $uploadedFiles
-     *            The uploaded files as array
+     * @param string $scriptFilename The script filename to execute
+     * @param array  $globals        The globals instance
+     * @param array  $uploadedFiles  The uploaded files as array
      */
     public function __construct($scriptFilename, array $globals = array(), array $uploadedFiles = array())
     {
@@ -73,9 +70,8 @@ class Process
     /**
      * Runs the process
      *
-     * @param int $flags
-     *            Flags how to start the process
-     *            
+     * @param int $flags Flags how to start the process
+     *
      * @return void
      */
     public function start($flags)
@@ -91,7 +87,7 @@ class Process
         $_GET = $globals['get'];
         $_COOKIE = $globals['cookie'];
         $_FILES = $globals['files'];
-        
+
         // get current working dir for reset after processing
         $oldCwd = getcwd();
         // change dir to be in real php process context

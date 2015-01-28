@@ -106,13 +106,10 @@ class Condition
     /**
      * Default constructor
      *
-     * @param string $operand
-     *            The value to check with the given action
-     * @param string $action
-     *            How the operand has to be checked, this will hold the needed action
-     * @param string $modifier
-     *            Modifier which should be used to integrate things like apache flags and others
-     *            
+     * @param string $operand  The value to check with the given action
+     * @param string $action   How the operand has to be checked, this will hold the needed action
+     * @param string $modifier Modifier which should be used to integrate things like apache flags and others
+     *
      * @throws \InvalidArgumentException
      */
     public function __construct($operand, $action, $modifier = '')
@@ -136,27 +133,27 @@ class Condition
             '[NC]',
             '[nocase]'
         );
-        
+
         // We do not negate by default, nor do we combine with the following condition via "or"
         $this->isNegated = false;
-        
+
         // Check if the passed modifier is valid (or empty)
         if (! isset(array_flip($this->allowedModifiers)[$modifier]) && ! empty($modifier)) {
             throw new \InvalidArgumentException($modifier . ' is not an allowed condition modifier.');
         }
-        
+
         // Fill the more important properties
         $this->operand = $operand;
         $this->action = $action;
         $this->modifier = $modifier;
         $this->additionalOperand = '';
-        
+
         // Check if we have a negation
         $this->preparePossibleNegation();
-        
+
         // check what type we have. Per default it's regex
         $this->prepareOperandAdditions();
-        
+
         // If we got a regex we have to re-organize a few things
         if ($this->type !== 'check') {
             // we have to set the type correctly, collect the regex as additional operand and set the regex flag as
@@ -186,7 +183,7 @@ class Condition
                     $this->additionalOperand = substr($this->action, 1);
                     $this->action = substr($this->action, 0, 1);
                 }
-                
+
                 // If we reach this point we are of the check type
                 $this->type = 'check';
                 break;
@@ -243,9 +240,8 @@ class Condition
     /**
      * Will resolve the directive's parts by substituting placeholders with the corresponding backreferences
      *
-     * @param array $backreferences
-     *            The backreferences used for resolving placeholders
-     *            
+     * @param array $backreferences The backreferences used for resolving placeholders
+     *
      * @return void
      */
     public function resolve(array $backreferences)
@@ -253,10 +249,10 @@ class Condition
         // Separate the keys from the values so we can use them in str_replace
         $backreferenceHolders = array_keys($backreferences);
         $backreferenceValues = array_values($backreferences);
-        
+
         // Substitute the backreferences in our operand and additionalOperand
         $this->operand = str_replace($backreferenceHolders, $backreferenceValues, $this->operand);
-        
+
         // prepare our operand to be usable for filesystem checks
         $this->prepareFilesystemOperand();
         $this->additionalOperand = str_replace($backreferenceHolders, $backreferenceValues, $this->additionalOperand);
@@ -275,48 +271,46 @@ class Condition
         $result = false;
         if ($this->action === ConditionActions::REGEX) {
             // Get the result for a regex
-            
+
             $result = preg_match('`' . $this->additionalOperand . '`', $this->operand) === 1;
         } elseif ($this->action === ConditionActions::IS_DIR) {
             // Is it an existing directory?
-            
+
             $result = is_dir($this->additionalOperand . $this->operand);
         } elseif ($this->action === ConditionActions::IS_EXECUTABLE) {
             // Is the file an executable?
-            
+
             $result = is_executable($this->additionalOperand . $this->operand);
         } elseif ($this->action === ConditionActions::IS_FILE) {
             // Is it a regular file?
-            
+
             $result = is_file($this->additionalOperand . $this->operand);
         } elseif ($this->action === ConditionActions::IS_LINK) {
             // Is it a symlink?
-            
+
             $result = is_link($this->additionalOperand . $this->operand);
         } elseif ($this->action === ConditionActions::IS_USED_FILE) {
             // Is it a real file which has a size greater 0?
-            
+
             $result = (is_file($this->additionalOperand . $this->operand) && (int) filesize($this->additionalOperand . $this->operand) > 0);
         } elseif ($this->action === ConditionActions::STR_EQUAL) {
             // Or the compared strings equal
-            
+
             $result = strcmp($this->operand, $this->additionalOperand) == 0;
         } elseif ($this->action === ConditionActions::STR_GREATER) {
             // Is the operand bigger?
-            
+
             $result = strcmp($this->operand, $this->additionalOperand) > 0;
         } elseif ($this->action === ConditionActions::STR_LESS) {
             // Is the operand smaller?
-            
             $result = strcmp($this->operand, $this->additionalOperand) < 0;
         }
-        
+
         // If the check got negated we will just negate what we got from our preceding checks
         if ($this->isNegated) {
-            
             $result = ! $result;
         }
-        
+
         return $result;
     }
 
@@ -328,11 +322,10 @@ class Condition
     protected function prepareFilesystemOperand()
     {
         if ($this->action === ConditionActions::IS_DIR || $this->action === ConditionActions::IS_EXECUTABLE || $this->action === ConditionActions::IS_FILE || $this->action === ConditionActions::IS_LINK || $this->action === ConditionActions::IS_USED_FILE) {
-            
             if (strpos($this->operand, '?') !== false) {
                 $this->operand = strstr($this->operand, '?', true);
             }
-            
+
             if (! is_readable($this->additionalOperand . $this->operand)) {
                 // Set the placeholder for the document root, it will be resolved anyway
                 // If we got ourselves a complete path, we do not need the document root
@@ -351,19 +344,17 @@ class Condition
         $backreferences = array();
         $matches = array();
         if ($this->type === 'regex') {
-            
             preg_match('`' . $this->additionalOperand . '`', $this->operand, $matches);
-            
+
             // Unset the first find of our backreferences, so we can use it automatically
             unset($matches[0]);
         }
-        
+
         // Iterate over all our found matches and give them a fine name
         foreach ($matches as $key => $match) {
-            
             $backreferences['$' . (string) $key] = $match;
         }
-        
+
         return $backreferences;
     }
 }

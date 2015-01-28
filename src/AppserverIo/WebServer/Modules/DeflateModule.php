@@ -66,11 +66,10 @@ class DeflateModule implements HttpModuleInterface
     );
 
     /**
-     * Check's if given mime type is relevant for compression
+     * Checks if given mime type is relevant for compression
      *
-     * @param string $mimeType
-     *            The mime type to check
-     *            
+     * @param string $mimeType The mime type to check
+     *
      * @return boolean
      */
     protected function isRelevantMimeType($mimeType)
@@ -82,9 +81,8 @@ class DeflateModule implements HttpModuleInterface
     /**
      * Initiates the module
      *
-     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext
-     *            The server's context instance
-     *            
+     * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext The server's context instance
+     *
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
@@ -94,31 +92,27 @@ class DeflateModule implements HttpModuleInterface
     }
 
     /**
-     * Implement's module logic for given hook
+     * Implements module logic for given hook
      *
-     * @param \AppserverIo\Psr\HttpMessage\RequestInterface $request
-     *            A request object
-     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface $response
-     *            A response object
-     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext
-     *            A requests context instance
-     * @param int $hook
-     *            The current hook to process logic for
-     *            
+     * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
+     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
+     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
+     * @param int                                                    $hook           The current hook to process logic for
+     *
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
     public function process(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext, $hook)
     {
         // In php an interface is, by definition, a fixed contract. It is immutable.
-        // So we have to declair the right ones afterwards...
+        // So we have to declare the right ones afterwards...
         /**
          * @var $request \AppserverIo\Psr\HttpMessage\RequestInterface
          */
         /**
          * @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface
          */
-        
+
         // if false hook is comming do nothing
         if (ModuleHooks::RESPONSE_PRE !== $hook) {
             return;
@@ -133,10 +127,9 @@ class DeflateModule implements HttpModuleInterface
         }
         // check if request accepts deflate
         if (strpos($request->getHeader(Protocol::HEADER_ACCEPT_ENCODING), 'deflate') !== false) {
-            
             // get stream meta data
             $streamMetaData = stream_get_meta_data($response->getBodyStream());
-            
+
             /**
              * Currently it's not possible to apply zlib.deflate filter on memory (php://memory) or
              * temp (php://temp) streams due to a bug in that zlib library.,

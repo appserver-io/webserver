@@ -11,13 +11,11 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 
 namespace AppserverIo\WebServer\Modules;
@@ -36,16 +34,15 @@ use AppserverIo\Server\Interfaces\ServerContextInterface;
 /**
  * Class AccessModule
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 class AccessModule implements HttpModuleInterface
 {
+
     /**
      * Defines the module name
      *
@@ -122,16 +119,16 @@ class AccessModule implements HttpModuleInterface
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
-    public function process(
-        RequestInterface $request,
-        ResponseInterface $response,
-        RequestContextInterface $requestContext,
-        $hook
-    ) {
+    public function process(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext, $hook)
+    {
         // In php an interface is, by definition, a fixed contract. It is immutable.
         // So we have to declair the right ones afterwards...
-        /** @var $request \AppserverIo\Psr\HttpMessage\RequestInterface */
-        /** @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface */
+        /**
+         * @var $request \AppserverIo\Psr\HttpMessage\RequestInterface
+         */
+        /**
+         * @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface
+         */
 
         // if false hook is comming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
@@ -157,20 +154,15 @@ class AccessModule implements HttpModuleInterface
         if ($accesses['allow']) {
             // check allow accesses informations if something matches
             foreach ($accesses['allow'] as $accessData) {
-
                 // we are optimistic an initial say data will match
                 $matchAllow = true;
 
                 // check if accessData matches server vars
                 foreach ($accessData as $serverVar => $varPattern) {
-
                     // check if server var exists
                     if ($requestContext->hasServerVar($serverVar)) {
                         // check if pattern matches
-                        if (!preg_match(
-                            '/' . $varPattern . '/',
-                            $requestContext->getServerVar($serverVar)
-                        )) {
+                        if (! preg_match('/' . $varPattern . '/', $requestContext->getServerVar($serverVar))) {
                             $matchAllow = false;
                             // break here if anything not matches
                             break;
@@ -188,23 +180,17 @@ class AccessModule implements HttpModuleInterface
         }
 
         if (isset($accesses['deny'])) {
-
             // check deny accesses informations if something matches
             foreach ($accesses['deny'] as $accessData) {
-
                 // initial nothing denies the request
                 $matchDeny = false;
 
                 // check if accessData matches server vars
                 foreach ($accessData as $serverVar => $varPattern) {
-
                     // check if server var exists
                     if ($requestContext->hasServerVar($serverVar)) {
                         // check if pattern matches
-                        if (preg_match(
-                            '/' . $varPattern . '/',
-                            $requestContext->getServerVar($serverVar)
-                        )) {
+                        if (preg_match('/' . $varPattern . '/', $requestContext->getServerVar($serverVar))) {
                             $matchDeny = true;
                             // break here if anything matches
                             break;
@@ -222,7 +208,7 @@ class AccessModule implements HttpModuleInterface
         }
 
         // check if it's finally not allowed
-        if (!$allowed) {
+        if (! $allowed) {
             throw new ModuleException('This request is forbidden', 403);
         }
     }

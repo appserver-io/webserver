@@ -11,13 +11,11 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Bernhard Wick <bw@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Bernhard Wick <bw@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 
 namespace AppserverIo\WebServer\Modules\Rewrite\Entities;
@@ -30,16 +28,15 @@ use AppserverIo\Server\Dictionaries\ServerVars;
  *
  * This class provides an object based representation of a rewrite rules condition including logic for checking itself.
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Bernhard Wick <bw@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Bernhard Wick <bw@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 class Condition
 {
+
     /**
      * The allowed values for the $types member
      *
@@ -55,7 +52,8 @@ class Condition
     protected $allowedModifiers = array();
 
     /**
-     * Possible additions to the known PCRE regex. These additions get used by htaccess notation only.
+     * Possible additions to the known PCRE regex.
+     * These additions get used by htaccess notation only.
      *
      * @var array<string> $htaccessAdditions
      */
@@ -76,7 +74,8 @@ class Condition
     protected $operand;
 
     /**
-     * In some cases, e.g. string comparison or regex, we need another operand to work with
+     * In some cases, e.g.
+     * string comparison or regex, we need another operand to work with
      *
      * @var string $additionalOperand
      */
@@ -116,7 +115,10 @@ class Condition
     public function __construct($operand, $action, $modifier = '')
     {
         // Fill the default values for our members here
-        $this->allowedTypes = array('regex', 'check');
+        $this->allowedTypes = array(
+            'regex',
+            'check'
+        );
         $this->htaccessAdditions = array(
             ConditionActions::STR_LESS,
             ConditionActions::STR_GREATER,
@@ -127,13 +129,16 @@ class Condition
             ConditionActions::IS_LINK,
             ConditionActions::IS_EXECUTABLE
         );
-        $this->allowedModifiers = array('[NC]', '[nocase]');
+        $this->allowedModifiers = array(
+            '[NC]',
+            '[nocase]'
+        );
 
         // We do not negate by default, nor do we combine with the following condition via "or"
         $this->isNegated = false;
 
         // Check if the passed modifier is valid (or empty)
-        if (!isset(array_flip($this->allowedModifiers)[$modifier]) && !empty($modifier)) {
+        if (! isset(array_flip($this->allowedModifiers)[$modifier]) && ! empty($modifier)) {
             throw new \InvalidArgumentException($modifier . ' is not an allowed condition modifier.');
         }
 
@@ -268,53 +273,42 @@ class Condition
             // Get the result for a regex
 
             $result = preg_match('`' . $this->additionalOperand . '`', $this->operand) === 1;
-
         } elseif ($this->action === ConditionActions::IS_DIR) {
             // Is it an existing directory?
 
             $result = is_dir($this->additionalOperand . $this->operand);
-
         } elseif ($this->action === ConditionActions::IS_EXECUTABLE) {
             // Is the file an executable?
 
             $result = is_executable($this->additionalOperand . $this->operand);
-
         } elseif ($this->action === ConditionActions::IS_FILE) {
             // Is it a regular file?
 
             $result = is_file($this->additionalOperand . $this->operand);
-
         } elseif ($this->action === ConditionActions::IS_LINK) {
             // Is it a symlink?
 
-            $result = is_link($this->additionalOperand .$this->operand);
-
+            $result = is_link($this->additionalOperand . $this->operand);
         } elseif ($this->action === ConditionActions::IS_USED_FILE) {
             // Is it a real file which has a size greater 0?
 
-            $result = (is_file($this->additionalOperand . $this->operand) &&
-                (int) filesize($this->additionalOperand . $this->operand) > 0);
-
+            $result = (is_file($this->additionalOperand . $this->operand) && (int) filesize($this->additionalOperand . $this->operand) > 0);
         } elseif ($this->action === ConditionActions::STR_EQUAL) {
             // Or the compared strings equal
 
             $result = strcmp($this->operand, $this->additionalOperand) == 0;
-
         } elseif ($this->action === ConditionActions::STR_GREATER) {
             // Is the operand bigger?
 
             $result = strcmp($this->operand, $this->additionalOperand) > 0;
-
         } elseif ($this->action === ConditionActions::STR_LESS) {
             // Is the operand smaller?
-
             $result = strcmp($this->operand, $this->additionalOperand) < 0;
         }
 
         // If the check got negated we will just negate what we got from our preceding checks
         if ($this->isNegated) {
-
-            $result = !$result;
+            $result = ! $result;
         }
 
         return $result;
@@ -327,18 +321,12 @@ class Condition
      */
     protected function prepareFilesystemOperand()
     {
-        if ($this->action === ConditionActions::IS_DIR ||
-            $this->action === ConditionActions::IS_EXECUTABLE ||
-            $this->action === ConditionActions::IS_FILE ||
-            $this->action === ConditionActions::IS_LINK ||
-            $this->action === ConditionActions::IS_USED_FILE
-        ) {
-
+        if ($this->action === ConditionActions::IS_DIR || $this->action === ConditionActions::IS_EXECUTABLE || $this->action === ConditionActions::IS_FILE || $this->action === ConditionActions::IS_LINK || $this->action === ConditionActions::IS_USED_FILE) {
             if (strpos($this->operand, '?') !== false) {
                 $this->operand = strstr($this->operand, '?', true);
             }
 
-            if (!is_readable($this->additionalOperand . $this->operand)) {
+            if (! is_readable($this->additionalOperand . $this->operand)) {
                 // Set the placeholder for the document root, it will be resolved anyway
                 // If we got ourselves a complete path, we do not need the document root
                 $this->additionalOperand = '$' . ServerVars::DOCUMENT_ROOT;
@@ -356,7 +344,6 @@ class Condition
         $backreferences = array();
         $matches = array();
         if ($this->type === 'regex') {
-
             preg_match('`' . $this->additionalOperand . '`', $this->operand, $matches);
 
             // Unset the first find of our backreferences, so we can use it automatically
@@ -365,8 +352,7 @@ class Condition
 
         // Iterate over all our found matches and give them a fine name
         foreach ($matches as $key => $match) {
-
-            $backreferences['$' . (string)$key] = $match;
+            $backreferences['$' . (string) $key] = $match;
         }
 
         return $backreferences;

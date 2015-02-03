@@ -11,30 +11,26 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Authentication
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2015 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io
  */
-
 namespace AppserverIo\WebServer\Authentication;
 
 /**
  * Class AuthenticationException
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Authentication
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2015 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link https://github.com/appserver-io/webserver
+ * @link http://www.appserver.io
  */
 class AuthenticationException extends \Exception
 {
+
     /**
      * Defines message for invalid or missing auth file
      *

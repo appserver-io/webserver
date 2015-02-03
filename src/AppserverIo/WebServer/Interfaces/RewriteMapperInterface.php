@@ -1,7 +1,7 @@
 <?php
 
 /**
- * \AppserverIo\Server\Exceptions\ModuleException
+ * \AppserverIo\WebServer\Interfaces\RewriteMapperInterface
  *
  * NOTICE OF LICENSE
  *
@@ -11,33 +11,28 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Interfaces
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link https://github.com/appserver-io/webserver
+ * @link http://www.appserver.io
  */
-
 namespace AppserverIo\WebServer\Interfaces;
 
 /**
  * Interface RewriteMapperInterface
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Interfaces
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link https://github.com/appserver-io/webserver
+ * @link http://www.appserver.io
  */
 interface RewriteMapperInterface
 {
 
     /**
-     * Look's up a target url for given request url
+     * Looks up a target url for given request url
      *
      * @param string $requestUri The requested url without query params
      *

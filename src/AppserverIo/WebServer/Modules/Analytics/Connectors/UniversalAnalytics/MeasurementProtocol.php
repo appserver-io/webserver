@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * AppserverIo\WebServer\Modules\Analytics\Connectors\UniversalAnalytics\MeasurementProtocol
+ *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the Open Software License (OSL 3.0)
@@ -9,13 +11,11 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Bernhard Wick <bw@appserver.io>
- * @copyright  2014 TechDivision GmbH - <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       http://www.appserver.io/
+ * @author    Bernhard Wick <bw@appserver.io>
+ * @copyright 2014 TechDivision GmbH - <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 
 namespace AppserverIo\WebServer\Modules\Analytics\Connectors\UniversalAnalytics;
@@ -31,17 +31,13 @@ use AppserverIo\Server\Interfaces\ServerContextInterface;
 use AppserverIo\Logger\LoggerUtils;
 
 /**
- * AppserverIo\WebServer\Modules\Analytics\Connectors\UniversalAnalytics\MeasurementProtocol
- *
  * Connector for google's "Universal Analytics" measurement protocol API
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Bernhard Wick <bw@appserver.io>
- * @copyright  2014 TechDivision GmbH - <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       http://www.appserver.io/
+ * @author    Bernhard Wick <bw@appserver.io>
+ * @copyright 2014 TechDivision GmbH - <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 class MeasurementProtocol implements ConnectorInterface
 {
@@ -112,7 +108,12 @@ class MeasurementProtocol implements ConnectorInterface
      *
      * @see https://developers.google.com/analytics/devguides/collection/protocol/v1/devguide
      */
-    protected $supportedHitTypes = array('event', 'screenview', 'item', 'social');
+    protected $supportedHitTypes = array(
+        'event',
+        'screenview',
+        'item',
+        'social'
+    );
 
     /**
      * Default constructor
@@ -142,7 +143,9 @@ class MeasurementProtocol implements ConnectorInterface
         );
 
         // set our default parameters
-        $this->defaultParameters = array('v' => 1);
+        $this->defaultParameters = array(
+            'v' => 1
+        );
     }
 
     /**
@@ -165,17 +168,14 @@ class MeasurementProtocol implements ConnectorInterface
 
         // the client will be a random UUID, at least if we do not get a matching cookie
         if ($request->hasHeader(HttpProtocol::HEADER_COOKIE)) {
-
             $cookie = $request->getHeader(HttpProtocol::HEADER_COOKIE);
             $matches = array();
             preg_match('/_ga=GA[0-9]\.[0-9]\.(.+)/', $cookie, $matches);
             if (isset($matches[1])) {
-
                 $parameters['cid'] = $matches[1];
             }
         }
-        if (!isset($parameters['cid'])) {
-
+        if (! isset($parameters['cid'])) {
             $uuid4 = Uuid::uuid4();
             $parameters['cid'] = $uuid4->toString();
         }
@@ -195,20 +195,14 @@ class MeasurementProtocol implements ConnectorInterface
     {
         // we only check if we know the requirements
         if (isset($this->requiredParameters[$params['t']])) {
-
             foreach ($this->requiredParameters[$params['t']] as $requirement) {
-
-                if (!isset($params[$requirement])) {
-
+                if (! isset($params[$requirement])) {
                     // do the logging, preferably by one of our loggers
                     $message = 'We miss the required parameter "%s", you might not get proper analytics!';
                     if ($this->serverContext->hasLogger(LoggerUtils::SYSTEM)) {
-
                         $logger = $this->serverContext->getLogger(LoggerUtils::SYSTEM);
                         $logger->warning(sprintf($message, $requirement));
-
                     } else {
-
                         error_log(sprintf($message, $requirement));
                     }
                 }
@@ -238,12 +232,9 @@ class MeasurementProtocol implements ConnectorInterface
 
         // first of all we have to check for the hit type
         $supportedHitTypes = array_flip($this->supportedHitTypes);
-        if (!isset($params['t'])) {
-
+        if (! isset($params['t'])) {
             $params['t'] = self::DEFAULT_HIT_TYPE;
-
-        } elseif (!isset($supportedHitTypes[$params['t']])) {
-
+        } elseif (! isset($supportedHitTypes[$params['t']])) {
             throw new \InvalidArgumentException(sprintf('Unsupported hit type "%s", please check configuration and module implementation.', $params['t']));
         }
 

@@ -11,14 +11,11 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Tim Wagner <tw@appserver.io>
- * @author     Bernhard Wick <bw@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 
 namespace AppserverIo\WebServer\Modules;
@@ -43,14 +40,11 @@ use Crunch\FastCGI\Client as FastCgiClient;
  * This module allows us to let requests be handled by Fast-CGI client
  * that has been configured in the web servers configuration.
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Tim Wagner <tw@appserver.io>
- * @author     Bernhard Wick <bw@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 class FastCgiModule implements HttpModuleInterface
 {
@@ -87,19 +81,17 @@ class FastCgiModule implements HttpModuleInterface
      * @return bool
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
-    public function process(
-        RequestInterface $request,
-        ResponseInterface $response,
-        RequestContextInterface $requestContext,
-        $hook
-    ) {
-
+    public function process(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext, $hook)
+    {
         try {
-
             // in php an interface is, by definition, a fixed contract. It is immutable.
             // so we have to declair the right ones afterwards...
-            /** @var $request \AppserverIo\Psr\HttpMessage\RequestInterface */
-            /** @var $request \AppserverIo\Psr\HttpMessage\ResponseInterface */
+            /**
+             * @var $request \AppserverIo\Psr\HttpMessage\RequestInterface
+             */
+            /**
+             * @var $request \AppserverIo\Psr\HttpMessage\ResponseInterface
+             */
 
             // if false hook is comming do nothing
             if (ModuleHooks::REQUEST_POST !== $hook) {
@@ -112,7 +104,7 @@ class FastCgiModule implements HttpModuleInterface
             }
 
             // check if file does not exist
-            if (!$requestContext->hasServerVar(ServerVars::SCRIPT_FILENAME)) {
+            if (! $requestContext->hasServerVar(ServerVars::SCRIPT_FILENAME)) {
                 $response->setStatusCode(404);
                 throw new ModuleException(null, 404);
             }
@@ -159,8 +151,8 @@ class FastCgiModule implements HttpModuleInterface
 
             // set response state to be dispatched after this without calling other modules process
             $response->setState(HttpResponseStates::DISPATCH);
-
-        } catch (\Exception $e) { // catch all exceptions
+        } catch (\Exception $e) {
+            // catch all exceptions
             throw new ModuleException($e);
         }
     }
@@ -184,7 +176,6 @@ class FastCgiModule implements HttpModuleInterface
 
         // check if we've configured module variables
         if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_FILE_HANDLER_VARIABLES)) {
-
             // load the volatile file handler variables and set connection data
             $fileHandlerVariables = $requestContext->getModuleVar(ModuleVars::VOLATILE_FILE_HANDLER_VARIABLES);
             if (isset($fileHandlerVariables['host'])) {
@@ -193,7 +184,6 @@ class FastCgiModule implements HttpModuleInterface
             if (isset($fileHandlerVariables['port'])) {
                 $port = $fileHandlerVariables['port'];
             }
-
         }
 
         // create and return the FastCGI client
@@ -201,7 +191,7 @@ class FastCgiModule implements HttpModuleInterface
     }
 
     /**
-     * Prepares and returns the array with the FastCGI environment varaibles.
+     * Prepares and returns the array with the FastCGI environment variables.
      *
      * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
      * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
@@ -214,20 +204,20 @@ class FastCgiModule implements HttpModuleInterface
         // prepare the Fast-CGI environment variables
         $environment = array(
             ServerVars::GATEWAY_INTERFACE => 'FastCGI/1.0',
-            ServerVars::REQUEST_METHOD    => $requestContext->getServerVar(ServerVars::REQUEST_METHOD),
-            ServerVars::SCRIPT_FILENAME   => $requestContext->getServerVar(ServerVars::SCRIPT_FILENAME),
-            ServerVars::QUERY_STRING      => $requestContext->getServerVar(ServerVars::QUERY_STRING),
-            ServerVars::SCRIPT_NAME       => $requestContext->getServerVar(ServerVars::SCRIPT_NAME),
-            ServerVars::REQUEST_URI       => $requestContext->getServerVar(ServerVars::REQUEST_URI),
-            ServerVars::DOCUMENT_ROOT     => $requestContext->getServerVar(ServerVars::DOCUMENT_ROOT),
-            ServerVars::SERVER_PROTOCOL   => $requestContext->getServerVar(ServerVars::SERVER_PROTOCOL),
-            ServerVars::HTTPS             => $requestContext->getServerVar(ServerVars::HTTPS),
-            ServerVars::SERVER_SOFTWARE   => $requestContext->getServerVar(ServerVars::SERVER_SOFTWARE),
-            ServerVars::REMOTE_ADDR       => $requestContext->getServerVar(ServerVars::REMOTE_ADDR),
-            ServerVars::REMOTE_PORT       => $requestContext->getServerVar(ServerVars::REMOTE_PORT),
-            ServerVars::SERVER_ADDR       => $requestContext->getServerVar(ServerVars::SERVER_ADDR),
-            ServerVars::SERVER_PORT       => $requestContext->getServerVar(ServerVars::SERVER_PORT),
-            ServerVars::SERVER_NAME       => $requestContext->getServerVar(ServerVars::SERVER_NAME)
+            ServerVars::REQUEST_METHOD => $requestContext->getServerVar(ServerVars::REQUEST_METHOD),
+            ServerVars::SCRIPT_FILENAME => $requestContext->getServerVar(ServerVars::SCRIPT_FILENAME),
+            ServerVars::QUERY_STRING => $requestContext->getServerVar(ServerVars::QUERY_STRING),
+            ServerVars::SCRIPT_NAME => $requestContext->getServerVar(ServerVars::SCRIPT_NAME),
+            ServerVars::REQUEST_URI => $requestContext->getServerVar(ServerVars::REQUEST_URI),
+            ServerVars::DOCUMENT_ROOT => $requestContext->getServerVar(ServerVars::DOCUMENT_ROOT),
+            ServerVars::SERVER_PROTOCOL => $requestContext->getServerVar(ServerVars::SERVER_PROTOCOL),
+            ServerVars::HTTPS => $requestContext->getServerVar(ServerVars::HTTPS),
+            ServerVars::SERVER_SOFTWARE => $requestContext->getServerVar(ServerVars::SERVER_SOFTWARE),
+            ServerVars::REMOTE_ADDR => $requestContext->getServerVar(ServerVars::REMOTE_ADDR),
+            ServerVars::REMOTE_PORT => $requestContext->getServerVar(ServerVars::REMOTE_PORT),
+            ServerVars::SERVER_ADDR => $requestContext->getServerVar(ServerVars::SERVER_ADDR),
+            ServerVars::SERVER_PORT => $requestContext->getServerVar(ServerVars::SERVER_PORT),
+            ServerVars::SERVER_NAME => $requestContext->getServerVar(ServerVars::SERVER_NAME)
         );
 
         // if we found a redirect status, add it to the environment variables
@@ -270,7 +260,7 @@ class FastCgiModule implements HttpModuleInterface
     protected function formatResponse($stdout)
     {
 
-        // split the header from the body.  Split on \n\n.
+        // split the header from the body. Split on \n\n.
         $doubleCr = strpos($stdout, "\r\n\r\n");
         $rawHeader = substr($stdout, 0, $doubleCr);
         $rawBody = substr($stdout, $doubleCr, strlen($stdout));
@@ -285,20 +275,17 @@ class FastCgiModule implements HttpModuleInterface
 
         // iterate over the headers found in the response.
         foreach ($headerLines as $line) {
-
             // initialize the array with the matches
             $matches = array();
 
             // extract the header data.
             if (preg_match('/([\w-]+):\s*(.*)$/', $line, $matches)) {
-
                 // initialize header name/value.
                 $headerName = strtolower($matches[1]);
                 $headerValue = trim($matches[2]);
 
                 // if we found an status header (will only be available if not have a 200).
                 if ($headerName == 'status') {
-
                     // initialize the status header and the code.
                     $headerStatus = $headerValue;
                     $code = $headerValue;
@@ -309,16 +296,17 @@ class FastCgiModule implements HttpModuleInterface
 
                 // we need to know if this header is already available
                 if (array_key_exists($headerName, $header)) {
-
                     // check if the value is an array already
                     if (is_array($header[$headerName])) {
                         // Simply append the next header value
                         $header[$headerName][] = $headerValue;
                     } else {
                         // convert the existing value into an array and append the new header value
-                        $header[$headerName] = array($header[$headerName], $headerValue);
+                        $header[$headerName] = array(
+                            $header[$headerName],
+                            $headerValue
+                        );
                     }
-
                 } else {
                     $header[$headerName] = $headerValue;
                 }
@@ -336,8 +324,8 @@ class FastCgiModule implements HttpModuleInterface
         // return the array with the response
         return array(
             'statusCode' => (int) $code,
-            'headers'    => $header,
-            'body'       => trim($rawBody)
+            'headers' => $header,
+            'body' => trim($rawBody)
         );
     }
 
@@ -367,9 +355,7 @@ class FastCgiModule implements HttpModuleInterface
      * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext The servers context instance
      *
      * @return bool
-     * @throws \AppserverIo\Server\Exceptions\ModuleException
-     *
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @throws \AppserverIo\Server\Exceptions\ModuleException @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function init(ServerContextInterface $serverContext)
     {

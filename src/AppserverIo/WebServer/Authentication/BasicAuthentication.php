@@ -11,15 +11,12 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Authentication
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io
  */
-
 namespace AppserverIo\WebServer\Authentication;
 
 use AppserverIo\Server\Exceptions\ModuleException;
@@ -28,16 +25,15 @@ use AppserverIo\WebServer\Interfaces\AuthenticationInterface;
 /**
  * Class BasicAuthentication
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Authentication
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link https://github.com/appserver-io/webserver
+ * @link http://www.appserver.io
  */
 class BasicAuthentication extends AbstractAuthentication implements AuthenticationInterface
 {
+
     /**
      * Defines the auth type which should match the client request type definition
      *
@@ -55,7 +51,7 @@ class BasicAuthentication extends AbstractAuthentication implements Authenticati
         // set auth hash got from auth data request header
         $this->authHash = trim(strstr($this->getAuthData(), " "));
         // get out username and password
-        list($this->username, $this->password) = explode(':', base64_decode($this->authHash));
+        list ($this->username, $this->password) = explode(':', base64_decode($this->authHash));
         // check if either username or password was not found and return false
         if (($this->password === null) || ($this->username === null)) {
             return false;
@@ -84,7 +80,7 @@ class BasicAuthentication extends AbstractAuthentication implements Authenticati
         $fileLines = file($this->configData['file']);
         // iterate all lines and set credentials
         foreach ($fileLines as $fileLine) {
-            list($user, $pass) = explode(':', $fileLine);
+            list ($user, $pass) = explode(':', $fileLine);
             $this->credentials[trim($user)] = trim($pass);
         }
     }
@@ -100,9 +96,10 @@ class BasicAuthentication extends AbstractAuthentication implements Authenticati
         // set internal var refs
         $credentials = $this->getCredentials();
         // verify everything to be ready for auth if not return false
-        if (!$this->verify()) {
+        if (! $this->verify()) {
             return false;
-        };
+        }
+        ;
         // do auth check
         return (password_verify($this->getPassword(), $credentials[$this->getUsername()]));
     }

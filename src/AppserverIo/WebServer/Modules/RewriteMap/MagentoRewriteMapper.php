@@ -11,13 +11,11 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 
 namespace AppserverIo\WebServer\Modules\RewriteMap;
@@ -27,13 +25,11 @@ use AppserverIo\WebServer\Interfaces\RewriteMapperInterface;
 /**
  * Class MagentoRewriteMapper
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Modules
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
  */
 class MagentoRewriteMapper implements RewriteMapperInterface
 {
@@ -49,7 +45,7 @@ class MagentoRewriteMapper implements RewriteMapperInterface
     }
 
     /**
-     * Look's up a target url for given request url
+     * Looks up a target url for given request url
      *
      * @param string $requestUrl The requested url without query params
      *
@@ -96,19 +92,17 @@ class MagentoRewriteMapper implements RewriteMapperInterface
             $query = $db->query(
                 "select * from $rewriteTableName
                 where request_path = '$magentoRequestPath'
-                  and store_id = '$magentoStore->store_id'
-                  and options = 'RP'"
+                and store_id = '$magentoStore->store_id'
+                and options = 'RP'"
             );
 
             // Check if we got something useful
             if (is_a($query, '\PDOStatement')) {
-
                 $magentoUrlRewrite = $query->fetch(\PDO::FETCH_OBJ);
 
                 // check if target_path was found and set target url for return
                 if (isset($magentoUrlRewrite->target_path)) {
-                    $targetUrl .= $this->params['protocol'] . $this->params['headerHost'] .
-                        $baseUrl . $magentoUrlRewrite->target_path;
+                    $targetUrl .= $this->params['protocol'] . $this->params['headerHost'] . $baseUrl . $magentoUrlRewrite->target_path;
                 }
             }
 

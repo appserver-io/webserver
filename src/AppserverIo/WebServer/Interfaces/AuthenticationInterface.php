@@ -11,15 +11,12 @@
  *
  * PHP version 5
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Interfaces
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io
  */
-
 namespace AppserverIo\WebServer\Interfaces;
 
 use AppserverIo\Server\Exceptions\ModuleException;
@@ -27,16 +24,15 @@ use AppserverIo\Server\Exceptions\ModuleException;
 /**
  * Interface AuthenticationInterface
  *
- * @category   Server
- * @package    WebServer
- * @subpackage Interfaces
- * @author     Johann Zelger <jz@appserver.io>
- * @copyright  2014 TechDivision GmbH <info@appserver.io>
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link       https://github.com/appserver-io/webserver
+ * @author Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link https://github.com/appserver-io/webserver
+ * @link http://www.appserver.io
  */
 interface AuthenticationInterface
 {
+
     /**
      * Constructs the authentication type
      *
@@ -62,14 +58,14 @@ interface AuthenticationInterface
     public function auth();
 
     /**
-     * Return's the authentication type token to compare with request header
+     * Returns the authentication type token to compare with request header
      *
      * @return string
      */
     public function getType();
 
     /**
-     * Return's the parsed username
+     * Returns the parsed username
      *
      * @return string
      */

@@ -393,9 +393,6 @@ class Rule
                 // Build up the REQUEST_FILENAME from DOCUMENT_ROOT and X_REQUEST_URI (without the query string)
                 $this->type = 'relative';
 
-                $requestContext->setServerVar(ServerVars::SCRIPT_FILENAME, $requestContext->getServerVar(ServerVars::DOCUMENT_ROOT) . DIRECTORY_SEPARATOR . $this->target);
-                $requestContext->setServerVar(ServerVars::SCRIPT_NAME, $this->target);
-
                 // Setting the X_REQUEST_URI for internal communication
                 // Requested uri always has to begin with a slash
                 $this->target = '/' . ltrim($this->target, '/');

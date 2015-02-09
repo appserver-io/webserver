@@ -1,3 +1,23 @@
+# Version 0.4.2
+
+## Bugfixes
+
+* None
+
+## Features
+
+* added welcome-page support
+
+# Version 0.4.1
+
+## Bugfixes
+
+* Internal refactoring
+
+## Features
+
+* None
+
 # Version 0.4.0
 
 ## Bugfixes

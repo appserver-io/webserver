@@ -1,3 +1,13 @@
+# Version 0.4.3
+
+## Bugfixes
+
+* Fixes [#492](https://github.com/appserver-io/appserver/issues/492) in [appserver-io/appserver](https://github.com/appserver-io/appserver)
+
+## Features
+
+* None
+
 # Version 0.4.2
 
 ## Bugfixes

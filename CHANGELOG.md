@@ -1,3 +1,13 @@
+# Version 0.4.1
+
+## Bugfixes
+
+* None
+
+## Features
+
+* added welcome-page support
+
 # Version 0.4.0
 
 ## Bugfixes

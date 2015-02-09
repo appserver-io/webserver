@@ -153,7 +153,7 @@ class FastCgiModule implements HttpModuleInterface
             $response->setState(HttpResponseStates::DISPATCH);
         } catch (\Exception $e) {
             // catch all exceptions
-            throw new ModuleException($e);
+            throw new ModuleException($e->getMessage(), $e->getCode());
         }
     }
 

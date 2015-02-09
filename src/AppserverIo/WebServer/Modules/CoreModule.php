@@ -88,6 +88,14 @@ class CoreModule implements HttpModuleInterface
         // Just make sure that you check for the existence of the query string first, as it might not be set
         $uriWithoutQueryString = parse_url($requestContext->getServerVar(ServerVars::X_REQUEST_URI), PHP_URL_PATH);
 
+        // check if uri without query string is just "/"
+        if ($uriWithoutQueryString === '/' && $requestContext->hasServerVar(ServerVars::SERVER_WELCOME_PAGE_TEMPLATE_PATH)) {
+            // in this case we will set welcome page template to be errors template
+            if ($welcomePageTemplate = $requestContext->getServerVar(ServerVars::SERVER_WELCOME_PAGE_TEMPLATE_PATH)) {
+                $requestContext->setServerVar(ServerVars::SERVER_ERRORS_PAGE_TEMPLATE_PATH, $welcomePageTemplate);
+            }
+        }
+
         // split all path parts got from uri without query string
         $pathParts = explode('/', $uriWithoutQueryString);
 

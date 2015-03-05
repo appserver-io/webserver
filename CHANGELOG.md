@@ -1,3 +1,13 @@
+# Version 1.0.1
+
+## Bugfixes
+
+* Add missing REDIRECT_URI and REDIRECT_URL environment variables to FastCgiModule
+
+## Features
+
+* None
+
 # Version 1.0.0
 
 ## Bugfixes

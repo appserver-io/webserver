@@ -225,6 +225,16 @@ class FastCgiModule implements HttpModuleInterface
             $environment[ServerVars::REDIRECT_STATUS] = $requestContext->getServerVar(ServerVars::REDIRECT_STATUS);
         }
 
+        // if we found a redirect URL, add it to the environment variables
+        if ($requestContext->hasServerVar(ServerVars::REDIRECT_URL)) {
+            $environment[ServerVars::REDIRECT_URL] = $requestContext->getServerVar(ServerVars::REDIRECT_URL);
+        }
+
+        // if we found a redirect URI, add it to the environment variables
+        if ($requestContext->hasServerVar(ServerVars::REDIRECT_URI)) {
+            $environment[ServerVars::REDIRECT_URI] = $requestContext->getServerVar(ServerVars::REDIRECT_URI);
+        }
+
         // if we found a Content-Type header, add it to the environment variables
         if ($request->hasHeader(Protocol::HEADER_CONTENT_TYPE)) {
             $environment['CONTENT_TYPE'] = $request->getHeader(Protocol::HEADER_CONTENT_TYPE);

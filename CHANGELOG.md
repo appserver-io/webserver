@@ -1,3 +1,13 @@
+# Version 2.0.1
+
+## Bugfixes
+
+* Server vars REQUEST_URI and X_REQUEST_URI will be url decoded to avoid problems within the modules URI handling
+
+## Features
+
+* None
+
 # Version 2.0.0
 
 ## Bugfixes

@@ -69,5 +69,24 @@ $ruleSets = array(
             '/imprint' => '/index.do/imprint',
             '/index?q=dfgdsfgs&p=fsdgdfg' => '/index.do?q=dfgdsfgs&p=fsdgdfg'
         )
+    ),
+    'urlencode' => array(
+        'rules' => array(
+            array(
+                'condition' => '-f',
+                'target' => '',
+                'flag' => 'L'
+            ),
+            array(
+                'condition' => '(.*)',
+                'target' => '/ERROR',
+                'flag' => 'L'
+            )
+        ),
+        'map' => array(
+            '/html' => '/ERROR',
+            '/html/spa ce.txt' => '/html/spa ce.txt',
+            '/html/spa%20ce.txt' => '/ERROR'
+        )
     )
 );

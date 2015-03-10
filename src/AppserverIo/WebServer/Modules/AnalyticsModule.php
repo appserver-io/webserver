@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * \AppserverIo\WebServer\Modules\Analytics
+ *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the Open Software License (OSL 3.0)
@@ -15,6 +17,7 @@
  * @link      https://github.com/appserver-io/webserver
  * @link      http://www.appserver.io/
  */
+
 namespace AppserverIo\WebServer\Modules;
 
 use AppserverIo\Psr\HttpMessage\RequestInterface;
@@ -28,8 +31,6 @@ use AppserverIo\Server\Interfaces\ServerContextInterface;
 use AppserverIo\WebServer\Interfaces\HttpModuleInterface;
 
 /**
- * AppserverIo\WebServer\Modules\Analytics
- *
  * Module which allows to track calls to certain locations on the server and react with a configured analytics connector
  *
  * @author    Bernhard Wick <bw@appserver.io>

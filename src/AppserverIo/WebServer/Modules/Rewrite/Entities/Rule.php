@@ -1,7 +1,7 @@
 <?php
 
 /**
- * AppserverIo\WebServer\Modules\Rewrite\Entities\Rule
+ * \AppserverIo\WebServer\Modules\Rewrite\Entities\Rule
  *
  * NOTICE OF LICENSE
  *

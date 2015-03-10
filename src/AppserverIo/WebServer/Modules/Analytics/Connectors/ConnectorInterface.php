@@ -1,7 +1,7 @@
 <?php
 
 /**
- * AppserverIo\WebServer\Modules\Analytics\Connectors\ConnectorInterface
+ * \AppserverIo\WebServer\Modules\Analytics\Connectors\ConnectorInterface
  *
  * NOTICE OF LICENSE
  *

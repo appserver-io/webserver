@@ -1,7 +1,7 @@
 <?php
 
 /**
- * AppserverIo\WebServer\Modules\Php\Process
+ * \AppserverIo\WebServer\Modules\Php\Process
  *
  * NOTICE OF LICENSE
  *

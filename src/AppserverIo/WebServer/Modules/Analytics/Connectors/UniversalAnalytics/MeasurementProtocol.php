@@ -1,7 +1,7 @@
 <?php
 
 /**
- * AppserverIo\WebServer\Modules\Analytics\Connectors\UniversalAnalytics\MeasurementProtocol
+ * \AppserverIo\WebServer\Modules\Analytics\Connectors\UniversalAnalytics\MeasurementProtocol
  *
  * NOTICE OF LICENSE
  *

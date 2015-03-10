@@ -1,3 +1,15 @@
+# Version 2.0.0
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Moved HTTP authentication functionality to appserver-io/http package
+* Some minor comment fixes
+* Updated build process
+
 # Version 1.0.1
 
 ## Bugfixes

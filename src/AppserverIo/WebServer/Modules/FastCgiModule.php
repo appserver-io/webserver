@@ -93,7 +93,7 @@ class FastCgiModule implements HttpModuleInterface
              * @var $request \AppserverIo\Psr\HttpMessage\ResponseInterface
              */
 
-            // if false hook is comming do nothing
+            // if false hook is coming do nothing
             if (ModuleHooks::REQUEST_POST !== $hook) {
                 return;
             }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * AppserverIo\WebServer\Modules\Rewrite\Dictionaries\ConditionActions
+ * \AppserverIo\WebServer\Modules\Rewrite\Dictionaries\ConditionActions
  *
  * NOTICE OF LICENSE
  *

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * \AppserverIo\WebServer\ConnectionHandlers
+ * \AppserverIo\WebServer\ConnectionHandlers\HttpConnectionHandler
  *
  * NOTICE OF LICENSE
  *
@@ -17,6 +17,7 @@
  * @link      https://github.com/appserver-io/webserver
  * @link      http://www.appserver.io
  */
+
 namespace AppserverIo\WebServer\ConnectionHandlers;
 
 use AppserverIo\Server\Dictionaries\EnvVars;
@@ -26,7 +27,6 @@ use AppserverIo\Server\Interfaces\ConnectionHandlerInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Server\Interfaces\WorkerInterface;
-use AppserverIo\WebServer\Interfaces\HttpModuleInterface;
 use AppserverIo\Psr\Socket\SocketInterface;
 use AppserverIo\Psr\Socket\SocketReadException;
 use AppserverIo\Psr\Socket\SocketReadTimeoutException;

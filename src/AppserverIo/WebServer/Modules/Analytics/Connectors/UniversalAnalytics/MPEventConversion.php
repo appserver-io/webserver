@@ -1,7 +1,7 @@
 <?php
 
 /**
- * AppserverIo\WebServer\Modules\Analytics\Connectors\UniversalAnalytics\MPEventConversion
+ * \AppserverIo\WebServer\Modules\Analytics\Connectors\UniversalAnalytics\MPEventConversion
  *
  * NOTICE OF LICENSE
  *

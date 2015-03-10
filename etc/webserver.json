@@ -67,13 +67,13 @@
                 {
                     "uri": "^\\/auth\\/basic\\/phpwebserver.*",
                     "realm": "PhpWebServer Basic Authentication System",
-                    "type": "\\AppserverIo\\WebServer\\Authentication\\BasicAuthentication",
+                    "type": "\\AppserverIo\\Http\\Authentication\\BasicAuthentication",
                     "hash": "cGhwd2Vic2VydmVyOnBocHdlYnNlcnZlci5pMA=="
                 },
                 {
                     "uri": "^\\/auth\\/basic\\/appserver.*",
                     "realm": "appserver.io Basic Authentication System",
-                    "type": "\\AppserverIo\\WebServer\\Authentication\\BasicAuthentication",
+                    "type": "\\AppserverIo\\Http\\Authentication\\BasicAuthentication",
                     "hash": "YXBwc2VydmVyOmFwcHNlcnZlci5pMA=="
                 }
             ],

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * AppserverIo\WebServer\Modules\RewriteMap\MagentoRewriteMapper
+ * \AppserverIo\WebServer\Modules\RewriteMap\MagentoRewriteMapper
  *
  * NOTICE OF LICENSE
  *

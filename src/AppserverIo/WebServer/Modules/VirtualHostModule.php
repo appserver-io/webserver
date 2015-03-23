@@ -92,7 +92,7 @@ class VirtualHostModule implements HttpModuleInterface
                 // get real cert path
                 $realCertPath = str_replace('/', DIRECTORY_SEPARATOR, $certPath);
                 // check if relative or absolute path was given
-                if(strpos($realCertPath, '/') === false) {
+                if (strpos($realCertPath, '/') === false) {
                     $realCertPath = SERVER_BASEDIR . $realCertPath;
                 }
                 // try to enhance sni server certs array

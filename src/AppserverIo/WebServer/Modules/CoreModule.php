@@ -81,8 +81,14 @@ class CoreModule implements HttpModuleInterface
 
         // get document root
         $documentRoot = $requestContext->getServerVar(ServerVars::DOCUMENT_ROOT);
-        // get handlers
+
+        // load the default handlers
         $handlers = $serverContext->getServerConfig()->getHandlers();
+
+        // check if there are some volatile location definitions so use them and override global locations
+        if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_HANDLERS)) {
+            $handlers = array_merge($handlers, $requestContext->getModuleVar(ModuleVars::VOLATILE_HANDLERS));
+        }
 
         // get uri without querystring
         // Just make sure that you check for the existence of the query string first, as it might not be set
@@ -139,26 +145,6 @@ class CoreModule implements HttpModuleInterface
             } else {
                 // else build up path info
                 $pathInfo .= DIRECTORY_SEPARATOR . $pathParts[$i];
-            }
-        }
-
-        // load the locations
-        $locations = $this->locations;
-
-        // check if there are some volatile location definitions so use them and override global locations
-        if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_LOCATIONS)) {
-            $locations = $requestContext->getModuleVar(ModuleVars::VOLATILE_LOCATIONS);
-        }
-
-        // process the locations for this request
-        foreach ($locations as $location) {
-            if (preg_match('/' . $location['condition'] . '/', $uriWithoutQueryString)) {
-                // if we find a configured file handler responsible for the path extension of this request
-                if (isset($location['handlers']['.' . $possibleValidPathExtension])) {
-                    // set/overwrite the default handler
-                    $handlers['.' . $possibleValidPathExtension] = $location['handlers']['.' . $possibleValidPathExtension];
-                    break;
-                }
             }
         }
 

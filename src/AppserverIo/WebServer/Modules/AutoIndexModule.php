@@ -22,10 +22,11 @@ namespace AppserverIo\WebServer\Modules;
 
 use AppserverIo\Http\HttpProtocol;
 use AppserverIo\Http\HttpResponseStates;
+use AppserverIo\Psr\HttpMessage\Protocol;
 use AppserverIo\Psr\HttpMessage\RequestInterface;
 use AppserverIo\Psr\HttpMessage\ResponseInterface;
-use AppserverIo\Psr\HttpMessage\Protocol;
 use AppserverIo\Server\Dictionaries\ServerVars;
+use AppserverIo\Server\Dictionaries\ModuleVars;
 use AppserverIo\Server\Dictionaries\ModuleHooks;
 use AppserverIo\Server\Exceptions\ModuleException;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
@@ -34,9 +35,8 @@ use AppserverIo\WebServer\Interfaces\HttpModuleInterface;
 
 /**
  * Module that creates a directory index, if no other module handles
- * the request.
- *
- * Modules have to be configured in the following order:
+ * the request. If you want to use this module, the modules have to be
+ * configured in the following order:
  *
  * <module type="\AppserverIo\WebServer\Modules\VirtualHostModule"/>
  * <module type="\AppserverIo\WebServer\Modules\AuthenticationModule"/>
@@ -44,6 +44,7 @@ use AppserverIo\WebServer\Interfaces\HttpModuleInterface;
  * <module type="\AppserverIo\WebServer\Modules\RewriteModule"/>
  * <module type="\AppserverIo\WebServer\Modules\DirectoryModule"/>
  * <module type="\AppserverIo\WebServer\Modules\AccessModule"/>
+ * <module type="\AppserverIo\WebServer\Modules\LocationModule"/>
  * <module type="\AppserverIo\WebServer\Modules\AutoIndexModule"/>
  * <module type="\AppserverIo\WebServer\Modules\CoreModule"/>
  * <module type="\AppserverIo\WebServer\Modules\PhpModule"/>
@@ -67,14 +68,7 @@ class AutoIndexModule implements HttpModuleInterface
     const MODULE_NAME = 'autoIndex';
 
     /**
-     * Holds the server context instance
-     *
-     * @var \AppserverIo\Server\Interfaces\ServerContextInterface
-     */
-    protected $serverContext;
-
-    /**
-     * Initiates the module
+     * Initiates the module.
      *
      * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext The server's context instance
      *
@@ -83,17 +77,6 @@ class AutoIndexModule implements HttpModuleInterface
      */
     public function init(ServerContextInterface $serverContext)
     {
-        $this->serverContext = $serverContext;
-    }
-
-    /**
-     * Return's the server context instance
-     *
-     * @return \AppserverIo\Server\Interfaces\ServerContextInterface
-     */
-    public function getServerContext()
-    {
-        return $this->serverContext;
     }
 
     /**
@@ -110,11 +93,10 @@ class AutoIndexModule implements HttpModuleInterface
     public function process(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext, $hook)
     {
 
-        // In php an interface is, by definition, a fixed contract. It is immutable.
-        // So we have to declare the right ones afterwards...
         /**
          * @var $request \AppserverIo\Psr\HttpMessage\RequestInterface
          */
+
         /**
          * @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface
          */
@@ -124,91 +106,207 @@ class AutoIndexModule implements HttpModuleInterface
             return;
         }
 
-        // set req and res object internally
-        $this->request = $request;
-        $this->response = $response;
+        // make request context available for usage in template
+        $this->requestContext = $requestContext;
 
-        // get server context ref to local func
-        $serverContext = $this->getServerContext();
+        // query whether the auto index module is enabled
+        if ($this->getRequestContext()->getServerVar(ServerVars::SERVER_AUTO_INDEX) === ServerVars::VALUE_AUTO_INDEX_OFF) {
+            return;
+        }
 
-        // get document root
-        $documentRoot = $requestContext->getServerVar(ServerVars::DOCUMENT_ROOT);
+        // now load the URL without path information and query string
+        $url = $this->getUrl();
 
-        // get url
-        $url = parse_url($requestContext->getServerVar(ServerVars::X_REQUEST_URI), PHP_URL_PATH);
+        // query whether the URL ends with a slash
+        if ($url[strlen($url) - 1] !== '/') {
+            return;
+        }
 
-        // get read path to requested uri
-        $realPath = $documentRoot . $url;
+        // query whether an existing path is requested
+        if (is_dir($realPath = $this->getRealPath()) === false) {
+            return;
+        }
 
-        // check if it's a dir
-        if (is_dir($realPath)) {
+        // load the auto index template if available
+        $autoIndexTemplatePath = $this->getRequestContext()->getServerVar(ServerVars::SERVER_AUTO_INDEX_TEMPLATE_PATH);
 
-            // initialize the directory listing
+        // query whether a template is configured and available
+        if ($autoIndexTemplatePath && is_file($autoIndexTemplatePath)) {
+            // render errors page
+            ob_start();
+            require $autoIndexTemplatePath;
+            $autoIndexPage = ob_get_clean();
+
+        } else {
+            // initialize the directory listing content
             $directoryListing = '<tr><th>Name</th><th>Last Modified</th><th>Size</th></tr>';
 
             // query whether if we've parent directory or not
-            if ($realPath !== $url) {
+            if ($this->hasParent($realPath)) {
                 $directoryListing .= sprintf(
                     '<tr><td colspan="3"><a href="%s">Parent Directory</a></td></tr>',
-                    dirname($url)
+                    $this->getParentLink()
                 );
             }
 
             // append the found files + directories to the directory listing
-            foreach (glob(sprintf('%s*', $realPath)) as $directory) {
-
-                // prepare the relative path the file
-                $relativePath = str_replace($documentRoot, '', $directory);
-
+            foreach ($this->getDirectoryContent($realPath) as $directory) {
                 // append the file or directory to the directory listing
                 $directoryListing .= sprintf(
                     '<tr><td><a href="%s">%s</a></td><td>%s</td><td>%d</td></tr>',
-                    $relativePath,
-                    basename($directory),
-                    date('Y-m-d H:i:s', filemtime($directory)),
-                    filesize($directory)
+                    $this->getLink($directory),
+                    $this->getName($directory),
+                    $this->getDate($directory),
+                    $this->getFilesize($directory)
                 );
             }
 
-            // append header and directory listing to response
-            $response->addHeader(HttpProtocol::HEADER_CONTENT_TYPE, 'text/html');
-            $response->appendBodyStream(
-                sprintf(
-                    '<!DOCTYPE html><html><head><title>Index of %s</title></head><body><h1>Index of %s</h1><table>%s</table></body></html>',
-                    $requestContext->getServerVar(ServerVars::REQUEST_URI),
-                    $requestContext->getServerVar(ServerVars::REQUEST_URI),
-                    $directoryListing
-                )
+            // concatenate the elements of the auto index page
+            $autoIndexPage = sprintf(
+                '<!DOCTYPE html><html><head><title>Index of %s</title></head><body><h1>Index of %s</h1><table>%s</table></body></html>',
+                $this->getUri(),
+                $this->getUri(),
+                $directoryListing
             );
-
-            // set response state to be dispatched after this without calling other modules process
-            $response->setState(HttpResponseStates::DISPATCH);
         }
+
+        // append errors page to response body
+        $response->appendBodyStream($autoIndexPage);
+
+        // set response state to be dispatched after this without calling other modules process
+        $response->setState(HttpResponseStates::DISPATCH);
     }
 
     /**
-     * Renders directory listing page by given directory
+     * Returns the actual request context instance.
      *
-     * @param string $errorMessage The error message string to render
-     *
-     * @return void
+     * @return \AppserverIo\Server\Interfaces\RequestContextInterface The actual requests context instance
      */
-    public function renderErrorPage($errorMessage)
+    public function getRequestContext()
     {
-        // get response ref to local var for template rendering
-        $response = $this->getParser()->getResponse();
-        // check if template is given and exists
-        if (($errorsPageTemplatePath = $this->getRequestContext()->getServerVar(ServerVars::SERVER_ERRORS_PAGE_TEMPLATE_PATH)) && is_file($errorsPageTemplatePath)) {
-            // render errors page
-            ob_start();
-            require $errorsPageTemplatePath;
-            $errorsPage = ob_get_clean();
-        } else {
-            // build up error message manually without template
-            $errorsPage = $response->getStatusCode() . ' ' . $response->getStatusReasonPhrase() . PHP_EOL . PHP_EOL . $errorMessage . PHP_EOL . PHP_EOL . strip_tags($this->getRequestContext()->getServerVar(ServerVars::SERVER_SIGNATURE));
-        }
-        // append errors page to response body
-        $response->appendBodyStream($errorsPage);
+        return $this->requestContext;
+    }
+
+    /**
+     * Returns the absolute path for the acutal request URL.
+     *
+     * @return string The absolute path for the acutal request URL
+     */
+    public function getRealPath()
+    {
+        return realpath($this->getDocumentRoot() . $this->getUrl());
+    }
+
+    /**
+     * Returns an array with the content of the passed directory.
+     *
+     * @param string $realPath The absolute path for the acutal request URL
+     *
+     * @return array The content of the actual directory
+     */
+    public function getDirectoryContent($realPath)
+    {
+        return glob(sprintf('%s/*', $realPath));
+    }
+
+    /**
+     * Returns the actual, by previous modules pre-processed, request URI.
+     *
+     * @return string The actual pre-processed request URI
+     */
+    public function getUri()
+    {
+        return $this->getRequestContext()->getServerVar(ServerVars::X_REQUEST_URI);
+    }
+
+    /**
+     * Returns the document root for the actual request.
+     *
+     * @return string The document root for the actual request
+     */
+    public function getDocumentRoot()
+    {
+        return $this->getRequestContext()->getServerVar(ServerVars::DOCUMENT_ROOT);
+    }
+
+    /**
+     * Returns the acutal request URL.
+     *
+     * @return string The actual request URL
+     */
+    public function getUrl()
+    {
+        return parse_url($this->getUri(), PHP_URL_PATH);
+    }
+
+    /**
+     * Queries whether the passed path has a parent directory we want to render.
+     *
+     * @param string $realPath The absolute path to query for a parent directory
+     *
+     * @return boolean TRUE if we've a parent directory, else FALSE
+     */
+    public function hasParent($realPath)
+    {
+        return $this->getDocumentRoot() !== $realPath;
+    }
+
+    /**
+     * Returns the relative path to the parent directory for the actual request URL.
+     *
+     * @return string the relative path to the parent directory
+     */
+    public function getParentLink()
+    {
+        return dirname($this->getUrl());
+    }
+
+    /**
+     * Returns the relative path to the documention root for the passed directory.
+     *
+     * @param string $directory The directory to return the relative path to the document root for
+     *
+     * @return mixed The relative path to the document root for the passed directory
+     */
+    public function getLink($directory)
+    {
+        return str_replace($this->getDocumentRoot(), '', $directory);
+    }
+
+    /**
+     * Returns the name of last element of the passed directory.
+     *
+     * @param string $directory The directory to return the last element from
+     *
+     * @return string The name of the last directory element
+     */
+    public function getName($directory)
+    {
+        return basename($directory);
+    }
+
+    /**
+     * Returns the modification time of the last element of the passed directory.
+     *
+     * @param string $directory The directory to return the last elements modification date from
+     *
+     * @return string The modification date of the last directory element
+     */
+    public function getDate($directory)
+    {
+        return date('Y-m-d H:i:s', filemtime($directory));
+    }
+
+    /**
+     * Returns the filesize of the last element of the passed directory.
+     *
+     * @param string $directory The directory to return the last elements filesize from
+     *
+     * @return string The filesize of the last directory element
+     */
+    public function getFilesize($directory)
+    {
+        return filesize($directory);
     }
 
     /**

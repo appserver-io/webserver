@@ -74,7 +74,7 @@ class VirtualHostModule implements HttpModuleInterface
 
     /**
      * Initializes all server certs for certain virtualhosts defined in configuration
-     * 
+     *
      * @return void
      */
     protected function initCerts()

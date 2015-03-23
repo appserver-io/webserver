@@ -31,8 +31,6 @@ use AppserverIo\Server\Dictionaries\ModuleVars;
 use AppserverIo\Server\Exceptions\ModuleException;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
-use AppserverIo\WebServer\Interfaces\AuthenticationInterface;
-use AppserverIo\WebServer\Authentication\BasicAuthentication;
 
 /**
  * Class AuthenticationModule
@@ -54,35 +52,49 @@ class AuthenticationModule implements HttpModuleInterface
     const MODULE_NAME = 'authentication';
 
     /**
-     * Hold's the server context instance
+     * Holds the server context instance
      *
      * @var \AppserverIo\Server\Interfaces\ServerContextInterface
      */
     protected $serverContext;
 
     /**
-     * Hold's all authentication instances
+     * Holds all authentication instances
      *
      * @var array
      */
     protected $authentications;
 
     /**
-     * Hold's all authenticationType instances used within server while running
+     * The request instance
+     *
+     * @var \AppserverIo\Psr\HttpMessage\RequestInterface $request
+     */
+    protected $request;
+
+    /**
+     * The response instance
+     *
+     * @var \AppserverIo\Psr\HttpMessage\ResponseInterface $response
+     */
+    protected $response;
+
+    /**
+     * Holds all authenticationType instances used within server while running
      *
      * @var array
      */
     protected $typeInstances;
 
     /**
-     * Hold's an array of all uri patterns to match uri for
+     * Holds an array of all uri patterns to match uri for
      *
      * @var array
      */
     protected $uriPatterns;
 
     /**
-     * Return's the request instance
+     * Returns the request instance
      *
      * @return \AppserverIo\Psr\HttpMessage\RequestInterface The request instance
      */
@@ -133,7 +145,7 @@ class AuthenticationModule implements HttpModuleInterface
     }
 
     /**
-     * Return's the server context instance
+     * Returns the server context instance
      *
      * @return \AppserverIo\Server\Interfaces\ServerContextInterface
      */
@@ -143,12 +155,13 @@ class AuthenticationModule implements HttpModuleInterface
     }
 
     /**
-     * Return's pre initiated auth type instance by given type
+     * Returns pre initiated auth type instance by given type
      *
      * @param string $type The authentication type
-     * @param string $data The data got from client for authentication process
+     * @param array  $data The data got from client for authentication process
      *
-     * @return \AppserverIo\WebServer\Interfaces\AuthenticationInterface
+     * @return \AppserverIo\Http\Authentication\AuthenticationInterface
+     *
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
     public function getAuthenticationTypeInstance($type, array $data = array())
@@ -159,17 +172,14 @@ class AuthenticationModule implements HttpModuleInterface
                 throw new ModuleException("No auth type found for '$type'", 500);
             }
             // construct type by given class definition and data
+            /** @var \AppserverIo\Http\Authentication\AuthenticationInterface $typeInstance */
             $this->typeInstances[$type] = $typeInstance = new $type($data);
-            // verify configuration
-            $typeInstance->verifyConfig();
-            // init credentials
-            $typeInstance->initCredentials();
         }
         return $this->typeInstances[$type];
     }
 
     /**
-     * Implement's module logic for given hook
+     * Implements module logic for given hook
      *
      * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
      * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
@@ -181,14 +191,6 @@ class AuthenticationModule implements HttpModuleInterface
      */
     public function process(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext, $hook)
     {
-        // In php an interface is, by definition, a fixed contract. It is immutable.
-        // So we have to declair the right ones afterwards...
-        /**
-         * @var $request \AppserverIo\Psr\HttpMessage\RequestInterface
-         */
-        /**
-         * @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface
-         */
 
         // if false hook is coming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
@@ -222,7 +224,7 @@ class AuthenticationModule implements HttpModuleInterface
                 // set type Instance to local ref
                 $typeInstance = $this->getAuthenticationTypeInstance($data["type"]);
 
-                // check if auth header is not set in comming request headers
+                // check if auth header is not set in coming request headers
                 if (! $request->hasHeader(Protocol::HEADER_AUTHORIZATION)) {
                     // send header for challenge authentication against client
                     $response->addHeader(Protocol::HEADER_WWW_AUTHENTICATE, $typeInstance->getAuthenticateHeader());
@@ -235,7 +237,7 @@ class AuthenticationModule implements HttpModuleInterface
 
                 try {
                     // check if auth works
-                    if ($typeInstance->auth()) {
+                    if ($typeInstance->authenticate()) {
                         // set server vars
                         $requestContext->setServerVar(ServerVars::REMOTE_USER, $typeInstance->getUsername());
                         // break out because everything is fine at this point
@@ -255,7 +257,7 @@ class AuthenticationModule implements HttpModuleInterface
     }
 
     /**
-     * Return's an array of module names which should be executed first
+     * Returns an array of module names which should be executed first
      *
      * @return array The array of module names
      */

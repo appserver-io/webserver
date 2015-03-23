@@ -1,3 +1,46 @@
+# Version 3.0.1
+
+## Bugfixes
+
+* fixed error logging on multiple ssl certificate errors
+* fixed relative and absolut cert path configuration
+
+## Features
+
+* None
+
+# Version 3.0.0
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Added sni server certs feature which needs php 5.6. This allowes more than one ssl certificates at the same time on one ip address.
+
+# Version 2.0.1
+
+## Bugfixes
+
+* Server vars REQUEST_URI and X_REQUEST_URI will be url decoded to avoid problems within the modules URI handling
+
+## Features
+
+* None
+
+# Version 2.0.0
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Moved HTTP authentication functionality to appserver-io/http package
+* Some minor comment fixes
+* Updated build process
+
 # Version 1.0.1
 
 ## Bugfixes

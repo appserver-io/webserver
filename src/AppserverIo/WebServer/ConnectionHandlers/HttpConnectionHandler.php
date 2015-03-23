@@ -1,7 +1,7 @@
 <?php
 
 /**
- * \AppserverIo\WebServer\ConnectionHandlers
+ * \AppserverIo\WebServer\ConnectionHandlers\HttpConnectionHandler
  *
  * NOTICE OF LICENSE
  *
@@ -17,6 +17,7 @@
  * @link      https://github.com/appserver-io/webserver
  * @link      http://www.appserver.io
  */
+
 namespace AppserverIo\WebServer\ConnectionHandlers;
 
 use AppserverIo\Server\Dictionaries\EnvVars;
@@ -26,7 +27,6 @@ use AppserverIo\Server\Interfaces\ConnectionHandlerInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Server\Interfaces\WorkerInterface;
-use AppserverIo\WebServer\Interfaces\HttpModuleInterface;
 use AppserverIo\Psr\Socket\SocketInterface;
 use AppserverIo\Psr\Socket\SocketReadException;
 use AppserverIo\Psr\Socket\SocketReadTimeoutException;
@@ -310,7 +310,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         do {
             // try to handle request if its a http request
             try {
-                // reset connection infos to server vars
+                // reset connection info to server vars
                 $requestContext->setServerVar(ServerVars::REMOTE_ADDR, $connection->getAddress());
                 $requestContext->setServerVar(ServerVars::REMOTE_PORT, $connection->getPort());
 
@@ -640,8 +640,8 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         // set request method, query-string, uris and scheme
         $requestContext->setServerVar(ServerVars::REQUEST_METHOD, $request->getMethod());
         $requestContext->setServerVar(ServerVars::QUERY_STRING, $request->getQueryString());
-        $requestContext->setServerVar(ServerVars::REQUEST_URI, $request->getUri());
-        $requestContext->setServerVar(ServerVars::X_REQUEST_URI, $request->getUri());
+        $requestContext->setServerVar(ServerVars::REQUEST_URI, urldecode($request->getUri()));
+        $requestContext->setServerVar(ServerVars::X_REQUEST_URI, urldecode($request->getUri()));
         // this is the http connection handler, therefor we will rely on the https flag
         if ($requestContext->hasServerVar(ServerVars::HTTPS) && $requestContext->getServerVar(ServerVars::HTTPS) === ServerVars::VALUE_HTTPS_ON) {
             $requestContext->setServerVar(ServerVars::REQUEST_SCHEME, 'https');

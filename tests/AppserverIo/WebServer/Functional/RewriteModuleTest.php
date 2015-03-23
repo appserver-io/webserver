@@ -400,6 +400,26 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test wrapper for the urlencode dataset
+     *
+     * @return null
+     * @throws \Exception
+     */
+    public function testUrlencode()
+    {
+        try {
+
+            // Now check if we got the same thing here
+            $this->assertionEngine('urlencode');
+
+        } catch (\Exception $e) {
+
+            // Re-throw the exception
+            throw $e;
+        }
+    }
+
+    /**
      * Test wrapper for the LFlag dataset
      *
      * @return null

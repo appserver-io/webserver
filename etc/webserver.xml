@@ -68,6 +68,7 @@
             type="\AppserverIo\Server\Servers\MultiThreadedServer"
             worker="\AppserverIo\Server\Workers\ThreadWorker"
             socket="\AppserverIo\Server\Sockets\StreamSocket"
+            streamContext="\AppserverIo\Server\Contexts\StreamContext"
             serverContext="\AppserverIo\Server\Contexts\ServerContext"
             requestContext="\AppserverIo\Server\Contexts\RequestContext"
             loggerName="System">
@@ -92,14 +93,14 @@
             <authentications>
                 <authentication uri="^\/auth\/basic\/.*">
                     <params>
-                        <param name="type" type="string">\AppserverIo\WebServer\Authentication\BasicAuthentication</param>
+                        <param name="type" type="string">\AppserverIo\Http\Authentication\BasicAuthentication</param>
                         <param name="realm" type="string">PhpWebServer Basic Authentication System</param>
                         <param name="file" type="string">var/www/auth/basic/.htpasswd</param>
                     </params>
                 </authentication>
                 <authentication uri="^\/auth\/digest\/.*">
                     <params>
-                        <param name="type" type="string">\AppserverIo\WebServer\Authentication\DigestAuthentication</param>
+                        <param name="type" type="string">\AppserverIo\Http\Authentication\DigestAuthentication</param>
                         <param name="realm" type="string">appserver.io Digest Authentication System</param>
                         <param name="file" type="string">var/www/auth/digest/.htpasswd</param>
                     </params>
@@ -260,6 +261,7 @@
             type="\AppserverIo\Server\Servers\MultiThreadedServer"
             worker="\AppserverIo\Server\Workers\ThreadWorker"
             socket="\AppserverIo\Server\Sockets\StreamSocket"
+            streamContext="\AppserverIo\Server\Contexts\StreamContext"
             serverContext="\AppserverIo\Server\Contexts\ServerContext"
             requestContext="\AppserverIo\Server\Contexts\RequestContext"
             loggerName="System">
@@ -273,7 +275,7 @@
                 <param name="transport" type="string">ssl</param>
                 <param name="address" type="string">0.0.0.0</param>
                 <param name="port" type="integer">9443</param>
-                <param name="certPath" type="string">etc/phpwebserver.pem</param>
+                <param name="certPath" type="string">etc/webserver.pem</param>
                 <param name="passphrase" type="string">passphrase</param>
                 <!-- Note: it's intended to use a relative path to get content from webservers basedir/var/www -->
                 <param name="documentRoot" type="string">var/www</param>
@@ -282,6 +284,12 @@
                 <param name="keepAliveTimeout" type="integer">5</param>
                 <param name="errorsPageTemplatePath" type="string"/>
             </params>
+
+            <certificates>
+                <certificate domain="phpwebserver.dev" certPath="etc/webserver.pem"/>
+                <certificate domain="phpwebserver.local" certPath="etc/webserver1.pem"/>
+                <certificate domain="phpwebserver.test" certPath="etc/webserver2.pem"/>
+            </certificates>
 
             <virtualHosts>
             
@@ -393,14 +401,14 @@
             <authentications>
                 <authentication uri="^\/auth\/basic\/.*">
                     <params>
-                        <param name="type" type="string">\AppserverIo\WebServer\Authentication\BasicAuthentication</param>
+                        <param name="type" type="string">\AppserverIo\Http\Authentication\BasicAuthentication</param>
                         <param name="realm" type="string">PhpWebServer Basic Authentication System</param>
                         <param name="file" type="string">var/www/auth/basic/.htpasswd</param>
                     </params>
                 </authentication>
                 <authentication uri="^\/auth\/digest\/.*">
                     <params>
-                        <param name="type" type="string">\AppserverIo\WebServer\Authentication\DigestAuthentication</param>
+                        <param name="type" type="string">\AppserverIo\Http\Authentication\DigestAuthentication</param>
                         <param name="realm" type="string">appserver.io Digest Authentication System</param>
                         <param name="file" type="string">var/www/auth/digest/.htpasswd</param>
                     </params>

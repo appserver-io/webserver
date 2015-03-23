@@ -1,3 +1,13 @@
+# Version 3.0.0
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Added sni server certs feature which needs php 5.6. This allowes more than one ssl certificates at the same time on one ip address.
+
 # Version 2.0.1
 
 ## Bugfixes

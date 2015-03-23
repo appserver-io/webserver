@@ -87,7 +87,9 @@
                 <param name="directoryIndex" type="string">index.php index.html index.htm</param>
                 <param name="keepAliveMax" type="integer">64</param>
                 <param name="keepAliveTimeout" type="integer">5</param>
+                <param name="autoIndex" type="boolean">false</param>
                 <param name="errorsPageTemplatePath" type="string"/>
+                <param name="autoIndexTemplatePath" type="string"/>
             </params>
 
             <authentications>
@@ -243,6 +245,8 @@
                 <module type="\AppserverIo\WebServer\Modules\RewriteModule"/>
                 <module type="\AppserverIo\WebServer\Modules\DirectoryModule"/>
                 <module type="\AppserverIo\WebServer\Modules\AccessModule"/>
+                <module type="\AppserverIo\WebServer\Modules\LocationModule"/>
+                <module type="\AppserverIo\WebServer\Modules\AutoIndexModule"/>
                 <module type="\AppserverIo\WebServer\Modules\CoreModule"/>
                 <module type="\AppserverIo\WebServer\Modules\PhpModule"/>
                 <module type="\AppserverIo\WebServer\Modules\FastCgiModule"/>
@@ -282,7 +286,9 @@
                 <param name="directoryIndex" type="string">index.php index.html index.htm</param>
                 <param name="keepAliveMax" type="integer">64</param>
                 <param name="keepAliveTimeout" type="integer">5</param>
+                <param name="autoIndex" type="boolean">false</param>
                 <param name="errorsPageTemplatePath" type="string"/>
+                <param name="autoIndexTemplatePath" type="string"/>
             </params>
 
             <certificates>
@@ -441,6 +447,8 @@
                 <module type="\AppserverIo\WebServer\Modules\RewriteModule"/>
                 <module type="\AppserverIo\WebServer\Modules\DirectoryModule"/>
                 <module type="\AppserverIo\WebServer\Modules\AccessModule"/>
+                <module type="\AppserverIo\WebServer\Modules\LocationModule"/>
+                <module type="\AppserverIo\WebServer\Modules\AutoIndexModule"/>
                 <module type="\AppserverIo\WebServer\Modules\CoreModule"/>
                 <module type="\AppserverIo\WebServer\Modules\PhpModule"/>
                 <module type="\AppserverIo\WebServer\Modules\FastCgiModule"/>

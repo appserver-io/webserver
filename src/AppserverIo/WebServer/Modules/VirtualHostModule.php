@@ -83,20 +83,27 @@ class VirtualHostModule implements HttpModuleInterface
         $streamContext = $this->getServerContext()->getStreamContext();
         // get logger
         $logger = $this->getServerContext()->getLogger();
-        // try to enhance sni server certs array
-        try {
-            // set possible ssl certs for virtual hosts
-            $virtualHosts = $this->getServerContext()->getServerConfig()->getVirtualHosts();
-            
-            foreach ($virtualHosts as $virtualHostName => $virtualHostData) {
-                if (isset($virtualHostData['params']['certPath'])) {
-                    $realCertPath = SERVER_BASEDIR . str_replace('/', DIRECTORY_SEPARATOR, $virtualHostData['params']['certPath']);
+        
+        // set possible ssl certs for virtual hosts
+        $virtualHosts = $this->getServerContext()->getServerConfig()->getVirtualHosts();
+        
+        foreach ($virtualHosts as $virtualHostName => $virtualHostData) {
+            if (isset($virtualHostData['params']['certPath'])) {
+                // get real cert path
+                $realCertPath = str_replace('/', DIRECTORY_SEPARATOR, $certPath);
+                // check if relative or absolute path was given
+                if (strpos($realCertPath, '/') === false) {
+                    $realCertPath = SERVER_BASEDIR . $realCertPath;
+                }
+                // try to enhance sni server certs array
+                try {
+                    // add to sni server certs configuration
                     $streamContext->addSniServerCert($virtualHostName, $realCertPath);
+                } catch (\Exception $e) {
+                    // log exception message
+                    $logger->error($e->getMessage());
                 }
             }
-        } catch (\Exception $e) {
-            // log exception message
-            $logger->error($e->getMessage());
         }
     }
     

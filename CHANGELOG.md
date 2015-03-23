@@ -1,3 +1,13 @@
+# Version 3.0.0
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Added sni server certs feature which needs php 5.6
+
 # Version 2.0.1
 
 ## Bugfixes

@@ -62,7 +62,10 @@ class VirtualHostModule implements HttpModuleInterface
         'admin' => ServerVars::SERVER_ADMIN,
         'documentRoot' => ServerVars::DOCUMENT_ROOT,
         'software' => ServerVars::SERVER_SOFTWARE,
-        'errorsPageTemplatePath' => ServerVars::SERVER_ERRORS_PAGE_TEMPLATE_PATH
+        'autoIndex' => ServerVars::SERVER_AUTO_INDEX,
+        'errorsPageTemplatePath' => ServerVars::SERVER_ERRORS_PAGE_TEMPLATE_PATH,
+        'welcomPageTemplatePath' => ServerVars::SERVER_WELCOME_PAGE_TEMPLATE_PATH,
+        'autoIndexTemplatePath' => ServerVars::SERVER_AUTO_INDEX_TEMPLATE_PATH
     );
 
     /**

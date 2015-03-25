@@ -1,3 +1,13 @@
+# Version 3.1.0
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Add LocationModule, refactor AutoIndexModule, CoreModule + VirtualHostModule
+
 # Version 3.0.1
 
 ## Bugfixes

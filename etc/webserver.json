@@ -61,7 +61,9 @@
             "directoryIndex": "index.php index.html index.htm",
             "keepAliveMax": 64,
             "keepAliveTimeout": 5,
+            "autoIndex" : false,
             "errorsPageTemplatePath": "",
+            "autoIndexTemplatePath": "",
 
             "authentications": [
                 {
@@ -202,6 +204,8 @@
                 "\\AppserverIo\\WebServer\\Modules\\RewriteModule",
                 "\\AppserverIo\\WebServer\\Modules\\DirectoryModule",
                 "\\AppserverIo\\WebServer\\Modules\\AccessModule",
+                "\\AppserverIo\\WebServer\\Modules\\LocationModule",
+                "\\AppserverIo\\WebServer\\Modules\\AutoIndexModule",
                 "\\AppserverIo\\WebServer\\Modules\\CoreModule",
                 "\\AppserverIo\\WebServer\\Modules\\PhpModule",
                 "\\AppserverIo\\WebServer\\Modules\\FastCgiModule",
@@ -237,7 +241,9 @@
             "directoryIndex": "index.php index.html index.htm",
             "keepAliveMax": 64,
             "keepAliveTimeout": 5,
+            "autoIndex" : false,
             "errorsPageTemplatePath": "",
+            "autoIndexTemplatePath": "",
 
             "authentications": [
                 {
@@ -376,6 +382,8 @@
                 "\\AppserverIo\\WebServer\\Modules\\RewriteModule",
                 "\\AppserverIo\\WebServer\\Modules\\DirectoryModule",
                 "\\AppserverIo\\WebServer\\Modules\\AccessModule",
+                "\\AppserverIo\\WebServer\\Modules\\LocationModule",
+                "\\AppserverIo\\WebServer\\Modules\\AutoIndexModule",
                 "\\AppserverIo\\WebServer\\Modules\\CoreModule",
                 "\\AppserverIo\\WebServer\\Modules\\PhpModule",
                 "\\AppserverIo\\WebServer\\Modules\\FastCgiModule",

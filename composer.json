@@ -32,7 +32,7 @@
 		"monolog/monolog" : "1.10.*",
 		"rhumsaa/uuid" : "~2.8",
 		"psr/log" : "*",
-		"appserver-io/server" : "~2.0",
+		"appserver-io/server" : "~3.0",
 		"appserver-io/http" : "~1.0",
 		"appserver-io/fastcgi" : "~1.0",
 		"appserver-io/logger" : "~1.0",

@@ -1,3 +1,13 @@
+# Version 3.1.1
+
+## Bugfixes
+
+* Fixed newline behaviour in ssl context
+
+## Features
+
+* None
+
 # Version 3.1.0
 
 ## Bugfixes

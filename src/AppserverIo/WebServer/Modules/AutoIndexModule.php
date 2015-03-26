@@ -12,6 +12,7 @@
  * PHP version 5
  *
  * @author    Tim Wagner <tw@appserver.io>
+ * @author    Johann Zelger <jz@appserver.io>
  * @copyright 2015 TechDivision GmbH <info@appserver.io>
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link      https://github.com/appserver-io/webserver
@@ -52,6 +53,7 @@ use AppserverIo\WebServer\Interfaces\HttpModuleInterface;
  * <module type="\AppserverIo\Appserver\ServletEngine\ServletEngine" />
  *
  * @author    Tim Wagner <tw@appserver.io>
+ * @author    Johann Zelger <jz@appserver.io>
  * @copyright 2015 TechDivision GmbH <info@appserver.io>
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link      https://github.com/appserver-io/webserver
@@ -268,6 +270,22 @@ class AutoIndexModule implements HttpModuleInterface
      *
      * @return mixed The relative path to the document root for the passed directory
      */
+    public function getIcon($directory)
+    {
+        if (is_file($directory)) {
+            return pathinfo($directory, PATHINFO_EXTENSION);
+        }
+        // if it not a file it should be an directory
+        return 'dir';
+    }
+
+    /**
+     * Returns the relative path to the documention root for the passed directory.
+     *
+     * @param string $directory The directory to return the relative path to the document root for
+     *
+     * @return mixed The relative path to the document root for the passed directory
+     */
     public function getLink($directory)
     {
         return str_replace($this->getDocumentRoot(), '', $directory);
@@ -306,7 +324,22 @@ class AutoIndexModule implements HttpModuleInterface
      */
     public function getFilesize($directory)
     {
-        return filesize($directory);
+        $bytes = filesize($directory);
+        if ($bytes >= 1073741824) {
+            $bytes = number_format($bytes / 1073741824, 2) . ' GB';
+        } elseif ($bytes >= 1048576) {
+            $bytes = number_format($bytes / 1048576, 2) . ' MB';
+        } elseif ($bytes >= 1024) {
+            $bytes = number_format($bytes / 1024, 2) . ' KB';
+        } elseif ($bytes > 1) {
+            $bytes = $bytes . ' bytes';
+        } elseif ($bytes == 1) {
+            $bytes = $bytes . ' byte';
+        } else {
+            $bytes = '0 bytes';
+        }
+        // return formated bytes
+        return $bytes;
     }
 
     /**

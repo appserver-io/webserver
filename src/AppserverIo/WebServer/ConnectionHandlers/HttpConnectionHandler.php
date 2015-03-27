@@ -444,7 +444,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                 // set status code given by exception
                 // if 0 is comming set 500 by default
                 $response->setStatusCode($e->getCode() ? $e->getCode() : 500);
-                $this->renderErrorPage($e->__toString());
+                $this->renderErrorPage($e);
             }
 
             // send response to connected client
@@ -507,11 +507,11 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     /**
      * Renders error page by given exception
      *
-     * @param string $errorMessage The error message string to render
+     * @param \Exception $exception The exception object
      *
      * @return void
      */
-    public function renderErrorPage($errorMessage)
+    public function renderErrorPage(\Exception $exception)
     {
         // get response ref to local var for template rendering
         $response = $this->getParser()->getResponse();
@@ -707,7 +707,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                     // set response code to 500 Internal Server Error
                     $response->setStatusCode(500);
                     $errorMessage = 'PHP Fatal error: ' . $lastError['message'] . ' in ' . $lastError['file'] . ' on line ' . $lastError['line'];
-                    $this->renderErrorPage($errorMessage);
+                    $this->renderErrorPage(new \RuntimeException($errorMessage, 500));
                 }
 
                 // grep headers and set to response object

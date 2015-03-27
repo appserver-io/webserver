@@ -1,3 +1,13 @@
+# Version 3.1.2
+
+## Bugfixes
+
+* Closed [#141](https://github.com/appserver-io/appserver/issues/141) refactored error page rendering
+
+## Features
+
+* None
+
 # Version 3.1.1
 
 ## Bugfixes

@@ -352,7 +352,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                  *
                  * @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.1
                  */
-                if ($line === "\r\n") {
+                if (in_array($line, array("\r\n", "\n"))) {
                     // ignore the first CRLF and go on reading the expected start-line.
                     $line = $connection->readLine(self::HTTP_CONNECTION_READ_LENGTH);
                 }
@@ -366,7 +366,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                  * @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2
                  */
                 $messageHeaders = '';
-                while ($line != "\r\n") {
+                while (!in_array($line, array("\r\n", "\n"))) {
                     // read next line
                     $line = $connection->readLine();
                     // enhance headers
@@ -444,7 +444,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                 // set status code given by exception
                 // if 0 is comming set 500 by default
                 $response->setStatusCode($e->getCode() ? $e->getCode() : 500);
-                $this->renderErrorPage($e->__toString());
+                $this->renderErrorPage($e);
             }
 
             // send response to connected client
@@ -507,11 +507,11 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     /**
      * Renders error page by given exception
      *
-     * @param string $errorMessage The error message string to render
+     * @param \Exception $exception The exception object
      *
      * @return void
      */
-    public function renderErrorPage($errorMessage)
+    public function renderErrorPage(\Exception $exception)
     {
         // get response ref to local var for template rendering
         $response = $this->getParser()->getResponse();
@@ -586,7 +586,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         if ($accessLogger) {
             // init datetime instance with current time and timezone
             $datetime = new \DateTime('now');
-
+            // log access
             $accessLogger->info(
                 sprintf(
                     /* This logs in apaches default combined format */
@@ -640,8 +640,8 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         // set request method, query-string, uris and scheme
         $requestContext->setServerVar(ServerVars::REQUEST_METHOD, $request->getMethod());
         $requestContext->setServerVar(ServerVars::QUERY_STRING, $request->getQueryString());
-        $requestContext->setServerVar(ServerVars::REQUEST_URI, urldecode($request->getUri()));
-        $requestContext->setServerVar(ServerVars::X_REQUEST_URI, urldecode($request->getUri()));
+        $requestContext->setServerVar(ServerVars::REQUEST_URI, $request->getUri());
+        $requestContext->setServerVar(ServerVars::X_REQUEST_URI, $request->getUri());
         // this is the http connection handler, therefor we will rely on the https flag
         if ($requestContext->hasServerVar(ServerVars::HTTPS) && $requestContext->getServerVar(ServerVars::HTTPS) === ServerVars::VALUE_HTTPS_ON) {
             $requestContext->setServerVar(ServerVars::REQUEST_SCHEME, 'https');
@@ -707,7 +707,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                     // set response code to 500 Internal Server Error
                     $response->setStatusCode(500);
                     $errorMessage = 'PHP Fatal error: ' . $lastError['message'] . ' in ' . $lastError['file'] . ' on line ' . $lastError['line'];
-                    $this->renderErrorPage($errorMessage);
+                    $this->renderErrorPage(new \RuntimeException($errorMessage, 500));
                 }
 
                 // grep headers and set to response object

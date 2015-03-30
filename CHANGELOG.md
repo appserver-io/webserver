@@ -1,3 +1,54 @@
+# Version 3.1.2
+
+## Bugfixes
+
+* Closed [#141](https://github.com/appserver-io/appserver/issues/141) refactored error page rendering
+
+## Features
+
+* None
+
+# Version 3.1.1
+
+## Bugfixes
+
+* Fixed newline behaviour in ssl context
+
+## Features
+
+* None
+
+# Version 3.1.0
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Add LocationModule, refactor AutoIndexModule, CoreModule + VirtualHostModule
+
+# Version 3.0.1
+
+## Bugfixes
+
+* fixed error logging on multiple ssl certificate errors
+* fixed relative and absolut cert path configuration
+
+## Features
+
+* None
+
+# Version 3.0.0
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Added sni server certs feature which needs php 5.6. This allowes more than one ssl certificates at the same time on one ip address.
+
 # Version 2.0.1
 
 ## Bugfixes

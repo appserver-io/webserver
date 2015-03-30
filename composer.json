@@ -32,7 +32,7 @@
 		"monolog/monolog" : "1.10.*",
 		"rhumsaa/uuid" : "~2.8",
 		"psr/log" : "*",
-		"appserver-io/server" : "~1.0",
+		"appserver-io/server" : "~3.0",
 		"appserver-io/http" : "~1.0",
 		"appserver-io/fastcgi" : "~1.0",
 		"appserver-io/logger" : "~1.0",
@@ -40,7 +40,8 @@
 		"appserver-io-psr/http-message" : "~1.0"
 	},
 	"require-dev" : {
-		"appserver-io/build" : "~1.0"
+		"appserver-io/build" : "~1.0",
+		"codeclimate/php-test-reporter": "dev-master"
 	},
 	"autoload" : {
 		"psr-0" : {
@@ -52,7 +53,7 @@
 	},
 	"config" : {
 		"github-oauth" : {
-			"github.com" : "604a3b5943228e434a5b52c2ba3cf72286d30db9"
+			"github.com" : "bb0ca6adf013e65b1e630197308621791517b5d8"
 		}
 	},
 	"support" : {

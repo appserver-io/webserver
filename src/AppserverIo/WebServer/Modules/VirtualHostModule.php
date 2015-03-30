@@ -29,6 +29,7 @@ use AppserverIo\Server\Dictionaries\ModuleHooks;
 use AppserverIo\Server\Dictionaries\ServerVars;
 use AppserverIo\Server\Dictionaries\ModuleVars;
 use AppserverIo\Server\Exceptions\ModuleException;
+use AppserverIo\Server\Exceptions\ServerException;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
 
@@ -61,7 +62,10 @@ class VirtualHostModule implements HttpModuleInterface
         'admin' => ServerVars::SERVER_ADMIN,
         'documentRoot' => ServerVars::DOCUMENT_ROOT,
         'software' => ServerVars::SERVER_SOFTWARE,
-        'errorsPageTemplatePath' => ServerVars::SERVER_ERRORS_PAGE_TEMPLATE_PATH
+        'autoIndex' => ServerVars::SERVER_AUTO_INDEX,
+        'errorsPageTemplatePath' => ServerVars::SERVER_ERRORS_PAGE_TEMPLATE_PATH,
+        'welcomPageTemplatePath' => ServerVars::SERVER_WELCOME_PAGE_TEMPLATE_PATH,
+        'autoIndexTemplatePath' => ServerVars::SERVER_AUTO_INDEX_TEMPLATE_PATH
     );
 
     /**
@@ -71,6 +75,41 @@ class VirtualHostModule implements HttpModuleInterface
      */
     protected $serverContext;
 
+    /**
+     * Initializes all server certs for certain virtualhosts defined in configuration
+     *
+     * @return void
+     */
+    protected function initCerts()
+    {
+        // get stream context to enhance it
+        $streamContext = $this->getServerContext()->getStreamContext();
+        // get logger
+        $logger = $this->getServerContext()->getLogger();
+        
+        // set possible ssl certs for virtual hosts
+        $virtualHosts = $this->getServerContext()->getServerConfig()->getVirtualHosts();
+        
+        foreach ($virtualHosts as $virtualHostName => $virtualHostData) {
+            if (isset($virtualHostData['params']['certPath'])) {
+                // get real cert path
+                $realCertPath = str_replace('/', DIRECTORY_SEPARATOR, $certPath);
+                // check if relative or absolute path was given
+                if (strpos($realCertPath, '/') === false) {
+                    $realCertPath = SERVER_BASEDIR . $realCertPath;
+                }
+                // try to enhance sni server certs array
+                try {
+                    // add to sni server certs configuration
+                    $streamContext->addSniServerCert($virtualHostName, $realCertPath);
+                } catch (\Exception $e) {
+                    // log exception message
+                    $logger->error($e->getMessage());
+                }
+            }
+        }
+    }
+    
     /**
      * Return's the request instance
      *
@@ -102,6 +141,9 @@ class VirtualHostModule implements HttpModuleInterface
     public function init(ServerContextInterface $serverContext)
     {
         $this->serverContext = $serverContext;
+        
+        // init ssl certs based on virtual hosts via sni server cert feature
+        $this->initCerts();
     }
 
     /**
@@ -127,15 +169,6 @@ class VirtualHostModule implements HttpModuleInterface
      */
     public function process(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext, $hook)
     {
-        // In php an interface is, by definition, a fixed contract. It is immutable.
-        // So we have to declair the right ones afterwards...
-        /**
-         * @var $request \AppserverIo\Psr\HttpMessage\RequestInterface
-         */
-        /**
-         * @var $response \AppserverIo\Psr\HttpMessage\ResponseInterface
-         */
-
         // if false hook is comming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
             return;

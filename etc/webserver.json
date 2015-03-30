@@ -47,6 +47,7 @@
             "socket": "\\AppserverIo\\Server\\Sockets\\StreamSocket",
             "serverContext": "\\AppserverIo\\Server\\Contexts\\ServerContext",
             "requestContext": "\\AppserverIo\\Server\\Contexts\\RequestContext",
+            "streamContext": "\\AppserverIo\\Server\\Contexts\\StreamContext",
             "loggerName": "System",
             "workerNumber": 128,
             "workerAcceptMin": 8,
@@ -61,7 +62,10 @@
             "directoryIndex": "index.php index.html index.htm",
             "keepAliveMax": 64,
             "keepAliveTimeout": 5,
-            "errorsPageTemplatePath": "",
+            "autoIndex": true,
+            "errorsPageTemplatePath": "resources/templates/www/error.phtml",
+            "welcomeTemplatePath": "resources/templates/www/welcome.phtml",
+            "autoIndexTemplatePath": "resources/templates/www/auto_index.phtml",
 
             "authentications": [
                 {
@@ -82,10 +86,6 @@
                 {
                     "type": "allow",
                     "REQUEST_URI": ".*"
-                },
-                {
-                    "type": "deny",
-                    "REQUEST_URI": "^\\/errors.*"
                 }
             ],
 
@@ -102,7 +102,6 @@
                     "name": "phpwebserver.dev phpwebserver.local phpwebserver.test",
                     "admin": "admin@phpwebserver.dev",
                     "documentRoot": "var/www",
-                    "errorsPageTemplatePath": "var/www/errors/error.phtml",
                     "rewrites": [
                         {
                             "condition": "-f{OR}-l{OR}-d",
@@ -121,7 +120,6 @@
                     "name": "phpwebserver-fcgi.dev phpwebserver-fcgi.local phpwebserver-fcgi.test",
                     "admin": "admin@phpwebserver.dev",
                     "documentRoot": "var/www/cgi",
-                    "errorsPageTemplatePath": "var/www/errors/error.phtml",
                     "rewrites": [
                         {
                             "condition": "-f{OR}-l{OR}-d",
@@ -155,7 +153,6 @@
                     "name": "magento.local",
                     "admin": "admin@magento.local",
                     "documentRoot": "/var/www/magento",
-                    "errorsPageTemplatePath": "var/www/errors/error.phtml",
                     "rewriteMaps": [
                         {
                             "type": "\\AppserverIo\\WebServer\\Modules\\MagentoRewriteMapper",
@@ -202,6 +199,8 @@
                 "\\AppserverIo\\WebServer\\Modules\\RewriteModule",
                 "\\AppserverIo\\WebServer\\Modules\\DirectoryModule",
                 "\\AppserverIo\\WebServer\\Modules\\AccessModule",
+                "\\AppserverIo\\WebServer\\Modules\\LocationModule",
+                "\\AppserverIo\\WebServer\\Modules\\AutoIndexModule",
                 "\\AppserverIo\\WebServer\\Modules\\CoreModule",
                 "\\AppserverIo\\WebServer\\Modules\\PhpModule",
                 "\\AppserverIo\\WebServer\\Modules\\FastCgiModule",
@@ -221,6 +220,7 @@
             "socket": "\\AppserverIo\\Server\\Sockets\\StreamSocket",
             "serverContext": "\\AppserverIo\\Server\\Contexts\\ServerContext",
             "requestContext": "\\AppserverIo\\Server\\Contexts\\RequestContext",
+            "streamContext": "\\AppserverIo\\Server\\Contexts\\StreamContext",
             "loggerName": "System",
             "workerNumber": 128,
             "workerAcceptMin": 8,
@@ -237,7 +237,25 @@
             "directoryIndex": "index.php index.html index.htm",
             "keepAliveMax": 64,
             "keepAliveTimeout": 5,
-            "errorsPageTemplatePath": "",
+            "autoIndex": true,
+            "errorsPageTemplatePath": "resources/templates/www/error.phtml",
+            "welcomeTemplatePath": "resources/templates/www/welcome.phtml",
+            "autoIndexTemplatePath": "resources/templates/www/auto_index.phtml",
+
+            "certificates": [
+                {
+                    "domain": "phpwebserver.dev",
+                    "certPath": "etc/webserver.pem"
+                },
+                {
+                    "domain": "phpwebserver.local",
+                    "certPath": "etc/webserver1.pem"
+                },
+                {
+                    "domain": "phpwebserver.test",
+                    "certPath": "etc/webserver2.pem"
+                }
+            ],
 
             "authentications": [
                 {
@@ -258,10 +276,6 @@
                 {
                     "type": "allow",
                     "REQUEST_URI": ".*"
-                },
-                {
-                    "type": "deny",
-                    "REQUEST_URI": "^\\/errors.*"
                 }
             ],
 
@@ -278,7 +292,6 @@
                     "name": "phpwebserver.dev phpwebserver.local phpwebserver.test",
                     "admin": "admin@phpwebserver.dev",
                     "documentRoot": "var/www",
-                    "errorsPageTemplatePath": "var/www/errors/error.phtml",
                     "rewrites": [
                         {
                             "condition": "-f{OR}-l{OR}-d",
@@ -297,7 +310,6 @@
                     "name": "phpwebserver-fcgi.dev phpwebserver-fcgi.local phpwebserver-fcgi.test",
                     "admin": "admin@phpwebserver.dev",
                     "documentRoot": "var/www/cgi",
-                    "errorsPageTemplatePath": "var/www/errors/error.phtml",
                     "rewrites": [
                         {
                             "condition": "-f{OR}-l{OR}-d",
@@ -331,7 +343,6 @@
                     "name": "magento.local",
                     "admin": "admin@magento.local",
                     "documentRoot": "/var/www/magento",
-                    "errorsPageTemplatePath": "var/www/errors/error.phtml",
                     "rewriteMaps": [
                         {
                             "type": "\\AppserverIo\\WebServer\\Modules\\MagentoRewriteMapper",
@@ -376,6 +387,8 @@
                 "\\AppserverIo\\WebServer\\Modules\\RewriteModule",
                 "\\AppserverIo\\WebServer\\Modules\\DirectoryModule",
                 "\\AppserverIo\\WebServer\\Modules\\AccessModule",
+                "\\AppserverIo\\WebServer\\Modules\\LocationModule",
+                "\\AppserverIo\\WebServer\\Modules\\AutoIndexModule",
                 "\\AppserverIo\\WebServer\\Modules\\CoreModule",
                 "\\AppserverIo\\WebServer\\Modules\\PhpModule",
                 "\\AppserverIo\\WebServer\\Modules\\FastCgiModule",

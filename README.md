@@ -4,8 +4,8 @@
  [![Total Downloads](https://img.shields.io/packagist/dt/appserver-io/webserver.svg?style=flat-square)](https://packagist.org/packages/appserver-io/webserver)
  [![License](https://img.shields.io/packagist/l/appserver-io/webserver.svg?style=flat-square)](https://packagist.org/packages/appserver-io/webserver)
  [![Build Status](https://img.shields.io/travis/appserver-io/webserver/master.svg?style=flat-square)](http://travis-ci.org/appserver-io/webserver)
- [![Code Quality](https://img.shields.io/codeclimate/coverage/github/appserver-io/webserver.svg?style=flat-square)](https://codeclimate.com/github/appserver-io/webserver)
  [![Code Coverage](https://img.shields.io/codeclimate/github/appserver-io/webserver.svg?style=flat-square)](https://codeclimate.com/github/appserver-io/webserver)
+ [![Code Quality](https://img.shields.io/codeclimate/coverage/github/appserver-io/webserver.svg?style=flat-square)](https://codeclimate.com/github/appserver-io/webserver)
 
 # Introduction
 

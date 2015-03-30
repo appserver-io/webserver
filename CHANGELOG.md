@@ -1,3 +1,13 @@
+# Version 2.0.2
+
+## Bugfixes
+
+* Closed [#142](https://github.com/appserver-io/webserver/issues/142) - fixed ssl newline behaviour
+
+## Features
+
+* None
+
 # Version 2.0.1
 
 ## Bugfixes

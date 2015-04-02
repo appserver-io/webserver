@@ -10,11 +10,14 @@ matrix:
   allow_failures:
     - php: 7.0
 
+addons:
+  code_climate:
+    repo_token: 731b271667db5c81e244e6cbdb2035c73a2e8270d24068c51f86e907d9ec6277
+
 before_install:
   - pecl install pthreads-beta
   - pecl install xdebug
   - phpenv rehash
-  - wget https://scrutinizer-ci.com/ocular.phar
 
 before_script:
   - composer selfupdate
@@ -22,7 +25,9 @@ before_script:
 script:
   - ant composer-init
   - ant build
-  - php ocular.phar code-coverage:upload --format=php-clover $TRAVIS_BUILD_DIR/target/reports/unit/clover.xml
+  
+after_script:
+  - vendor/bin/test-reporter --coverage-report=target/reports/unit/clover.xml
 
 notifications:
   email: info@appserver.io

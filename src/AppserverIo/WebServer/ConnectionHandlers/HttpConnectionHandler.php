@@ -586,7 +586,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         if ($accessLogger) {
             // init datetime instance with current time and timezone
             $datetime = new \DateTime('now');
-
+            // log access
             $accessLogger->info(
                 sprintf(
                     /* This logs in apaches default combined format */

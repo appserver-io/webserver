@@ -25,4 +25,4 @@ BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 [ -z "$PHP_BIN" ] && PHP_BIN="/opt/appserver/bin/php";
 
 # call webserver script
-$PHP_BIN -dappserver.php_sapi=webserver -ddate.timezone=Europe/Berlin -dauto_globals_jit=0 $BASE_DIR/../src/server.php $@
+$PHP_BIN -ddisplay_errors=1 -dappserver.php_sapi=webserver -ddate.timezone=Europe/Berlin -dauto_globals_jit=0 $BASE_DIR/../src/server.php $@

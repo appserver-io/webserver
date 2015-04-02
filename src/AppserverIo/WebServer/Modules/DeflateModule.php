@@ -117,8 +117,12 @@ class DeflateModule implements HttpModuleInterface
         if (ModuleHooks::RESPONSE_PRE !== $hook) {
             return;
         }
+        // check if content type header exists if not stop processing
+        if (!$response->hasHeader(Protocol::HEADER_CONTENT_TYPE)) {
+            return;
+        }
         // check if no accept encoding headers are sent
-        if (! $request->hasHeader(Protocol::HEADER_ACCEPT_ENCODING)) {
+        if (!$request->hasHeader(Protocol::HEADER_ACCEPT_ENCODING)) {
             return;
         }
         // check if response was encoded before and exit than

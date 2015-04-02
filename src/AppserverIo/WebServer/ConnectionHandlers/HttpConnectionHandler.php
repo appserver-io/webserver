@@ -38,6 +38,7 @@ use AppserverIo\Http\HttpPart;
 use AppserverIo\Http\HttpQueryParser;
 use AppserverIo\Http\HttpRequestParser;
 use AppserverIo\Http\HttpResponseStates;
+use AppserverIo\Http\HttpProtocol;
 
 /**
  * Class HttpConnectionHandler
@@ -301,6 +302,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         // init keep alive settings
         $keepAliveTimeout = (int) $serverConfig->getKeepAliveTimeout();
         $keepAliveMax = (int) $serverConfig->getKeepAliveMax();
+        
         // init keep alive connection flag
         $keepAliveConnection = false;
 
@@ -341,7 +343,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                 $keepAliveConnection = false;
 
                 // set first line from connection
-                $line = $connection->readLine(self::HTTP_CONNECTION_READ_LENGTH);
+                $line = $connection->readLine(self::HTTP_CONNECTION_READ_LENGTH, $keepAliveTimeout);
 
                 /**
                  * In the interest of robustness, servers SHOULD ignore any empty
@@ -443,6 +445,10 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             } catch (\Exception $e) {
                 // set status code given by exception
                 // if 0 is comming set 500 by default
+                
+                echo $e;
+                echo __METHOD__ . __LINE__ . PHP_EOL;
+                
                 $response->setStatusCode($e->getCode() ? $e->getCode() : 500);
                 $this->renderErrorPage($e);
             }
@@ -538,6 +544,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     {
         // get local var refs
         $response = $this->getParser()->getResponse();
+        
         // prepare headers in response object to be ready for delivery
         $response->prepareHeaders();
     }
@@ -557,7 +564,11 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         // write response headers
         $connection->write($response->getHeaderString());
         // stream response body to connection
-        $connection->copyStream($response->getBodyStream());
+
+        $contentLength = $response->getHeader(HttpProtocol::HEADER_CONTENT_LENGTH);
+        
+        $connection->copyStream($response->getBodyStream(), (int)$contentLength);
+        
     }
 
     /**
@@ -680,7 +691,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         $worker = $this->getWorker();
         $request = $this->getParser()->getRequest();
         $response = $this->getParser()->getResponse();
-
+        
         // check if connections is still alive
         if ($connection) {
             // call current fileahandler module's shutdown hook if exists

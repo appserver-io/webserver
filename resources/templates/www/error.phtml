@@ -16,7 +16,12 @@
     <h1><?php echo $response->getStatusCode() ?> <?php echo $response->getStatusReasonPhrase() ?></h1>
 </header>
 
-<p class="exception"><?php echo $errorMessage ?></p>
+<div class="exception">
+        <?php if ($response->getStatusReasonPhrase() !== $exception->getMessage()): ?>
+            <h2><?php echo $exception->getMessage() ?></h2>
+        <?php endif; ?>
+        <p><?php echo str_replace("\n","<br/><br/>", $exception->__toString()); ?></p>
+</div>
 
 <p>Please report bugs to<br/>
     <a href="https://github.com/appserver-io/webserver/issues/new">https://github.com/appserver-io/webserver/issues/new</a>

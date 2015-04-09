@@ -61,6 +61,37 @@
             </handlers>
         </logger>
     </loggers>
+    
+    <upstreams>
+        <upstream name="backend" type="\AppserverIo\WebServer\Upstreams\DefaultUpstream">
+            <servers>
+                <server name="server1" type="\AppserverIo\WebServer\Upstreams\Servers\DefaultServer">
+                    <params>
+                        <param name="host" type="string">127.0.0.2</param>
+                        <param name="weight" type="integer">1</param>
+                        <param name="maxFails" type="integer">10</param>
+                        <param name="failTimeout" type="integer">30</param>
+                        <param name="maxConns" type="integer">64</param>
+                        <param name="backup" type="boolean">false</param>
+                        <param name="down" type="boolean">false</param>
+                        <param name="resolve" type="boolean">false</param>
+                    </params>
+                </server>
+                <server name="server2" type="\AppserverIo\WebServer\Upstreams\Servers\DefaultServer">
+                    <params>
+                        <param name="host" type="string">127.0.0.2</param>
+                        <param name="weight" type="integer">1</param>
+                        <param name="maxFails" type="integer">10</param>
+                        <param name="failTimeout" type="integer">30</param>
+                        <param name="maxConns" type="integer">64</param>
+                        <param name="backup" type="boolean">false</param>
+                        <param name="down" type="boolean">false</param>
+                        <param name="resolve" type="boolean">false</param>
+                    </params>
+                </server>
+            </servers>
+        </upstream>
+    </upstreams>
 
     <servers>
         <server
@@ -122,9 +153,21 @@
             <rewrites>
                 <rewrite condition="-f{OR}-l{OR}-d" target="" flag="L"/>
             </rewrites>
+            
+            <locations>
+                <location condition="\/(icons|test).*">
+                    <handlers>
+                        <handler name="proxy" extension=".*">
+                            <params>
+                                <param name="upstream" type="string">backend</param>
+                            </params>
+                        </handler>
+                    </handlers>
+                </location>
+            </locations>
 
             <virtualHosts>
-            
+
                 <virtualHost name="phpwebserver.dev phpwebserver.local phpwebserver.test">
                     <params>
                         <param name="admin" type="string">admin@phpwebserver.dev</param>
@@ -135,7 +178,7 @@
                         <rewrite condition="-f{OR}-l{OR}-d" target="" flag="L"/>
                     </rewrites>
                 </virtualHost>
-                
+
                 <virtualHost name="phpwebserver-fcgi.dev phpwebserver-fcgi.local phpwebserver-fcgi.test">
                     <params>
                         <param name="admin" type="string">admin@phpwebserver.dev</param>
@@ -247,8 +290,6 @@
                 <module type="\AppserverIo\WebServer\Modules\DeflateModule" />
             </modules>
             <handlers>
-
-                <handler name="proxy" extension=".*"/>
                 <handler name="php" extension=".php"/>
                 <handler name="php" extension=".phtml"/>
                 <handler name="servlet" extension=".do"/>
@@ -294,7 +335,7 @@
             </certificates>
 
             <virtualHosts>
-            
+
                 <virtualHost name="phpwebserver.dev phpwebserver.local phpwebserver.test">
                     <params>
                         <param name="admin" type="string">admin@phpwebserver.dev</param>
@@ -308,7 +349,7 @@
                         <environmentVariable condition="" definition="EXAMPLE_VARIABLE=test" />
                     </environmentVariables>
                 </virtualHost>
-                
+
                 <virtualHost name="phpwebserver-fcgi.dev phpwebserver-fcgi.local phpwebserver-fcgi.test">
                     <params>
                         <param name="admin" type="string">admin@phpwebserver.dev</param>

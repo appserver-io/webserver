@@ -433,6 +433,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
 
                 // process modules by hook RESPONSE_PRE
                 $this->processModules(ModuleHooks::RESPONSE_PRE);
+                
             } catch (SocketReadTimeoutException $e) {
                 // break the request processing due to client timeout
                 break;
@@ -445,10 +446,6 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             } catch (\Exception $e) {
                 // set status code given by exception
                 // if 0 is comming set 500 by default
-                
-                echo $e;
-                echo __METHOD__ . __LINE__ . PHP_EOL;
-                
                 $response->setStatusCode($e->getCode() ? $e->getCode() : 500);
                 $this->renderErrorPage($e);
             }
@@ -456,11 +453,11 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             // send response to connected client
             $this->prepareResponse();
 
-            // process modules by hook RESPONSE_POST
-            $this->processModules(ModuleHooks::RESPONSE_POST);
-
             // send response to connected client
             $this->sendResponse();
+            
+            // process modules by hook RESPONSE_POST
+            $this->processModules(ModuleHooks::RESPONSE_POST);
 
             // check if keep alive-loop is finished to close connection before log access and init vars
             // to avoid waiting on non keep alive requests for that
@@ -477,7 +474,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             // init the request parser for next request
             $parser->init();
         } while ($keepAliveConnection === true);
-
+        
         // close connection if not closed yet
         $connection->close();
     }
@@ -509,6 +506,20 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             }
         }
     }
+    
+
+    public function shutdownModules()
+    {
+        // get object refs to local vars
+        $modules = $this->getModules();
+        // interate all modules and call process by given hook
+        foreach ($modules as $module) {
+            /* @var $module \AppserverIo\WebServer\Interfaces\HttpModuleInterface */
+            // process modules shutdown logic
+            $module->shutdown();
+        }
+    }
+    
 
     /**
      * Renders error page by given exception
@@ -564,11 +575,12 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         // write response headers
         $connection->write($response->getHeaderString());
         // stream response body to connection
-
-        $contentLength = $response->getHeader(HttpProtocol::HEADER_CONTENT_LENGTH);
-        
-        $connection->copyStream($response->getBodyStream(), (int)$contentLength);
-        
+        if ($response->hasHeader(HttpProtocol::HEADER_CONTENT_LENGTH)) {
+            $contentLength = $response->getHeader(HttpProtocol::HEADER_CONTENT_LENGTH);
+            $connection->copyStream($response->getBodyStream(), (int)$contentLength);
+        } else {
+            $connection->copyStream($response->getBodyStream(), $response->getContentLength());
+        }
     }
 
     /**
@@ -691,6 +703,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         $worker = $this->getWorker();
         $request = $this->getParser()->getRequest();
         $response = $this->getParser()->getResponse();
+        $response->init();
         
         // check if connections is still alive
         if ($connection) {

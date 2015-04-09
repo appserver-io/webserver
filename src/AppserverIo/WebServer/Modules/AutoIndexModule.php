@@ -115,6 +115,12 @@ class AutoIndexModule implements HttpModuleInterface
         if ($this->getRequestContext()->getServerVar(ServerVars::SERVER_AUTO_INDEX) === ServerVars::VALUE_AUTO_INDEX_OFF) {
             return;
         }
+        
+        // check if file handler is still core
+        if ($requestContext->getServerVar(ServerVars::SERVER_HANDLER) === 'core') {
+            // stop processing
+            return;
+        }
 
         // now load the URL without path information and query string
         $url = $this->getUrl();

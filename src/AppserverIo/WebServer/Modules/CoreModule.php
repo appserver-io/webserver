@@ -220,14 +220,13 @@ class CoreModule implements HttpModuleInterface
             // stop processing
             return;
         }
+        
+        echo __METHOD__ . PHP_EOL;
 
         // populates request context for possible script calling based on file handler configurations
         $this->populateRequestContext($requestContext);
 
-        // check if file handler is not core module anymore
-        
-        var_dump($requestContext->getServerVar(ServerVars::SERVER_HANDLER));
-        
+        // check if file handler is not core module anymore        
         if ($requestContext->getServerVar(ServerVars::SERVER_HANDLER) !== self::MODULE_NAME) {
             // stop processing
             return;

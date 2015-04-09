@@ -25,8 +25,9 @@ use AppserverIo\Psr\HttpMessage\RequestInterface;
 use AppserverIo\Psr\HttpMessage\ResponseInterface;
 use AppserverIo\WebServer\Interfaces\HttpModuleInterface;
 use AppserverIo\Http\HttpResponseStates;
-use AppserverIo\Server\Dictionaries\ModuleHooks;
 use AppserverIo\Server\Dictionaries\ServerVars;
+use AppserverIo\Server\Dictionaries\ModuleVars;
+use AppserverIo\Server\Dictionaries\ModuleHooks;
 use AppserverIo\Server\Exceptions\ModuleException;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
@@ -58,7 +59,22 @@ class ProxyModule implements HttpModuleInterface
      * 
      * @var StreamSocket
      */
-    protected $connection;
+    public $connection = null;
+    
+    public $shouldDisconnect = false;
+    
+    public function checkShouldDisconnect()
+    {
+        // check if we should reconnection connection next time
+        if ($this->shouldDisconnect === true) {
+            // close connection first if exists
+            if ($this->connection) {
+                $this->connection->close();
+                $this->connection = null;
+            }
+            $this->shouldDisconnect = false;
+        }
+    }
     
     /**
      * Implements module logic for given hook
@@ -73,60 +89,77 @@ class ProxyModule implements HttpModuleInterface
      */
     public function process(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext, $hook)
     {
+        $serverContext = $this->getServerContext();
+        
+        $upstream = $serverContext->getUpstream('backend');
+        
+        // check if we've configured module variables
+        if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_FILE_HANDLER_VARIABLES)) {
+            // load the volatile file handler variables and set connection data
+            $fileHandlerVariables = $requestContext->getModuleVar(ModuleVars::VOLATILE_FILE_HANDLER_VARIABLES);
+        }
+        
+        // check if response post is is comming
+        if (ModuleHooks::RESPONSE_POST === $hook) {
+            $this->checkShouldDisconnect();
+            return;
+        }
+        
         // if wrong hook is coming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
             return;
         }
 
-        
         try {
-
-            // check if connection object was initialised but connection resource is not ready
-            if ($this->connection) {
-                
-                var_dump($this->connection->getConnectionResource());
-                var_dump(stream_get_meta_data($this->connection->getConnectionResource()));
-                
-                if (!is_resource($this->connection->getConnectionResource())) {
-                    // unset connection instance to for a new one to be created
-                    unset($this->connection);
-                }
+            // check if should reconnect
+            $this->checkShouldDisconnect();
+            
+            // check if proxy connection object was initialised but connection resource is not ready
+            if (($this->connection) && ($this->connection->getStatus() === false)) {
+                // unset connection if corrupt
+                $this->connection = null;
             }
 
-            // check if no connection instance is there
-            if (!$this->connection) {
+            // check if connection should be established
+            if ($this->connection === null) {
                 // create and connect to defined backend
-                echo '#### CONNECT TO BACKEND #### in Thread ' . \Thread::getCurrentThreadId() . PHP_EOL;
                 $this->connection = StreamSocket::getClientInstance('tcp://127.0.0.1:80');
+                // set proxy connection resource as stream source for body stream directly
+                // that avoids huge memory consumtion when transferring big files via proxy connections
                 $response->setBodyStream($this->connection->getConnectionResource());
             }
 
+            // get connection to local var
             $connection = $this->connection;
 
-            $rawRequestString = sprintf('%s %s %s' . "\r\n", $request->getMethod(), $request->getUri(), HttpProtocol::VERSION_1_1 );
+            // build up raw request start line
+            $rawRequestString = sprintf(
+                '%s %s %s' . "\r\n", 
+                $request->getMethod(),
+                $request->getUri(),
+                HttpProtocol::VERSION_1_1
+            );
             $headers = $request->getHeaders();
-    
             foreach ($headers as $headerName => $headerValue) {
                 $rawRequestString .= $headerName . HttpProtocol::HEADER_SEPARATOR . $headerValue . "\r\n";
             }
-    
             $rawRequestString .= "\r\n";
             
-            var_dump($connection->write($rawRequestString));
+            // write headers to proxy connection
+            $connection->write($rawRequestString);
+            // copy raw request body stream to proxy connection
+            $connection->copyStream($request->getBodyStream());
             
-            var_dump(socket_get_status($connection->getConnectionResource()));
-            
-            usleep(1000);
-            
+            // read status line from proxy connection
             $statusLine = $connection->readLine(1024, 5);
-            
+            // parse start line
             list($httpVersion, $responseStatusCode) = explode(' ', $statusLine);
             
+            // map everything from proxy response to our response object
             $response->setStatusCode($responseStatusCode);
             
             $line = '';
             $messageHeaders = '';
-            
             while (!in_array($line, array("\r\n", "\n"))) {
                 // read next line
                 $line = $connection->readLine();
@@ -143,42 +176,36 @@ class ProxyModule implements HttpModuleInterface
             
             // delimit headers by CRLF
             $headerLines = explode("\r\n", $messageHeaders);
-            
-
 
             // iterate all headers
             foreach ($headerLines as $headerLine) {
-    
                 // extract header info
                 $extractedHeaderInfo = explode(HttpProtocol::HEADER_SEPARATOR, trim($headerLine));
-                
                 if ((!$extractedHeaderInfo) || ($extractedHeaderInfo[0] === $headerLine)) {
                     throw new HttpException('Wrong header format');
                 }
-                
                 // split name and value
                 list($headerName, $headerValue) = $extractedHeaderInfo;
-    
                 // add header
                 $response->addHeader(trim($headerName), trim($headerValue));
-                
             }
             
-            // check if connection should be closed
+            // set flag false by default
+            $this->shouldDisconnect = false;
+            
+            // check if connection should be closed as given in connection header
             if ($response->getHeader(HttpProtocol::HEADER_CONNECTION) === HttpProtocol::HEADER_CONNECTION_VALUE_CLOSE) {
-                $connection->close();
-                unset($connection);
-                
-                echo "CLOSE CONNECTION########################" . PHP_EOL;
+                $this->shouldDisconnect = true;
             }
+
+        } catch(\AppserverIo\Psr\Socket\SocketReadException $e) {
+            // close and unset connection and try to process the request again to
+            // not let a white page get delivered to the client
+            $this->shouldDisconnect = true;
+            return $this->process($request, $response, $requestContext, $hook);
             
         } catch(\Exception $e) {
-            
-            echo '#### EXCEPTION #### in Thread ' . \Thread::getCurrentThreadId() . PHP_EOL;
-            
-            echo $e;
-            // reset connection
-            unset($this->connection);
+            $this->shouldDisconnect = true;
         }
         
         $response->setState(HttpResponseStates::DISPATCH);
@@ -214,8 +241,12 @@ class ProxyModule implements HttpModuleInterface
     */
     public function init(ServerContextInterface $serverContext)
     {
-        echo __METHOD__ . PHP_EOL;
         $this->serverContext = $serverContext;
+    }
+    
+    public function getServerContext()
+    {
+        return $this->serverContext;
     }
     
     /**
@@ -228,10 +259,4 @@ class ProxyModule implements HttpModuleInterface
     {
         // nothing to prepare for this module
     }
-    
-    public function __destruct()
-    {
-        echo __METHOD__ . PHP_EOL;
-    }
-
 }

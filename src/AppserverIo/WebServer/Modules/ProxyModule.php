@@ -185,6 +185,10 @@ class ProxyModule implements HttpModuleInterface
             // populate request headers
             $headers = $request->getHeaders();
             foreach ($headers as $headerName => $headerValue) {
+                // @todo: make keep-alive available for proxy connections
+                if ($headerName === HttpProtocol::HEADER_CONNECTION) {
+                    $headerValue = HttpProtocol::HEADER_CONNECTION_VALUE_CLOSE;
+                }
                 $rawRequestString .= $headerName . HttpProtocol::HEADER_SEPARATOR . $headerValue . "\r\n";
             }
             
@@ -263,6 +267,11 @@ class ProxyModule implements HttpModuleInterface
             $this->shouldDisconnect = true;
             return $this->process($request, $response, $requestContext, $hook);
             
+        } catch (\AppserverIo\Psr\Socket\SocketReadTimeoutException $e) {
+            // close and unset connection and try to process the request again to
+            // not let a white page get delivered to the client
+            $this->shouldDisconnect = true;
+            return $this->process($request, $response, $requestContext, $hook);
         }
         
         // set response to be dispatched at this point

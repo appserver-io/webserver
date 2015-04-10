@@ -61,6 +61,39 @@
             </handlers>
         </logger>
     </loggers>
+    
+    <upstreams>
+        <upstream name="backend" type="\AppserverIo\WebServer\Upstreams\DefaultUpstream">
+            <servers>
+                <server name="local-apache" type="\AppserverIo\WebServer\Upstreams\Servers\DefaultServer">
+                    <params>
+                        <param name="address" type="string">127.0.0.1</param>
+                        <param name="port" type="integer">80</param>
+                        <param name="weight" type="integer">1</param>
+                        <param name="maxFails" type="integer">10</param>
+                        <param name="failTimeout" type="integer">30</param>
+                        <param name="maxConns" type="integer">64</param>
+                        <param name="backup" type="boolean">false</param>
+                        <param name="down" type="boolean">false</param>
+                        <param name="resolve" type="boolean">false</param>
+                    </params>
+                </server>
+                <server name="local-nginx" type="\AppserverIo\WebServer\Upstreams\Servers\DefaultServer">
+                    <params>
+                        <param name="address" type="string">127.0.0.1</param>
+                        <param name="port" type="integer">8080</param>
+                        <param name="weight" type="integer">1</param>
+                        <param name="maxFails" type="integer">10</param>
+                        <param name="failTimeout" type="integer">30</param>
+                        <param name="maxConns" type="integer">64</param>
+                        <param name="backup" type="boolean">false</param>
+                        <param name="down" type="boolean">false</param>
+                        <param name="resolve" type="boolean">false</param>
+                    </params>
+                </server>
+            </servers>
+        </upstream>
+    </upstreams>
 
     <servers>
         <server
@@ -122,9 +155,22 @@
             <rewrites>
                 <rewrite condition="-f{OR}-l{OR}-d" target="" flag="L"/>
             </rewrites>
+            
+            <locations>
+                <location condition="\/(icons|test).*">
+                    <handlers>
+                        <handler name="proxy" extension=".*">
+                            <params>
+                                <param name="transport" type="string">tcp</param>
+                                <param name="upstream" type="string">backend</param>
+                            </params>
+                        </handler>
+                    </handlers>
+                </location>
+            </locations>
 
             <virtualHosts>
-            
+
                 <virtualHost name="phpwebserver.dev phpwebserver.local phpwebserver.test">
                     <params>
                         <param name="admin" type="string">admin@phpwebserver.dev</param>
@@ -135,7 +181,7 @@
                         <rewrite condition="-f{OR}-l{OR}-d" target="" flag="L"/>
                     </rewrites>
                 </virtualHost>
-                
+
                 <virtualHost name="phpwebserver-fcgi.dev phpwebserver-fcgi.local phpwebserver-fcgi.test">
                     <params>
                         <param name="admin" type="string">admin@phpwebserver.dev</param>
@@ -230,20 +276,21 @@
 
             <modules>
                 <!-- REQUEST_POST hook -->
-                <module type="\AppserverIo\WebServer\Modules\AuthenticationModule"/>
-                <module type="\AppserverIo\WebServer\Modules\VirtualHostModule"/>
+                <module type="\AppserverIo\WebServer\Modules\AuthenticationModule" />
+                <module type="\AppserverIo\WebServer\Modules\VirtualHostModule" />
                 <module type="\AppserverIo\WebServer\Modules\EnvironmentVariableModule" />
-                <module type="\AppserverIo\WebServer\Modules\RewriteMapModule"/>
-                <module type="\AppserverIo\WebServer\Modules\RewriteModule"/>
-                <module type="\AppserverIo\WebServer\Modules\DirectoryModule"/>
-                <module type="\AppserverIo\WebServer\Modules\AccessModule"/>
-                <module type="\AppserverIo\WebServer\Modules\LocationModule"/>
-                <module type="\AppserverIo\WebServer\Modules\AutoIndexModule"/>
-                <module type="\AppserverIo\WebServer\Modules\CoreModule"/>
-                <module type="\AppserverIo\WebServer\Modules\PhpModule"/>
-                <module type="\AppserverIo\WebServer\Modules\FastCgiModule"/>
+                <module type="\AppserverIo\WebServer\Modules\RewriteMapModule" />
+                <module type="\AppserverIo\WebServer\Modules\RewriteModule" />
+                <module type="\AppserverIo\WebServer\Modules\DirectoryModule" />
+                <module type="\AppserverIo\WebServer\Modules\AccessModule" />
+                <module type="\AppserverIo\WebServer\Modules\LocationModule" />
+                <module type="\AppserverIo\WebServer\Modules\AutoIndexModule" />
+                <module type="\AppserverIo\WebServer\Modules\CoreModule" />
+                <module type="\AppserverIo\WebServer\Modules\PhpModule" />
+                <module type="\AppserverIo\WebServer\Modules\FastCgiModule" />
+                <module type="\AppserverIo\WebServer\Modules\ProxyModule" />
                 <!-- RESPONSE_PRE hook -->
-                <module type="\AppserverIo\WebServer\Modules\DeflateModule"/>
+                <module type="\AppserverIo\WebServer\Modules\DeflateModule" />
             </modules>
             <handlers>
                 <handler name="php" extension=".php"/>
@@ -291,7 +338,7 @@
             </certificates>
 
             <virtualHosts>
-            
+
                 <virtualHost name="phpwebserver.dev phpwebserver.local phpwebserver.test">
                     <params>
                         <param name="admin" type="string">admin@phpwebserver.dev</param>
@@ -305,7 +352,7 @@
                         <environmentVariable condition="" definition="EXAMPLE_VARIABLE=test" />
                     </environmentVariables>
                 </virtualHost>
-                
+
                 <virtualHost name="phpwebserver-fcgi.dev phpwebserver-fcgi.local phpwebserver-fcgi.test">
                     <params>
                         <param name="admin" type="string">admin@phpwebserver.dev</param>
@@ -430,17 +477,17 @@
 
             <modules>
                 <!-- REQUEST_POST hook -->
-                <module type="\AppserverIo\WebServer\Modules\AuthenticationModule"/>
-                <module type="\AppserverIo\WebServer\Modules\VirtualHostModule"/>
+                <module type="\AppserverIo\WebServer\Modules\AuthenticationModule" />
+                <module type="\AppserverIo\WebServer\Modules\VirtualHostModule" />
                 <module type="\AppserverIo\WebServer\Modules\EnvironmentVariableModule" />
-                <module type="\AppserverIo\WebServer\Modules\RewriteMapModule"/>
-                <module type="\AppserverIo\WebServer\Modules\RewriteModule"/>
-                <module type="\AppserverIo\WebServer\Modules\DirectoryModule"/>
-                <module type="\AppserverIo\WebServer\Modules\AccessModule"/>
-                <module type="\AppserverIo\WebServer\Modules\LocationModule"/>
-                <module type="\AppserverIo\WebServer\Modules\AutoIndexModule"/>
-                <module type="\AppserverIo\WebServer\Modules\CoreModule"/>
-                <module type="\AppserverIo\WebServer\Modules\PhpModule"/>
+                <module type="\AppserverIo\WebServer\Modules\RewriteMapModule" />
+                <module type="\AppserverIo\WebServer\Modules\RewriteModule" />
+                <module type="\AppserverIo\WebServer\Modules\DirectoryModule" />
+                <module type="\AppserverIo\WebServer\Modules\AccessModule" />
+                <module type="\AppserverIo\WebServer\Modules\LocationModule" />
+                <module type="\AppserverIo\WebServer\Modules\AutoIndexModule" />
+                <module type="\AppserverIo\WebServer\Modules\CoreModule" />
+                <module type="\AppserverIo\WebServer\Modules\PhpModule" />
                 <module type="\AppserverIo\WebServer\Modules\FastCgiModule"/>
                 <!-- RESPONSE_PRE hook -->
                 <module type="\AppserverIo\WebServer\Modules\DeflateModule"/>

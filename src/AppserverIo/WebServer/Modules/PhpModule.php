@@ -481,13 +481,9 @@ class PhpModule implements HttpModuleInterface
     /**
      * Implement's module shutdown logic
      *
-     * @param \AppserverIo\Psr\HttpMessage\RequestInterface  $request  The request object
-     * @param \AppserverIo\Psr\HttpMessage\ResponseInterface $response The response object
-     *
-     * @return bool
-     * @throws \AppserverIo\Server\Exceptions\ModuleException
+     * @return void
      */
-    public function shutdown(RequestInterface $request, ResponseInterface $response)
+    public function shutdown()
     {
         // todo: if non thread process is used than here should be the shutdown handling
         // if exit/die or fatal error happens in this context so that the worker will be

@@ -38,6 +38,7 @@ use AppserverIo\Http\HttpPart;
 use AppserverIo\Http\HttpQueryParser;
 use AppserverIo\Http\HttpRequestParser;
 use AppserverIo\Http\HttpResponseStates;
+use AppserverIo\Http\HttpProtocol;
 
 /**
  * Class HttpConnectionHandler
@@ -301,6 +302,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         // init keep alive settings
         $keepAliveTimeout = (int) $serverConfig->getKeepAliveTimeout();
         $keepAliveMax = (int) $serverConfig->getKeepAliveMax();
+        
         // init keep alive connection flag
         $keepAliveConnection = false;
 
@@ -341,7 +343,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                 $keepAliveConnection = false;
 
                 // set first line from connection
-                $line = $connection->readLine(self::HTTP_CONNECTION_READ_LENGTH);
+                $line = $connection->readLine(self::HTTP_CONNECTION_READ_LENGTH, $keepAliveTimeout);
 
                 /**
                  * In the interest of robustness, servers SHOULD ignore any empty
@@ -431,6 +433,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
 
                 // process modules by hook RESPONSE_PRE
                 $this->processModules(ModuleHooks::RESPONSE_PRE);
+                
             } catch (SocketReadTimeoutException $e) {
                 // break the request processing due to client timeout
                 break;
@@ -450,11 +453,11 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             // send response to connected client
             $this->prepareResponse();
 
-            // process modules by hook RESPONSE_POST
-            $this->processModules(ModuleHooks::RESPONSE_POST);
-
             // send response to connected client
             $this->sendResponse();
+            
+            // process modules by hook RESPONSE_POST
+            $this->processModules(ModuleHooks::RESPONSE_POST);
 
             // check if keep alive-loop is finished to close connection before log access and init vars
             // to avoid waiting on non keep alive requests for that
@@ -471,7 +474,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             // init the request parser for next request
             $parser->init();
         } while ($keepAliveConnection === true);
-
+        
         // close connection if not closed yet
         $connection->close();
     }
@@ -503,7 +506,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             }
         }
     }
-
+    
     /**
      * Renders error page by given exception
      *
@@ -538,6 +541,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     {
         // get local var refs
         $response = $this->getParser()->getResponse();
+        
         // prepare headers in response object to be ready for delivery
         $response->prepareHeaders();
     }
@@ -551,13 +555,16 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     {
         // get local var refs
         $response = $this->getParser()->getResponse();
+        $inputStream = $response->getBodyStream();
         $connection = $this->getConnection();
-        // write response status-line
-        $connection->write($response->getStatusLine());
-        // write response headers
-        $connection->write($response->getHeaderString());
-        // stream response body to connection
-        $connection->copyStream($response->getBodyStream());
+        // try to rewind stream
+        @rewind($inputStream);
+        // write response status-line + headers
+        $connection->write($response->getStatusLine() . $response->getHeaderString());
+        // stream response to client connection
+        while ($readContent = fread($inputStream, 4096)) {
+            $connection->write($readContent);
+        }
     }
 
     /**
@@ -680,7 +687,8 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         $worker = $this->getWorker();
         $request = $this->getParser()->getRequest();
         $response = $this->getParser()->getResponse();
-
+        $response->init();
+        
         // check if connections is still alive
         if ($connection) {
             // call current fileahandler module's shutdown hook if exists

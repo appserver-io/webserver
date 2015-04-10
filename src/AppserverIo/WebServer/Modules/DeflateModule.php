@@ -28,6 +28,7 @@ use AppserverIo\Server\Dictionaries\ModuleHooks;
 use AppserverIo\Server\Exceptions\ModuleException;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
+use AppserverIo\Server\Dictionaries\ServerVars;
 
 /**
  * Class DeflateModule
@@ -117,12 +118,21 @@ class DeflateModule implements HttpModuleInterface
         if (ModuleHooks::RESPONSE_PRE !== $hook) {
             return;
         }
+        // check if content type header exists if not stop processing
+        if (!$response->hasHeader(Protocol::HEADER_CONTENT_TYPE)) {
+            return;
+        }
         // check if no accept encoding headers are sent
-        if (! $request->hasHeader(Protocol::HEADER_ACCEPT_ENCODING)) {
+        if (!$request->hasHeader(Protocol::HEADER_ACCEPT_ENCODING)) {
             return;
         }
         // check if response was encoded before and exit than
         if ($response->hasHeader(Protocol::HEADER_CONTENT_ENCODING)) {
+            return;
+        }
+        // do not deflate on proxy requests because proxy servers are responsible for sending correct responses
+        if ($requestContext->getServerVar(ServerVars::SERVER_HANDLER) === 'proxy') {
+            // stop processing
             return;
         }
         // check if request accepts deflate
@@ -143,11 +153,9 @@ class DeflateModule implements HttpModuleInterface
                 // apply encoding filter to response body stream
                 stream_filter_append($response->getBodyStream(), 'zlib.deflate', STREAM_FILTER_READ);
                 // rewind current body stream
-                rewind($response->getBodyStream());
+                @rewind($response->getBodyStream());
                 // copy body stream to make use of filter in read mode
                 $deflateBodyStream = fopen('php://memory', 'w+b');
-                // copy stream with appended filter to new deflate body stream
-                stream_copy_to_stream($response->getBodyStream(), $deflateBodyStream);
                 // reset body stream on response
                 $response->setBodyStream($deflateBodyStream);
                 // set encoding header info

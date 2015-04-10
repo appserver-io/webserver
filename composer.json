@@ -37,11 +37,12 @@
 		"appserver-io/fastcgi" : "~1.0",
 		"appserver-io/logger" : "~1.0",
 		"appserver-io-psr/socket" : "~1.0",
-		"appserver-io-psr/http-message" : "~1.0"
+		"appserver-io-psr/http-message" : "~1.0",
+		"appserver-io/concurrency" : "~0.1"
 	},
 	"require-dev" : {
 		"appserver-io/build" : "~1.0",
-		"codeclimate/php-test-reporter": "dev-master"
+		"codeclimate/php-test-reporter" : "dev-master"
 	},
 	"autoload" : {
 		"psr-0" : {

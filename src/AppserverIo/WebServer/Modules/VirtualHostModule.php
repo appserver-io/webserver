@@ -92,6 +92,7 @@ class VirtualHostModule implements HttpModuleInterface
         
         foreach ($virtualHosts as $virtualHostName => $virtualHostData) {
             if (isset($virtualHostData['params']['certPath'])) {
+                $certPath = $virtualHostData['params']['certPath'];
                 // get real cert path
                 $realCertPath = str_replace('/', DIRECTORY_SEPARATOR, $certPath);
                 // check if relative or absolute path was given

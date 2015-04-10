@@ -1,3 +1,13 @@
+# Version 3.2.0
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Closed [#147](https://github.com/appserver-io/appserver/issues/147) added proxy module and upstream functionality.
+
 # Version 3.1.2
 
 ## Bugfixes

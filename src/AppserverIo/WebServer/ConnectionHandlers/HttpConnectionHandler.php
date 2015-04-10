@@ -507,20 +507,6 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         }
     }
     
-
-    public function shutdownModules()
-    {
-        // get object refs to local vars
-        $modules = $this->getModules();
-        // interate all modules and call process by given hook
-        foreach ($modules as $module) {
-            /* @var $module \AppserverIo\WebServer\Interfaces\HttpModuleInterface */
-            // process modules shutdown logic
-            $module->shutdown();
-        }
-    }
-    
-
     /**
      * Renders error page by given exception
      *
@@ -569,17 +555,15 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     {
         // get local var refs
         $response = $this->getParser()->getResponse();
+        $inputStream = $response->getBodyStream();
         $connection = $this->getConnection();
-        // write response status-line
-        $connection->write($response->getStatusLine());
-        // write response headers
-        $connection->write($response->getHeaderString());
-        // stream response body to connection
-        if ($response->hasHeader(HttpProtocol::HEADER_CONTENT_LENGTH)) {
-            $contentLength = $response->getHeader(HttpProtocol::HEADER_CONTENT_LENGTH);
-            $connection->copyStream($response->getBodyStream(), (int)$contentLength);
-        } else {
-            $connection->copyStream($response->getBodyStream(), $response->getContentLength());
+        // try to rewind stream
+        @rewind($inputStream);
+        // write response status-line + headers
+        $connection->write($response->getStatusLine() . $response->getHeaderString());
+        // stream response to client connection
+        while ($readContent = fread($inputStream, 4096)) {
+            $connection->write($readContent);
         }
     }
 

@@ -49,20 +49,37 @@ class ProxyModule implements HttpModuleInterface
 {
     /**
      * Defines the module's name
-     * 
+     *
      * @var string
      */
     const MODULE_NAME = 'proxy';
     
     /**
+     * Defines the default transport
+     *
+     * @var string
+     */
+    const PROXY_DEFAULT_TRANSPORT = 'tcp';
+    
+    /**
      * Holds connection to backend
-     * 
+     *
      * @var StreamSocket
      */
     public $connection = null;
     
+    /**
+     * Flag if proxy should be disconnected
+     *
+     * @var boolean
+     */
     public $shouldDisconnect = false;
     
+    /**
+     * Check if proxy connection should be disconnected
+     *
+     * @return void
+     */
     public function checkShouldDisconnect()
     {
         // check if we should reconnection connection next time
@@ -89,15 +106,8 @@ class ProxyModule implements HttpModuleInterface
      */
     public function process(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext, $hook)
     {
+        // get server context to local ref
         $serverContext = $this->getServerContext();
-        
-        $upstream = $serverContext->getUpstream('backend');
-        
-        // check if we've configured module variables
-        if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_FILE_HANDLER_VARIABLES)) {
-            // load the volatile file handler variables and set connection data
-            $fileHandlerVariables = $requestContext->getModuleVar(ModuleVars::VOLATILE_FILE_HANDLER_VARIABLES);
-        }
         
         // check if response post is is comming
         if (ModuleHooks::RESPONSE_POST === $hook) {
@@ -111,6 +121,38 @@ class ProxyModule implements HttpModuleInterface
         }
 
         try {
+            // init upstreamname and transport
+            $upstreamName = null;
+            $transport = 'tcp';
+            
+            // check if we've configured module variables
+            if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_FILE_HANDLER_VARIABLES)) {
+                // load the volatile file handler variables and set connection data
+                $fileHandlerVariables = $requestContext->getModuleVar(ModuleVars::VOLATILE_FILE_HANDLER_VARIABLES);
+                // check if upstream is set for proxy function
+                if (isset($fileHandlerVariables['upstream'])) {
+                    $upstreamName =  $fileHandlerVariables['upstream'];
+                }
+                if (isset($fileHandlerVariables['transport'])) {
+                    $transport = $fileHandlerVariables['transport'];
+                }
+            }
+            
+            // if there was no upstream defined
+            if (is_null($upstreamName)) {
+                throw new \ModuleException('No upstream configured for proxy filehandler');
+            }
+            
+            // get upstream instance by configured upstream name
+            $upstream = $serverContext->getUpstream($upstreamName);
+
+            // find next proxy server by given upstream type
+            $remoteAddr = $requestContext->getServerVar(ServerVars::REMOTE_ADDR);
+            $proxyServer = $upstream->findServer(md5($remoteAddr));
+            
+            // build proxy socket address for connection
+            $proxySocketAddress = sprintf('%s://%s:%s', $transport, $proxyServer->getAddress(), $proxyServer->getPort());
+            
             // check if should reconnect
             $this->checkShouldDisconnect();
             
@@ -119,11 +161,11 @@ class ProxyModule implements HttpModuleInterface
                 // unset connection if corrupt
                 $this->connection = null;
             }
-
+            
             // check if connection should be established
             if ($this->connection === null) {
                 // create and connect to defined backend
-                $this->connection = StreamSocket::getClientInstance('tcp://127.0.0.1:80');
+                $this->connection = StreamSocket::getClientInstance($proxySocketAddress);
                 // set proxy connection resource as stream source for body stream directly
                 // that avoids huge memory consumtion when transferring big files via proxy connections
                 $response->setBodyStream($this->connection->getConnectionResource());
@@ -134,19 +176,29 @@ class ProxyModule implements HttpModuleInterface
 
             // build up raw request start line
             $rawRequestString = sprintf(
-                '%s %s %s' . "\r\n", 
+                '%s %s %s' . "\r\n",
                 $request->getMethod(),
                 $request->getUri(),
                 HttpProtocol::VERSION_1_1
             );
+            
+            // populate request headers
             $headers = $request->getHeaders();
             foreach ($headers as $headerName => $headerValue) {
                 $rawRequestString .= $headerName . HttpProtocol::HEADER_SEPARATOR . $headerValue . "\r\n";
             }
+            
+            // get current protocol
+            $reqProto = $requestContext->getServerVar(ServerVars::REQUEST_SCHEME);
+            
+            // add proxy depending headers
+            $rawRequestString .= HttpProtocol::HEADER_X_FORWARD_FOR . HttpProtocol::HEADER_SEPARATOR . $remoteAddr . "\r\n";
+            $rawRequestString .= HttpProtocol::HEADER_X_FORWARDED_PROTO . HttpProtocol::HEADER_SEPARATOR . $reqProto . "\r\n";
             $rawRequestString .= "\r\n";
             
             // write headers to proxy connection
             $connection->write($rawRequestString);
+            
             // copy raw request body stream to proxy connection
             $connection->copyStream($request->getBodyStream());
             
@@ -186,10 +238,17 @@ class ProxyModule implements HttpModuleInterface
                 }
                 // split name and value
                 list($headerName, $headerValue) = $extractedHeaderInfo;
+                
+                // check header name for server
+                // @todo: make this configurable
+                if ($headerName === HttpProtocol::HEADER_SERVER) {
+                    continue;
+                }
+                
                 // add header
                 $response->addHeader(trim($headerName), trim($headerValue));
             }
-            
+
             // set flag false by default
             $this->shouldDisconnect = false;
             
@@ -198,16 +257,15 @@ class ProxyModule implements HttpModuleInterface
                 $this->shouldDisconnect = true;
             }
 
-        } catch(\AppserverIo\Psr\Socket\SocketReadException $e) {
+        } catch (\AppserverIo\Psr\Socket\SocketReadException $e) {
             // close and unset connection and try to process the request again to
             // not let a white page get delivered to the client
             $this->shouldDisconnect = true;
             return $this->process($request, $response, $requestContext, $hook);
             
-        } catch(\Exception $e) {
-            $this->shouldDisconnect = true;
         }
         
+        // set response to be dispatched at this point
         $response->setState(HttpResponseStates::DISPATCH);
     }
     
@@ -244,6 +302,11 @@ class ProxyModule implements HttpModuleInterface
         $this->serverContext = $serverContext;
     }
     
+    /**
+     * Return the server's context
+     *
+     * @return ServerContextInterface
+     */
     public function getServerContext()
     {
         return $this->serverContext;

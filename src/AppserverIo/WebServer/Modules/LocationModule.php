@@ -136,8 +136,6 @@ class LocationModule implements HttpModuleInterface
         if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_LOCATIONS)) {
             $locations = $requestContext->getModuleVar(ModuleVars::VOLATILE_LOCATIONS);
         }
-        
-        var_dump($locations);
 
         // query whether we've locations configured or not
         if (sizeof($locations) === 0) {

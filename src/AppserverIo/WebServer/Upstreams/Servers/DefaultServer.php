@@ -1,11 +1,42 @@
 <?php
 
+/**
+ * \AppserverIo\WebServer\Upstreams\Servers\DefaultServer
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * PHP version 5
+ *
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
+ */
+
 namespace AppserverIo\WebServer\Upstreams\Servers;
 
-class DefaultServer
+use AppserverIo\Server\Interfaces\UpstreamServerInterface;
+
+/**
+ * A simple default upstream server implementation
+ *
+ * @author    Johann Zelger <jz@appserver.io>
+ * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io/
+ */
+class DefaultServer implements UpstreamServerInterface
 {
     /**
      * Constructor
+     *
+     * @param array $params The params for the server to be constructed for
      */
     public function __construct(array $params)
     {
@@ -18,29 +49,36 @@ class DefaultServer
     }
     
     /**
-     * Holds the host param value
-     * 
+     * Holds the address param value
+     *
      * @var string
      */
-    protected $host;
+    protected $address;
+    
+    /**
+     * Holds the port param value
+     *
+     * @var string
+     */
+    protected $port;
     
     /**
      * Holds the weight param value
-     * 
+     *
      * @var int
      */
     protected $weight;
     
     /**
      * Holds the max fails param value
-     * 
+     *
      * @var int
      */
     protected $maxFails;
     
     /**
      * Holds the fail timeout param value
-     * 
+     *
      * @var int
      */
     protected $failTimeout;
@@ -74,18 +112,28 @@ class DefaultServer
     protected $resolve;
 
     /**
-     * Returns the host
-     * 
+     * Returns the address
+     *
      * @return string
      */
-    public function getHost()
+    public function getAddress()
     {
-        return $this->host;
+        return $this->address;
+    }
+    
+    /**
+     * Returns the port
+     *
+     * @return string
+     */
+    public function getPort()
+    {
+        return $this->port;
     }
 
     /**
      * Returns the weight
-     * 
+     *
      * @return int
      */
     public function getWeight()
@@ -95,7 +143,7 @@ class DefaultServer
 
     /**
      * Returns the max fails
-     * 
+     *
      * @return int
      */
     public function getMaxFails()
@@ -105,7 +153,7 @@ class DefaultServer
 
     /**
      * Returns the fail timeout
-     * 
+     *
      * @return int
      */
     public function getFailTimeout()
@@ -115,7 +163,7 @@ class DefaultServer
 
     /**
      * Returns the backup flag
-     * 
+     *
      * @return bool
      */
     public function isBackup()
@@ -135,7 +183,7 @@ class DefaultServer
 
     /**
      * Returns the max conns
-     * 
+     *
      * @return int
      */
     public function getMaxConns()

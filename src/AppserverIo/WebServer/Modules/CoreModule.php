@@ -84,8 +84,8 @@ class CoreModule implements HttpModuleInterface
 
         // load the default handlers
         $handlers = $serverContext->getServerConfig()->getHandlers();
-
-        // check if there are some volatile location definitions so use them and override global locations
+        
+        // check if there are some volatile location definitions so use them and merge with global locations
         if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_HANDLERS)) {
             $handlers = array_merge($handlers, $requestContext->getModuleVar(ModuleVars::VOLATILE_HANDLERS));
         }
@@ -220,13 +220,11 @@ class CoreModule implements HttpModuleInterface
             // stop processing
             return;
         }
-        
-        echo __METHOD__ . PHP_EOL;
 
         // populates request context for possible script calling based on file handler configurations
         $this->populateRequestContext($requestContext);
 
-        // check if file handler is not core module anymore        
+        // check if file handler is not core module anymore
         if ($requestContext->getServerVar(ServerVars::SERVER_HANDLER) !== self::MODULE_NAME) {
             // stop processing
             return;
@@ -247,7 +245,7 @@ class CoreModule implements HttpModuleInterface
 
             // set etag header
             $response->addHeader(Protocol::HEADER_ETAG, $eTag);
-
+            
             // set correct mimetype header
             $response->addHeader(Protocol::HEADER_CONTENT_TYPE, MimeTypes::getMimeTypeByExtension($fileInfo->getExtension()));
 

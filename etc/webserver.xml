@@ -65,9 +65,10 @@
     <upstreams>
         <upstream name="backend" type="\AppserverIo\WebServer\Upstreams\DefaultUpstream">
             <servers>
-                <server name="server1" type="\AppserverIo\WebServer\Upstreams\Servers\DefaultServer">
+                <server name="local-apache" type="\AppserverIo\WebServer\Upstreams\Servers\DefaultServer">
                     <params>
-                        <param name="host" type="string">127.0.0.2</param>
+                        <param name="address" type="string">127.0.0.1</param>
+                        <param name="port" type="integer">80</param>
                         <param name="weight" type="integer">1</param>
                         <param name="maxFails" type="integer">10</param>
                         <param name="failTimeout" type="integer">30</param>
@@ -77,9 +78,10 @@
                         <param name="resolve" type="boolean">false</param>
                     </params>
                 </server>
-                <server name="server2" type="\AppserverIo\WebServer\Upstreams\Servers\DefaultServer">
+                <server name="local-nginx" type="\AppserverIo\WebServer\Upstreams\Servers\DefaultServer">
                     <params>
-                        <param name="host" type="string">127.0.0.2</param>
+                        <param name="address" type="string">127.0.0.1</param>
+                        <param name="port" type="integer">8080</param>
                         <param name="weight" type="integer">1</param>
                         <param name="maxFails" type="integer">10</param>
                         <param name="failTimeout" type="integer">30</param>
@@ -159,6 +161,7 @@
                     <handlers>
                         <handler name="proxy" extension=".*">
                             <params>
+                                <param name="transport" type="string">tcp</param>
                                 <param name="upstream" type="string">backend</param>
                             </params>
                         </handler>

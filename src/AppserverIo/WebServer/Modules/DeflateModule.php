@@ -156,6 +156,8 @@ class DeflateModule implements HttpModuleInterface
                 @rewind($response->getBodyStream());
                 // copy body stream to make use of filter in read mode
                 $deflateBodyStream = fopen('php://memory', 'w+b');
+                // copy stream with appended filter to new deflate body stream
+                stream_copy_to_stream($response->getBodyStream(), $deflateBodyStream);
                 // reset body stream on response
                 $response->setBodyStream($deflateBodyStream);
                 // set encoding header info

@@ -1,3 +1,13 @@
+# Version 3.2.1
+
+## Bugfixes
+
+* Fixed [#148](https://github.com/appserver-io/appserver/issues/148) Deflated stream not copied back to response
+
+## Features
+
+* None
+
 # Version 3.2.0
 
 ## Bugfixes

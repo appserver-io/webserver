@@ -1,3 +1,13 @@
+# Version 3.2.2
+
+## Bugfixes
+
+* Fixed [#150](https://github.com/appserver-io/appserver/issues/150) $errorMessage variable has not been declared
+
+## Features
+
+* None
+
 # Version 3.2.1
 
 ## Bugfixes

@@ -1,3 +1,13 @@
+# Version 2.0.2
+
+## Bugfixes
+
+* Fixed #150 $errorMessage variable has not been declared
+
+## Features
+
+* None
+
 # Version 2.0.1
 
 ## Bugfixes

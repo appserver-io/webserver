@@ -523,7 +523,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             $errorsPage = ob_get_clean();
         } else {
             // build up error message manually without template
-            $errorsPage = $response->getStatusCode() . ' ' . $response->getStatusReasonPhrase() . PHP_EOL . PHP_EOL . $errorMessage . PHP_EOL . PHP_EOL . strip_tags($this->getRequestContext()->getServerVar(ServerVars::SERVER_SIGNATURE));
+            $errorsPage = $response->getStatusCode() . ' ' . $response->getStatusReasonPhrase() . PHP_EOL . PHP_EOL . $exception->__toString() . PHP_EOL . PHP_EOL . strip_tags($this->getRequestContext()->getServerVar(ServerVars::SERVER_SIGNATURE));
         }
         // append errors page to response body
         $response->appendBodyStream($errorsPage);

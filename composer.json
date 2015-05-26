@@ -40,7 +40,8 @@
 		"appserver-io-psr/http-message" : "~1.0"
 	},
 	"require-dev" : {
-		"appserver-io/build" : "~1.0"
+		"appserver-io/build" : "~1.0",
+                "codeclimate/php-test-reporter" : "dev-master"
 	},
 	"autoload" : {
 		"psr-0" : {

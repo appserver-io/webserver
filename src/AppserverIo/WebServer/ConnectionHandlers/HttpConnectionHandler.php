@@ -302,7 +302,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         // init keep alive settings
         $keepAliveTimeout = (int) $serverConfig->getKeepAliveTimeout();
         $keepAliveMax = (int) $serverConfig->getKeepAliveMax();
-        
+
         // init keep alive connection flag
         $keepAliveConnection = false;
 
@@ -433,7 +433,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
 
                 // process modules by hook RESPONSE_PRE
                 $this->processModules(ModuleHooks::RESPONSE_PRE);
-                
+
             } catch (SocketReadTimeoutException $e) {
                 // break the request processing due to client timeout
                 break;
@@ -455,7 +455,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
 
             // send response to connected client
             $this->sendResponse();
-            
+
             // process modules by hook RESPONSE_POST
             $this->processModules(ModuleHooks::RESPONSE_POST);
 
@@ -474,7 +474,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             // init the request parser for next request
             $parser->init();
         } while ($keepAliveConnection === true);
-        
+
         // close connection if not closed yet
         $connection->close();
     }
@@ -506,7 +506,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             }
         }
     }
-    
+
     /**
      * Renders error page by given exception
      *
@@ -526,7 +526,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             $errorsPage = ob_get_clean();
         } else {
             // build up error message manually without template
-            $errorsPage = $response->getStatusCode() . ' ' . $response->getStatusReasonPhrase() . PHP_EOL . PHP_EOL . $errorMessage . PHP_EOL . PHP_EOL . strip_tags($this->getRequestContext()->getServerVar(ServerVars::SERVER_SIGNATURE));
+            $errorsPage = $response->getStatusCode() . ' ' . $response->getStatusReasonPhrase() . PHP_EOL . PHP_EOL . $exception->__toString() . PHP_EOL . PHP_EOL . strip_tags($this->getRequestContext()->getServerVar(ServerVars::SERVER_SIGNATURE));
         }
         // append errors page to response body
         $response->appendBodyStream($errorsPage);
@@ -541,7 +541,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     {
         // get local var refs
         $response = $this->getParser()->getResponse();
-        
+
         // prepare headers in response object to be ready for delivery
         $response->prepareHeaders();
     }
@@ -688,7 +688,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         $request = $this->getParser()->getRequest();
         $response = $this->getParser()->getResponse();
         $response->init();
-        
+
         // check if connections is still alive
         if ($connection) {
             // call current fileahandler module's shutdown hook if exists

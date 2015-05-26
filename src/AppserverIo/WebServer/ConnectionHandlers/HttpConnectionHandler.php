@@ -352,7 +352,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                  *
                  * @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.1
                  */
-                if ($line === "\r\n") {
+                if (in_array($line, array("\r\n", "\n"))) {
                     // ignore the first CRLF and go on reading the expected start-line.
                     $line = $connection->readLine(self::HTTP_CONNECTION_READ_LENGTH);
                 }
@@ -366,7 +366,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                  * @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2
                  */
                 $messageHeaders = '';
-                while ($line != "\r\n") {
+                while (!in_array($line, array("\r\n", "\n"))) {
                     // read next line
                     $line = $connection->readLine();
                     // enhance headers
@@ -640,8 +640,8 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         // set request method, query-string, uris and scheme
         $requestContext->setServerVar(ServerVars::REQUEST_METHOD, $request->getMethod());
         $requestContext->setServerVar(ServerVars::QUERY_STRING, $request->getQueryString());
-        $requestContext->setServerVar(ServerVars::REQUEST_URI, urldecode($request->getUri()));
-        $requestContext->setServerVar(ServerVars::X_REQUEST_URI, urldecode($request->getUri()));
+        $requestContext->setServerVar(ServerVars::REQUEST_URI, $request->getUri());
+        $requestContext->setServerVar(ServerVars::X_REQUEST_URI, $request->getUri());
         // this is the http connection handler, therefor we will rely on the https flag
         if ($requestContext->hasServerVar(ServerVars::HTTPS) && $requestContext->getServerVar(ServerVars::HTTPS) === ServerVars::VALUE_HTTPS_ON) {
             $requestContext->setServerVar(ServerVars::REQUEST_SCHEME, 'https');

@@ -1,8 +1,18 @@
-# Version 2.0.2
+# Version 2.0.3
 
 ## Bugfixes
 
 * Fixed #150 $errorMessage variable has not been declared
+
+## Features
+
+* None
+
+# Version 2.0.2
+
+## Bugfixes
+
+* Closed [#142](https://github.com/appserver-io/webserver/issues/142) - fixed ssl newline behaviour
 
 ## Features
 

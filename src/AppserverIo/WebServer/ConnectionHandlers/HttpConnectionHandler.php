@@ -692,7 +692,9 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         // check if connections is still alive
         if ($connection) {
             // call current fileahandler module's shutdown hook if exists
-            if ($fileHandleModule = $this->getModule($requestContext->getServerVar(ServerVars::SERVER_HANDLER))) {
+            if ($requestContext->hasServerVar(ServerVars::SERVER_HANDLER) &&
+                $fileHandleModule = $this->getModule($requestContext->getServerVar(ServerVars::SERVER_HANDLER))
+            ) {
                 $fileHandleModule->process($request, $response, $requestContext, ModuleHooks::SHUTDOWN);
             }
 

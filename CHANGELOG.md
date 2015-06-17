@@ -1,3 +1,13 @@
+# Version 3.2.3
+
+## Bugfixes
+
+* Fixed [#847](https://github.com/appserver-io/appserver/issues/847) Webserver based authentication is missing "realm"
+
+## Features
+
+* None
+
 # Version 3.2.2
 
 ## Bugfixes

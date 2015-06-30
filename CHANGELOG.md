@@ -1,18 +1,18 @@
-# Version 3.2.3
+# Version 3.2.4
 
 ## Bugfixes
 
-* Fixed [#847](https://github.com/appserver-io/appserver/issues/847) Webserver based authentication is missing "realm"
+* Fixed [#150](https://github.com/appserver-io/appserver/issues/150) $errorMessage variable has not been declared
 
 ## Features
 
 * None
 
-# Version 3.2.2
+# Version 3.2.3
 
 ## Bugfixes
 
-* Fixed [#150](https://github.com/appserver-io/appserver/issues/150) $errorMessage variable has not been declared
+* Fixed [#847](https://github.com/appserver-io/appserver/issues/847) Webserver based authentication is missing "realm"
 
 ## Features
 

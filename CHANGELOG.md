@@ -1,3 +1,13 @@
+# Version 3.3.1
+
+## Bugfixes
+
+* fixed auto index module process function
+
+## Features
+
+* None
+
 # Version 3.3.0
 
 ## Bugfixes

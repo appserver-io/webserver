@@ -55,6 +55,7 @@ class DeflateModule implements HttpModuleInterface
      * @var array
      */
     protected $relevantMimeTypes = array(
+        "text/html",
         "text/plain",
         "text/css",
         "application/json",

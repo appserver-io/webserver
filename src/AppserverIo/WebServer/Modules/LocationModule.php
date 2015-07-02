@@ -144,6 +144,9 @@ class LocationModule implements HttpModuleInterface
 
         // initialize the array for the handlers
         $handlers = array();
+        
+        // initialize the array for the headers
+        $headers = array();
 
         // load the actual request URI without query string
         $uriWithoutQueryString = $requestContext->getServerVar(ServerVars::X_REQUEST_URI);
@@ -175,12 +178,26 @@ class LocationModule implements HttpModuleInterface
                 if (isset($location['handlers'])) {
                     $handlers = array_merge($handlers, $location['handlers']);
                 }
+                
+                // merge headers information to volatile headers if exists
+                if (isset($location['headers']) && is_array($location['headers'])) {
+                    $volatileHeaders = array();
+                    if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_HEADERS)) {
+                        $volatileHeaders = $requestContext->getModuleVar(ModuleVars::VOLATILE_HEADERS);
+                    }
+                    $headers = array_merge_recursive($volatileHeaders, $location['headers']);
+                }
             }
         }
 
         // add the handlers we have (if any)
         if (sizeof($handlers) !== 0) {
             $requestContext->setModuleVar(ModuleVars::VOLATILE_HANDLERS, $handlers);
+        }
+
+        // add the headers we have (if any)
+        if (sizeof($headers) !== 0) {
+            $requestContext->setModuleVar(ModuleVars::VOLATILE_HEADERS, $headers);
         }
     }
 

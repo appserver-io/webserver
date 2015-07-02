@@ -204,6 +204,12 @@ class VirtualHostModule implements HttpModuleInterface
                 }
             }
 
+            // Add the headers we have (if any) to the configuration's headers pool
+            if (! empty($virtualHosts[$serverName]['headers'])) {
+                // Set the rewrites we encountered as a temporary module var
+                $requestContext->setModuleVar(ModuleVars::VOLATILE_HEADERS, $virtualHosts[$serverName]['headers']);
+            }
+            
             // Add the rewrites we have (if any) to the configuration's rewrite pool
             if (! empty($virtualHosts[$serverName]['rewrites'])) {
                 // Set the rewrites we encountered as a temporary module var

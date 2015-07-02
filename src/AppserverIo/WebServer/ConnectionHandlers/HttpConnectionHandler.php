@@ -431,9 +431,6 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                     throw new \Exception('Response state is not dispatched', 500);
                 }
 
-                // process modules by hook RESPONSE_PRE
-                $this->processModules(ModuleHooks::RESPONSE_PRE);
-
             } catch (SocketReadTimeoutException $e) {
                 // break the request processing due to client timeout
                 break;
@@ -449,6 +446,9 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                 $response->setStatusCode($e->getCode() ? $e->getCode() : 500);
                 $this->renderErrorPage($e);
             }
+            
+            // process modules by hook RESPONSE_PRE
+            $this->processModules(ModuleHooks::RESPONSE_PRE);
 
             // send response to connected client
             $this->prepareResponse();
@@ -528,6 +528,8 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             // build up error message manually without template
             $errorsPage = $response->getStatusCode() . ' ' . $response->getStatusReasonPhrase() . PHP_EOL . PHP_EOL . $exception->__toString() . PHP_EOL . PHP_EOL . strip_tags($this->getRequestContext()->getServerVar(ServerVars::SERVER_SIGNATURE));
         }
+        // add content type to text/html
+        $response->addHeader(HttpProtocol::HEADER_CONTENT_TYPE, HttpProtocol::HEADER_CONTENT_TYPE_VALUE_TEXT_HTML);
         // append errors page to response body
         $response->appendBodyStream($errorsPage);
     }

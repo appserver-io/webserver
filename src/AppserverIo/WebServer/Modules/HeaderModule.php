@@ -103,9 +103,10 @@ class HeaderModule implements HttpModuleInterface
 
     /**
      * Applies the given headers to response
-     * 
-     * @param array $headers an array of headers to apply
-     * 
+     *
+     * @param array  $headers an array of headers to apply
+     * @param string $type    the type of headers to apply
+     *
      * @return @void
      */
     protected function applyHeaders(array $headers, $type = "response")

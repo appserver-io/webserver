@@ -1,3 +1,14 @@
+# Version 3.3.0
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Fixed [#154](https://github.com/appserver-io/appserver/issues/154) Vary Header configuration
+* Fixed [#156](https://github.com/appserver-io/appserver/issues/156) Response Header configuration
+
 # Version 3.2.4
 
 ## Bugfixes

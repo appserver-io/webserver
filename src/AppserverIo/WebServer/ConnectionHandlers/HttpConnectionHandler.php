@@ -446,7 +446,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                 $response->setStatusCode($e->getCode() ? $e->getCode() : 500);
                 $this->renderErrorPage($e);
             }
-            
+
             // process modules by hook RESPONSE_PRE
             $this->processModules(ModuleHooks::RESPONSE_PRE);
 
@@ -643,7 +643,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         // set http headers to server vars
         foreach ($request->getHeaders() as $headerName => $headerValue) {
             // set server vars by request
-            $requestContext->setServerVar('HTTP_' . strtoupper($headerName), $headerValue);
+            $requestContext->setServerVar('HTTP_' . str_replace('-', '_', strtoupper($headerName)), $headerValue);
         }
 
         // set request method, query-string, uris and scheme

@@ -111,6 +111,11 @@ class HeaderModule implements HttpModuleInterface
      */
     protected function applyHeaders(array $headers, $type = "response")
     {
+        // return if we do not have any headers
+        if (!isset($headers[$type])) {
+            return;
+        }
+
         foreach ($headers[$type] as $header) {
             // check if override flag was set for existing header
             if (($this->getResponse()->hasHeader($header['name']))
@@ -123,7 +128,7 @@ class HeaderModule implements HttpModuleInterface
             $this->getResponse()->addHeader($header['name'], $header['value'], $header['append']);
         }
     }
-    
+
     /**
      * Implement's module logic for given hook
      *
@@ -145,13 +150,13 @@ class HeaderModule implements HttpModuleInterface
         // set req and res object internally
         $this->request = $request;
         $this->response = $response;
-        
+
         // get server context ref to local func
         $serverContext = $this->getServerContext();
-        
+
         // init volatile headers array
         $volatileHeaders = array();
-        
+
         // apply possible volatile headers
         if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_HEADERS)) {
             $volatileHeaders = $requestContext->getModuleVar(ModuleVars::VOLATILE_HEADERS);
@@ -163,7 +168,7 @@ class HeaderModule implements HttpModuleInterface
                 $volatileHeaders
             )
         );
-        
+
         // signal good processing state
         return true;
     }

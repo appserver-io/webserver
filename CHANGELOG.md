@@ -1,3 +1,14 @@
+# Version 3.3.2
+
+## Bugfixes
+
+* Fixed a missing check for empty headers configuration within Headermodule
+* Fixed a bug within HTTP header ServerVar initialization
+
+## Features
+
+* None
+
 # Version 3.3.1
 
 ## Bugfixes

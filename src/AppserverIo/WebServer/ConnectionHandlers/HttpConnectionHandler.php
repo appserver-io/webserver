@@ -275,6 +275,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
      * @param \AppserverIo\Server\Interfaces\WorkerInterface $worker     The worker how started this handle
      *
      * @return bool Weather it was responsible to handle the firstLine or not.
+     * @throws \Exception
      */
     public function handle(SocketInterface $connection, WorkerInterface $worker)
     {
@@ -762,17 +763,18 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
     
     /**
      * Returns max post size in bytes if flag given
-     * 
+     *
      * @param boolean $asBytes If the return value should be bytes or string formated unit as given in ini
-     * 
+     *
      * @return int|string
      */
-    public function getPostMaxSize($asBytes = true) {
+    public function getPostMaxSize($asBytes = true)
+    {
         $postMaxSizeIniValue = ini_get('post_max_size');
         if ($asBytes === true) {
             $ini_v = trim($postMaxSizeIniValue);
             $s = array('g'=> 1<<30, 'm' => 1<<20, 'k' => 1<<10);
-            return intval($ini_v) * ($s[strtolower(substr($ini_v,-1))] ?: 1);
+            return intval($ini_v) * ($s[strtolower(substr($ini_v, -1))] ?: 1);
         }
         return $postMaxSizeIniValue;
     }

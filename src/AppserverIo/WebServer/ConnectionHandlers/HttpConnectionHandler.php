@@ -275,6 +275,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
      * @param \AppserverIo\Server\Interfaces\WorkerInterface $worker     The worker how started this handle
      *
      * @return bool Weather it was responsible to handle the firstLine or not.
+     * @throws \Exception
      */
     public function handle(SocketInterface $connection, WorkerInterface $worker)
     {
@@ -398,6 +399,11 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                 if ($request->hasHeader(Protocol::HEADER_CONTENT_LENGTH)) {
                     // get content-length header
                     if (($contentLength = (int) $request->getHeader(Protocol::HEADER_CONTENT_LENGTH)) > 0) {
+                        // check if given content length is not greater than post_max_size from php ini
+                        if ($this->getPostMaxSize() < $contentLength) {
+                            // throw 500 server error
+                            throw new \Exception(sprintf("Post max size '%s' exceeded", $this->getPostMaxSize(false)), 500);
+                        }
                         // copy connection stream to body stream by given content length
                         $request->copyBodyStream($connection->getConnectionResource(), $contentLength);
                         // get content out for oldschool query parsing todo: refactor query parsing
@@ -753,5 +759,23 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             // call shutdown process on worker to respawn
             $this->getWorker()->shutdown();
         }
+    }
+    
+    /**
+     * Returns max post size in bytes if flag given
+     *
+     * @param boolean $asBytes If the return value should be bytes or string formated unit as given in ini
+     *
+     * @return int|string
+     */
+    public function getPostMaxSize($asBytes = true)
+    {
+        $postMaxSizeIniValue = ini_get('post_max_size');
+        if ($asBytes === true) {
+            $ini_v = trim($postMaxSizeIniValue);
+            $s = array('g'=> 1<<30, 'm' => 1<<20, 'k' => 1<<10);
+            return intval($ini_v) * ($s[strtolower(substr($ini_v, -1))] ?: 1);
+        }
+        return $postMaxSizeIniValue;
     }
 }

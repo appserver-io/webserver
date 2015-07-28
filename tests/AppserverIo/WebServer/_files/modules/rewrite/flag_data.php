@@ -70,6 +70,18 @@ $ruleSets = array(
             '/testUri' => 'https://www.google.com'
         )
     ),
+    'NCFlag' => array(
+        'rules' => array(
+            array(
+                'condition' => 'testuri',
+                'target' => '/targetUri',
+                'flag' => 'NC,L'
+            )
+        ),
+        'map' => array(
+            '/testUri' => '/targetUri'
+        )
+    ),
     'mixedFlags' => array(
         'redirect' => true,
         'rules' => array(

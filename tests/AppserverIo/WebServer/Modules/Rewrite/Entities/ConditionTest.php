@@ -22,6 +22,7 @@ namespace AppserverIo\WebServer\Modules\Rewrite\Entities;
 
 use AppserverIo\WebServer\Mock\MockCondition;
 use AppserverIo\WebServer\Modules\RewriteModule;
+use AppserverIo\WebServer\Modules\Rewrite\Dictionaries\RuleFlags;
 
 /**
  * Class ConditionTest
@@ -50,20 +51,6 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Tests the constructor's behaviour on an invalid modifier
-     *
-     * @return void
-     */
-    public function testConstructInvalidModifier()
-    {
-        // We should get an \InvalidArgumentException
-        $this->setExpectedException('InvalidArgumentException');
-
-        // This modifier does not exist at all
-        new Condition('test', '.*', '[IDoNotExist]');
-    }
-
-    /**
      * Tests the constructor's ability to cut the action when needed
      *
      * @return void
@@ -88,16 +75,19 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Tests the getModifier() method
+     * Tests the getModifiers() method
      *
      * @return void
      */
-    public function testGetModifier()
+    public function testGetModifiers()
     {
         $condition = new Condition('test', '.*');
-        $this->assertEquals('', $condition->getModifier());
-        $condition = new Condition('test', '.*', '[NC]');
-        $this->assertEquals('[NC]', $condition->getModifier());
+        $this->assertCount(0, $condition->getModifiers());
+        $condition = new Condition('test', '.*', array(RuleFlags::LAST));
+        $this->assertCount(0, $condition->getModifiers());
+        $condition = new Condition('test', '.*', array(RuleFlags::NOCASE));
+        $this->assertCount(1, $condition->getModifiers());
+        $this->assertEquals(array(RuleFlags::NOCASE), $condition->getModifiers());
     }
 
     /**

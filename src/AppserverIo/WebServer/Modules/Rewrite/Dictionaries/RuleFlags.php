@@ -55,4 +55,11 @@ class RuleFlags
      * @var string
      */
     const LAST = 'L';
+
+    /**
+     * Make any regex condition check non case-sensitive
+     *
+     * @var string
+     */
+    const NOCASE = 'NC';
 }

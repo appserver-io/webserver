@@ -22,6 +22,7 @@ namespace AppserverIo\WebServer\Modules\Rewrite\Entities;
 
 use AppserverIo\WebServer\Modules\Rewrite\Dictionaries\ConditionActions;
 use AppserverIo\Server\Dictionaries\ServerVars;
+use AppserverIo\WebServer\Modules\Rewrite\Dictionaries\RuleFlags;
 
 /**
  * Class Condition
@@ -40,14 +41,14 @@ class Condition
     /**
      * The allowed values for the $types member
      *
-     * @var array<string> $allowedTypes
+     * @var string[] $allowedTypes
      */
     protected $allowedTypes = array();
 
     /**
      * All possible modifiers aka flags
      *
-     * @var array<string> $flagMapping
+     * @var string[] $allowedModifiers
      */
     protected $allowedModifiers = array();
 
@@ -55,7 +56,7 @@ class Condition
      * Possible additions to the known PCRE regex.
      * These additions get used by htaccess notation only.
      *
-     * @var array<string> $htaccessAdditions
+     * @var string[] $htaccessAdditions
      */
     protected $htaccessAdditions = array();
 
@@ -92,9 +93,9 @@ class Condition
     /**
      * Modifier which should be used to integrate things like apache flags and others
      *
-     * @var string $modifier
+     * @var string[] $modifiers
      */
-    protected $modifier;
+    protected $modifiers = array();
 
     /**
      * At least in the apache universe we can negate the logical meaning with a "!"
@@ -106,13 +107,13 @@ class Condition
     /**
      * Default constructor
      *
-     * @param string $operand  The value to check with the given action
-     * @param string $action   How the operand has to be checked, this will hold the needed action
-     * @param string $modifier Modifier which should be used to integrate things like apache flags and others
+     * @param string $operand The value to check with the given action
+     * @param string $action  How the operand has to be checked, this will hold the needed action
+     * @param string $flags   Flags which will be filtered into valid modifiers for our conditions
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($operand, $action, $modifier = '')
+    public function __construct($operand, $action, $flags = array())
     {
         // Fill the default values for our members here
         $this->allowedTypes = array(
@@ -129,23 +130,26 @@ class Condition
             ConditionActions::IS_LINK,
             ConditionActions::IS_EXECUTABLE
         );
-        $this->allowedModifiers = array(
-            '[NC]',
-            '[nocase]'
+        $this->allowedModifiers = array_flip(
+            array(
+                RuleFlags::NOCASE
+            )
         );
+        $this->modifiers = array();
 
         // We do not negate by default, nor do we combine with the following condition via "or"
         $this->isNegated = false;
 
         // Check if the passed modifier is valid (or empty)
-        if (! isset(array_flip($this->allowedModifiers)[$modifier]) && ! empty($modifier)) {
-            throw new \InvalidArgumentException($modifier . ' is not an allowed condition modifier.');
+        foreach ($flags as $flag) {
+            if (isset($this->allowedModifiers[$flag])) {
+                $this->modifiers[] = $flag;
+            }
         }
 
         // Fill the more important properties
         $this->operand = $operand;
         $this->action = $action;
-        $this->modifier = $modifier;
         $this->additionalOperand = '';
 
         // Check if we have a negation
@@ -228,13 +232,13 @@ class Condition
     }
 
     /**
-     * Getter for the $modifier member
+     * Getter for the $modifiers member
      *
      * @return string
      */
-    public function getModifier()
+    public function getModifiers()
     {
-        return $this->modifier;
+        return $this->modifiers;
     }
 
     /**
@@ -272,7 +276,9 @@ class Condition
         if ($this->action === ConditionActions::REGEX) {
             // Get the result for a regex
 
-            $result = preg_match('`' . $this->additionalOperand . '`', $this->operand) === 1;
+            $modifiers = array_flip($this->modifiers);
+            $modifier = isset($modifiers[RuleFlags::NOCASE])?'i':'';
+            $result = preg_match('`' . $this->additionalOperand . '`' . $modifier, $this->operand) === 1;
         } elseif ($this->action === ConditionActions::IS_DIR) {
             // Is it an existing directory?
 

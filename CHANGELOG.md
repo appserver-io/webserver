@@ -1,3 +1,13 @@
+# Version 3.4.0
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Rewrite rules now support the NC flag which allows for case-insensitive regex checks
+
 # Version 3.3.2
 
 ## Bugfixes

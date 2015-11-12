@@ -1,3 +1,13 @@
+# Version 3.4.2
+
+## Bugfixes
+
+* Add missing use statement for HttpProtocol in HttpConnectionHandler
+
+## Features
+
+* None
+
 # Version 3.4.1
 
 ## Bugfixes

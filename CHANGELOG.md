@@ -1,3 +1,13 @@
+# Version 3.4.1
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Add new default headers X-Frame-Options, X-Content-Type-Options and X-XSS-Protection to protect request agains security attacks
+
 # Version 3.4.0
 
 ## Bugfixes

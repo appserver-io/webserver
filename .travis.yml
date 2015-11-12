@@ -11,7 +11,7 @@ matrix:
     - php: 7.0
 
 before_install:
-  - pecl install pthreads-beta
+  - pecl install pthreads-2.0.10
   - pecl install xdebug
   - phpenv rehash
 

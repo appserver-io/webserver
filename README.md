@@ -22,7 +22,7 @@ If you want to use the web server with your application add this
 {
     "require": {
         "appserver-io/webserver": "dev-master"
-    },
+    }
 }
 ```
 

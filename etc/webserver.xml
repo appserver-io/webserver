@@ -105,7 +105,7 @@
             serverContext="\AppserverIo\Server\Contexts\ServerContext"
             requestContext="\AppserverIo\Server\Contexts\RequestContext"
             loggerName="System">
-
+            
             <params>
                 <param name="admin" type="string">www@localhost.localdomain</param>
                 <param name="software" type="string">php webserver</param>
@@ -125,6 +125,11 @@
                 <param name="welcomePageTemplatePath" type="string">resources/templates/www/welcome.phtml</param>
                 <param name="autoIndexTemplatePath" type="string">resources/templates/www/auto_index.phtml</param>
             </params>
+
+            <headers>
+                <header type="response" name="Server" value="PHP WEBSERVER" override="true"/>
+                <header type="response" name="X-Powered-By" value="Me"/>
+            </headers>
 
             <authentications>
                 <authentication uri="^\/auth\/basic\/.*">
@@ -157,6 +162,12 @@
             </rewrites>
             
             <locations>
+                <location condition="headersTest.*">
+                    <headers>
+                        <header type="response" name="Server" value="location" override="true"/>
+                        <header type="response" name="X-Powered-By" value="location" override="true"/>
+                    </headers>
+                </location>
                 <location condition="\/(icons|test).*">
                     <handlers>
                         <handler name="proxy" extension=".*">
@@ -172,6 +183,18 @@
             <virtualHosts>
 
                 <virtualHost name="phpwebserver.dev phpwebserver.local phpwebserver.test">
+                    <headers>
+                        <header type="response" name="Server" value="phpwebserver.dev PHP SERVER" override="true" />
+                        <header type="response" name="X-Powered-By-Vhost" value="phpwebserver.dev" />
+                    </headers>
+                    <locations>
+                        <location condition=".*">
+                            <headers>
+                                <header type="response" name="Server" value="location" override="true"/>
+                                <header type="response" name="X-Powered-By" value="location" override="true"/>
+                            </headers>
+                        </location>
+                    </locations>
                     <params>
                         <param name="admin" type="string">admin@phpwebserver.dev</param>
                         <!-- Note: it's intended to use a relative path to get content from webservers basedir/var/www -->
@@ -290,6 +313,7 @@
                 <module type="\AppserverIo\WebServer\Modules\FastCgiModule" />
                 <module type="\AppserverIo\WebServer\Modules\ProxyModule" />
                 <!-- RESPONSE_PRE hook -->
+                <module type="\AppserverIo\WebServer\Modules\HeaderModule" />
                 <module type="\AppserverIo\WebServer\Modules\DeflateModule" />
             </modules>
             <handlers>
@@ -490,6 +514,7 @@
                 <module type="\AppserverIo\WebServer\Modules\PhpModule" />
                 <module type="\AppserverIo\WebServer\Modules\FastCgiModule"/>
                 <!-- RESPONSE_PRE hook -->
+                <module type="\AppserverIo\WebServer\Modules\HeaderModule" />
                 <module type="\AppserverIo\WebServer\Modules\DeflateModule"/>
             </modules>
             <handlers>

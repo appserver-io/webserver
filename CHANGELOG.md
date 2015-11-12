@@ -1,3 +1,45 @@
+# Version 3.4.0
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Rewrite rules now support the NC flag which allows for case-insensitive regex checks
+
+# Version 3.3.2
+
+## Bugfixes
+
+* Fixed a missing check for empty headers configuration within Headermodule
+* Fixed a bug within HTTP header ServerVar initialization
+
+## Features
+
+* None
+
+# Version 3.3.1
+
+## Bugfixes
+
+* fixed auto index module process function
+
+## Features
+
+* None
+
+# Version 3.3.0
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Fixed [#154](https://github.com/appserver-io/appserver/issues/154) Vary Header configuration
+* Fixed [#156](https://github.com/appserver-io/appserver/issues/156) Response Header configuration
+
 # Version 3.2.4
 
 ## Bugfixes

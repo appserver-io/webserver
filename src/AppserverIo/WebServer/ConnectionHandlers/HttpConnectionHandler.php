@@ -276,6 +276,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
      * @param \AppserverIo\Server\Interfaces\WorkerInterface $worker     The worker how started this handle
      *
      * @return bool Weather it was responsible to handle the firstLine or not.
+     * @throws \Exception
      */
     public function handle(SocketInterface $connection, WorkerInterface $worker)
     {
@@ -399,6 +400,11 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                 if ($request->hasHeader(Protocol::HEADER_CONTENT_LENGTH)) {
                     // get content-length header
                     if (($contentLength = (int) $request->getHeader(Protocol::HEADER_CONTENT_LENGTH)) > 0) {
+                        // check if given content length is not greater than post_max_size from php ini
+                        if ($this->getPostMaxSize() < $contentLength) {
+                            // throw 500 server error
+                            throw new \Exception(sprintf("Post max size '%s' exceeded", $this->getPostMaxSize(false)), 500);
+                        }
                         // copy connection stream to body stream by given content length
                         $request->copyBodyStream($connection->getConnectionResource(), $contentLength);
                         // get content out for oldschool query parsing todo: refactor query parsing
@@ -434,9 +440,6 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                     throw new \Exception('Response state is not dispatched', 500);
                 }
 
-                // process modules by hook RESPONSE_PRE
-                $this->processModules(ModuleHooks::RESPONSE_PRE);
-
             } catch (SocketReadTimeoutException $e) {
                 // break the request processing due to client timeout
                 break;
@@ -452,6 +455,9 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                 $response->setStatusCode($e->getCode() ? $e->getCode() : 500);
                 $this->renderErrorPage($e);
             }
+
+            // process modules by hook RESPONSE_PRE
+            $this->processModules(ModuleHooks::RESPONSE_PRE);
 
             // send response to connected client
             $this->prepareResponse();
@@ -531,6 +537,8 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             // build up error message manually without template
             $errorsPage = $response->getStatusCode() . ' ' . $response->getStatusReasonPhrase() . PHP_EOL . PHP_EOL . $exception->__toString() . PHP_EOL . PHP_EOL . strip_tags($this->getRequestContext()->getServerVar(ServerVars::SERVER_SIGNATURE));
         }
+        // add content type to text/html
+        $response->addHeader(HttpProtocol::HEADER_CONTENT_TYPE, HttpProtocol::HEADER_CONTENT_TYPE_VALUE_TEXT_HTML);
         // append errors page to response body
         $response->appendBodyStream($errorsPage);
     }
@@ -644,7 +652,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         // set http headers to server vars
         foreach ($request->getHeaders() as $headerName => $headerValue) {
             // set server vars by request
-            $requestContext->setServerVar('HTTP_' . strtoupper($headerName), $headerValue);
+            $requestContext->setServerVar('HTTP_' . str_replace('-', '_', strtoupper($headerName)), $headerValue);
         }
 
         // set request method, query-string, uris and scheme
@@ -754,5 +762,23 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             // call shutdown process on worker to respawn
             $this->getWorker()->shutdown();
         }
+    }
+    
+    /**
+     * Returns max post size in bytes if flag given
+     *
+     * @param boolean $asBytes If the return value should be bytes or string formated unit as given in ini
+     *
+     * @return int|string
+     */
+    public function getPostMaxSize($asBytes = true)
+    {
+        $postMaxSizeIniValue = ini_get('post_max_size');
+        if ($asBytes === true) {
+            $ini_v = trim($postMaxSizeIniValue);
+            $s = array('g'=> 1<<30, 'm' => 1<<20, 'k' => 1<<10);
+            return intval($ini_v) * ($s[strtolower(substr($ini_v, -1))] ?: 1);
+        }
+        return $postMaxSizeIniValue;
     }
 }

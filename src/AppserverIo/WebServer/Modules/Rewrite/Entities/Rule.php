@@ -190,11 +190,11 @@ class Rule
                     $entry = array();
                     foreach ($actionStringPieces as $actionStringPiece) {
                         // Get a new condition instance
-                        $entry[] = new Condition($conditionOperands[$i], $actionStringPiece);
+                        $entry[] = new Condition($conditionOperands[$i], $actionStringPiece, array_keys($this->sortedFlags));
                     }
                 } else {
                     // Get a new condition instance
-                    $entry = new Condition($conditionOperands[$i], $andActionStringPiece);
+                    $entry = new Condition($conditionOperands[$i], $andActionStringPiece, array_keys($this->sortedFlags));
                 }
 
                 $this->sortedConditions[] = $entry;
@@ -211,6 +211,11 @@ class Rule
      */
     protected function sortFlags($flagString)
     {
+        // if the flag string is empty we can return an empty array
+        if (empty($flagString)) {
+            return array();
+        }
+
         $flags = array();
         foreach (explode(self::FLAG_DELIMITER, $flagString) as $flag) {
             $flagPieces = explode(self::FLAG_PARAMETER_ASSIGNER, $flag);

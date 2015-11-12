@@ -115,10 +115,10 @@ class AutoIndexModule implements HttpModuleInterface
         if ($this->getRequestContext()->getServerVar(ServerVars::SERVER_AUTO_INDEX) === ServerVars::VALUE_AUTO_INDEX_OFF) {
             return;
         }
-        
-        // check if file handler is still core
-        if ($requestContext->getServerVar(ServerVars::SERVER_HANDLER) === 'core') {
-            // stop processing
+
+        // stop processing if file handler will not be core in case that location module
+        // has changed the server handler to be proxy, fastcgi or what ever.
+        if ($requestContext->getServerVar(ServerVars::SERVER_HANDLER) !== 'core') {
             return;
         }
 

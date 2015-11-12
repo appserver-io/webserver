@@ -35,6 +35,7 @@ use AppserverIo\Psr\HttpMessage\Protocol;
 use AppserverIo\Http\HttpRequest;
 use AppserverIo\Http\HttpResponse;
 use AppserverIo\Http\HttpPart;
+use AppserverIo\Http\HttpProtocol;
 use AppserverIo\Http\HttpQueryParser;
 use AppserverIo\Http\HttpRequestParser;
 use AppserverIo\Http\HttpResponseStates;
@@ -763,7 +764,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
             $this->getWorker()->shutdown();
         }
     }
-    
+
     /**
      * Returns max post size in bytes if flag given
      *

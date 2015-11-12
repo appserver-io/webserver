@@ -38,7 +38,6 @@ use AppserverIo\Http\HttpPart;
 use AppserverIo\Http\HttpQueryParser;
 use AppserverIo\Http\HttpRequestParser;
 use AppserverIo\Http\HttpResponseStates;
-use AppserverIo\Http\HttpProtocol;
 
 /**
  * Class HttpConnectionHandler
@@ -138,9 +137,11 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
         $httpResponse = new HttpResponse();
         // set default response headers
         $httpResponse->setDefaultHeaders(array(
-            Protocol::HEADER_SERVER => $this->getServerConfig()
-                ->getSoftware(),
-            Protocol::HEADER_CONNECTION => Protocol::HEADER_CONNECTION_VALUE_CLOSE
+            Protocol::HEADER_SERVER                 => $this->getServerConfig()->getSoftware(),
+            Protocol::HEADER_CONNECTION             => Protocol::HEADER_CONNECTION_VALUE_CLOSE,
+            Protocol::HEADER_X_FRAME_OPTIONS        => Protocol::HEADER_X_FRAME_OPTIONS_VALUE_DENY,
+            Protocol::HEADER_X_XSS_PROTECTION       => Protocol::HEADER_X_XSS_PROTECTION_VALUE_ON,
+            Protocol::HEADER_X_CONTENT_TYPE_OPTIONS => Protocol::HEADER_X_CONTENT_TYPE_OPTIONS_VALUE_NOSNIFF
         ));
 
         // setup http parser
@@ -404,6 +405,8 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                         $content = $request->getBodyContent();
                         // check if request has to be parsed depending on Content-Type header
                         if ($queryParser->isParsingRelevant($request->getHeader(Protocol::HEADER_CONTENT_TYPE))) {
+                            // initialize the array for the matches
+                            $boundaryMatches = array();
                             // checks if request has multipart formdata or not
                             preg_match('/boundary=(.*)$/', $request->getHeader(Protocol::HEADER_CONTENT_TYPE), $boundaryMatches);
                             // check if boundaryMatches are found
@@ -721,7 +724,7 @@ class HttpConnectionHandler implements ConnectionHandlerInterface
                 }
 
                 // grep headers and set to response object
-                foreach (appserver_get_headers(true) as $i => $h) {
+                foreach (appserver_get_headers(true) as $h) {
                     // set headers defined in sapi headers
                     $h = explode(':', $h, 2);
                     if (isset($h[1])) {

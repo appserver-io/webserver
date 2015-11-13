@@ -1,3 +1,13 @@
+# Version 3.4.3
+
+## Bugfixes
+
+* Add missing Content-Type header to AutoIndex module to avoid protection with X-Content-Type-Options header set to nosniff by default
+
+## Features
+
+* None
+
 # Version 3.4.2
 
 ## Bugfixes

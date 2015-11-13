@@ -21,13 +21,11 @@
 
 namespace AppserverIo\WebServer\Modules;
 
-use AppserverIo\Http\HttpProtocol;
 use AppserverIo\Http\HttpResponseStates;
 use AppserverIo\Psr\HttpMessage\Protocol;
 use AppserverIo\Psr\HttpMessage\RequestInterface;
 use AppserverIo\Psr\HttpMessage\ResponseInterface;
 use AppserverIo\Server\Dictionaries\ServerVars;
-use AppserverIo\Server\Dictionaries\ModuleVars;
 use AppserverIo\Server\Dictionaries\ModuleHooks;
 use AppserverIo\Server\Exceptions\ModuleException;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
@@ -180,6 +178,9 @@ class AutoIndexModule implements HttpModuleInterface
 
         // append errors page to response body
         $response->appendBodyStream($autoIndexPage);
+
+        // set the Content-Type to text/html
+        $response->addHeader(Protocol::HEADER_CONTENT_TYPE, 'text/html');
 
         // set response state to be dispatched after this without calling other modules process
         $response->setState(HttpResponseStates::DISPATCH);

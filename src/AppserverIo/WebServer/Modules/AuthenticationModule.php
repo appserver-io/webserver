@@ -21,7 +21,6 @@
 namespace AppserverIo\WebServer\Modules;
 
 use AppserverIo\Logger\LoggerUtils;
-use AppserverIo\Psr\HttpMessage\Protocol;
 use AppserverIo\Psr\HttpMessage\RequestInterface;
 use AppserverIo\Psr\HttpMessage\ResponseInterface;
 use AppserverIo\WebServer\Interfaces\HttpModuleInterface;
@@ -133,7 +132,7 @@ class AuthenticationModule implements HttpModuleInterface
             // init all uri patterns
             foreach ($this->authentications as $uri => $params) {
                 $this->uriPatterns[$uri] = $params;
-                // try ti get authentication type instance
+                // try to get authentication type instance
                 try {
                     // pre init types by calling getter in init
                     $this->getAuthenticationInstance($uri, $params);
@@ -229,35 +228,23 @@ class AuthenticationModule implements HttpModuleInterface
             foreach ($authenticationSet as $uriPattern => $data) {
                 // check if pattern matches uri
                 if (preg_match('/' . $uriPattern . '/', $requestContext->getServerVar(ServerVars::X_REQUEST_URI))) {
-                    // set type Instance to local ref
-                    $typeInstance = $this->getAuthenticationInstance($uriPattern, $data);
-
-                    // check if auth header is not set in coming request headers
-                    if (! $request->hasHeader(Protocol::HEADER_AUTHORIZATION)) {
-                        // send header for challenge authentication against client
-                        $response->addHeader(Protocol::HEADER_WWW_AUTHENTICATE, $typeInstance->getAuthenticateHeader());
-                        // throw exception for auth required
-                        throw new ModuleException(null, 401);
-                    }
-
-                    // init type instance by request
-                    $typeInstance->init($request->getHeader(Protocol::HEADER_AUTHORIZATION), $request->getMethod());
-
                     try {
-                        // check if auth works
-                        if ($typeInstance->authenticate()) {
-                            // set server vars
-                            $requestContext->setServerVar(ServerVars::REMOTE_USER, $typeInstance->getUsername());
-                            // break out because everything is fine at this point
-                            break;
-                        }
+                        // create a local type instance, initialize and authenticate the request
+                        $typeInstance = $this->getAuthenticationInstance($uriPattern, $data);
+                        $typeInstance->init($request, $response);
+                        $typeInstance->authenticate($response);
+
+                        // set authenticated username as a server var
+                        $requestContext->setServerVar(ServerVars::REMOTE_USER, $typeInstance->getUsername());
+
+                        // break out because everything is fine at this point
+                        break;
+
                     } catch (\Exception $e) {
                         // log exception as warning to not end up with a 500 response which is not wanted here
                         $systemLogger->warning($e->getMessage());
                     }
 
-                    // send header for challenge authentication against client
-                    $response->addHeader(Protocol::HEADER_WWW_AUTHENTICATE, $typeInstance->getAuthenticateHeader());
                     // throw exception for auth required
                     throw new ModuleException(null, 401);
                 }

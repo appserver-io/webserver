@@ -173,9 +173,9 @@ class AuthenticationModule implements HttpModuleInterface
         $index = md5($uriPattern . implode('', $data));
         $type = $data['type'];
 
-        if (! isset($this->typeInstances[$index])) {
+        if (!isset($this->typeInstances[$index])) {
             // check if type class does not exist
-            if (! class_exists($type)) {
+            if (!class_exists($type)) {
                 throw new ModuleException(sprintf("No authentication instance found for URI pattern %s and type %s.", $uriPattern, $type), 500);
             }
             // construct type by given class definition and data
@@ -229,6 +229,9 @@ class AuthenticationModule implements HttpModuleInterface
                 // check if pattern matches uri
                 if (preg_match('/' . $uriPattern . '/', $requestContext->getServerVar(ServerVars::X_REQUEST_URI))) {
                     try {
+                        // append the document root to the authentication params
+                        $data['documentRoot'] = $requestContext->getServerVar(ServerVars::DOCUMENT_ROOT);
+
                         // create a local type instance, initialize and authenticate the request
                         $typeInstance = $this->getAuthenticationInstance($uriPattern, $data);
                         $typeInstance->init($request, $response);

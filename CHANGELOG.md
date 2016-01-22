@@ -1,3 +1,13 @@
+# Version 4.0.0
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Refactoring for new HTTP library with refactored authentication functionality
+
 # Version 3.4.3
 
 ## Bugfixes

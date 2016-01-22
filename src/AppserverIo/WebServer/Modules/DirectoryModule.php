@@ -132,8 +132,6 @@ class DirectoryModule implements HttpModuleInterface
         // set req and res object internally
         $this->request = $request;
         $this->response = $response;
-        // get server context ref to local func
-        $serverContext = $this->getServerContext();
 
         // get document root
         $documentRoot = $requestContext->getServerVar(ServerVars::DOCUMENT_ROOT);

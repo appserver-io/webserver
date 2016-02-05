@@ -295,7 +295,7 @@ class EnvironmentVariableModule implements HttpModuleInterface
             }
 
             // Build up the complete ruleset, volatile rules up front
-            $variables = array_merge($volatileEnvironmentVariables, $this->configuredVariables);
+            $variables = array_merge($this->configuredVariables, $volatileEnvironmentVariables);
 
             // Only act if we got something
             if (is_array($variables)) {

@@ -1,3 +1,13 @@
+# Version 4.0.1
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Changing merge order for environment variables to allow overriding environment variables in virtual hosts
+
 # Version 4.0.0
 
 ## Bugfixes

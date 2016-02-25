@@ -1,3 +1,13 @@
+# Version 4.0.2
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Switch to server version ~6.0
+
 # Version 4.0.1
 
 ## Bugfixes

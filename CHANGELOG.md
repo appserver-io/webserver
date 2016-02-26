@@ -1,3 +1,13 @@
+# Version 4.0.3
+
+## Bugfixes
+
+* Update JSON configuration to support new module params
+
+## Features
+
+* None
+
 # Version 4.0.2
 
 ## Bugfixes
@@ -6,7 +16,7 @@
 
 ## Features
 
-* Switch to the latest server version ~6.0 allowing module configuration params
+* Switch to server version ~6.0
 
 # Version 4.0.1
 

@@ -192,19 +192,42 @@
             ],
 
             "modules": [
-                "\\AppserverIo\\WebServer\\Modules\\AuthenticationModule",
-                "\\AppserverIo\\WebServer\\Modules\\VirtualHostModule",
-                "\\AppserverIo\\WebServer\\Modules\\EnvironmentVariableModule",
-                "\\AppserverIo\\WebServer\\Modules\\RewriteMapModule",
-                "\\AppserverIo\\WebServer\\Modules\\RewriteModule",
-                "\\AppserverIo\\WebServer\\Modules\\DirectoryModule",
-                "\\AppserverIo\\WebServer\\Modules\\AccessModule",
-                "\\AppserverIo\\WebServer\\Modules\\LocationModule",
-                "\\AppserverIo\\WebServer\\Modules\\AutoIndexModule",
-                "\\AppserverIo\\WebServer\\Modules\\CoreModule",
-                "\\AppserverIo\\WebServer\\Modules\\PhpModule",
-                "\\AppserverIo\\WebServer\\Modules\\FastCgiModule",
-                "\\AppserverIo\\WebServer\\Modules\\DeflateModule"
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\AuthenticationModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\VirtualHostModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\EnvironmentVariableModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\RewriteMapModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\DirectoryModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\AccessModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\LocationModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\AutoIndexModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\CoreModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\PhpModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\FastCgiModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\DeflateModule"
+                }
             ],
 
             "handlers": [
@@ -380,19 +403,42 @@
             ],
 
             "modules": [
-                "\\AppserverIo\\WebServer\\Modules\\AuthenticationModule",
-                "\\AppserverIo\\WebServer\\Modules\\VirtualHostModule",
-                "\\AppserverIo\\WebServer\\Modules\\EnvironmentVariableModule",
-                "\\AppserverIo\\WebServer\\Modules\\RewriteMapModule",
-                "\\AppserverIo\\WebServer\\Modules\\RewriteModule",
-                "\\AppserverIo\\WebServer\\Modules\\DirectoryModule",
-                "\\AppserverIo\\WebServer\\Modules\\AccessModule",
-                "\\AppserverIo\\WebServer\\Modules\\LocationModule",
-                "\\AppserverIo\\WebServer\\Modules\\AutoIndexModule",
-                "\\AppserverIo\\WebServer\\Modules\\CoreModule",
-                "\\AppserverIo\\WebServer\\Modules\\PhpModule",
-                "\\AppserverIo\\WebServer\\Modules\\FastCgiModule",
-                "\\AppserverIo\\WebServer\\Modules\\DeflateModule"
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\AuthenticationModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\VirtualHostModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\EnvironmentVariableModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\RewriteMapModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\DirectoryModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\AccessModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\LocationModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\AutoIndexModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\CoreModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\PhpModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\FastCgiModule"
+                },
+                { 
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\DeflateModule"
+                }
             ],
 
             "handlers": [

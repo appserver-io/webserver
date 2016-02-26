@@ -1,3 +1,13 @@
+# Version 4.0.2
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Switch to the latest server version ~6.0 allowing module configuration params
+
 # Version 4.0.1
 
 ## Bugfixes

@@ -1,3 +1,13 @@
+# Version 4.0.3
+
+## Bugfixes
+
+* Update JSON configuration to support new module params
+
+## Features
+
+* None
+
 # Version 4.0.2
 
 ## Bugfixes

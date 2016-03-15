@@ -109,7 +109,12 @@ class AutoIndexModule implements HttpModuleInterface
         // make request context available for usage in template
         $this->requestContext = $requestContext;
 
-        // query whether the auto index module is enabled
+        // query whether the auto index module is available
+        if ($this->getRequestContext()->hasServerVar(ServerVars::SERVER_AUTO_INDEX) === false) {
+            return;
+        }
+
+        // query whether the auto index module is available and enabled
         if ($this->getRequestContext()->getServerVar(ServerVars::SERVER_AUTO_INDEX) === ServerVars::VALUE_AUTO_INDEX_OFF) {
             return;
         }

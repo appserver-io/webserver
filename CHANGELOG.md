@@ -1,3 +1,13 @@
+# Version 4.0.4
+
+## Bugfixes
+
+* Fix for trying to load server var SERVER_AUTO_INDEX when server configuration param autoIndex is missing
+
+## Features
+
+* None
+
 # Version 4.0.3
 
 ## Bugfixes

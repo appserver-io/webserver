@@ -1,3 +1,13 @@
+# Version 4.0.5
+
+## Bugfixes
+
+* Fixed missing use statement for HttpException and remove trailing \ from ModuleException
+
+## Features
+
+* None
+
 # Version 4.0.4
 
 ## Bugfixes

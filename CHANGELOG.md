@@ -1,3 +1,13 @@
+# Version 4.0.6
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Switched to appserver-io/server version 7.x to make use of multiple SSL configuration options
+
 # Version 4.0.5
 
 ## Bugfixes

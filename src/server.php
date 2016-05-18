@@ -29,9 +29,9 @@ if (isset($argv[1])) {
     $config = STARTUP_BASE . 'etc/webserver.xml';
 }
 
-if(isset($argv[2])){
+if (isset($argv[2])) {
     $autoloaderFile = $argv[2];
-}else{
+} else {
     $autoloaderFile = APPSERVER_AUTOLOADER;
 }
 

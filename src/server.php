@@ -18,6 +18,7 @@
  * @link      http://www.appserver.io
  */
 define('STARTUP_BASE', __DIR__ . '/../');
+define('APPSERVER_AUTOLOADER', STARTUP_BASE . 'vendor/autoload.php');
 
 require (STARTUP_BASE . 'vendor/appserver-io/server/src/AppserverIo/Server/Standalone.php');
 
@@ -28,5 +29,11 @@ if (isset($argv[1])) {
     $config = STARTUP_BASE . 'etc/webserver.xml';
 }
 
-$server = new \AppserverIo\Server\Standalone(STARTUP_BASE, $config, STARTUP_BASE . 'vendor/autoload.php');
+if (isset($argv[2])) {
+    $autoloaderFile = $argv[2];
+} else {
+    $autoloaderFile = APPSERVER_AUTOLOADER;
+}
+
+$server = new \AppserverIo\Server\Standalone(STARTUP_BASE, $config, $autoloaderFile);
 $server->start();

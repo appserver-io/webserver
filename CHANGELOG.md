@@ -1,3 +1,14 @@
+# Version 4.0.8
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Extended module test suite with core module tests
+* Extended configuration evaluation in access module
+
 # Version 4.0.7
 
 ## Bugfixes

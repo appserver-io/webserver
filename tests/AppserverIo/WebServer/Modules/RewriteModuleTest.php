@@ -22,6 +22,7 @@ namespace AppserverIo\WebServer\Modules;
 
 use AppserverIo\Http\HttpRequest;
 use AppserverIo\Http\HttpResponse;
+use AppserverIo\Server\Dictionaries\ServerVars;
 use AppserverIo\WebServer\Mock\MockFaultyRequestContext;
 use AppserverIo\WebServer\Mock\MockRewriteModule;
 use AppserverIo\WebServer\Mock\MockServerConfig;
@@ -44,6 +45,30 @@ use AppserverIo\Server\Dictionaries\ModuleHooks;
  */
 class RewriteModuleTest extends \PHPUnit_Framework_TestCase
 {
+
+    /**
+     * The document root this tests are using
+     *
+     * @var string $documentRoot
+     */
+    protected $documentRoot;
+
+    /**
+     * Test set up method
+     *
+     * @return void
+     */
+    public function setUp()
+    {
+        $this->documentRoot = realpath(
+            __DIR__ .
+            DIRECTORY_SEPARATOR . '..' .
+            DIRECTORY_SEPARATOR . '_files' .
+            DIRECTORY_SEPARATOR . 'modules' .
+            DIRECTORY_SEPARATOR . RewriteModule::MODULE_NAME . DIRECTORY_SEPARATOR
+        );
+    }
+
     /**
      * Tests a certain path through the process() method
      *
@@ -94,6 +119,7 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
         // Get objects we need
         $rewriteModule = new MockRewriteModule();
         $mockRequestContext = new MockRequestContext();
+        $mockRequestContext->setServerVar(ServerVars::DOCUMENT_ROOT, $this->documentRoot);
 
         // Do the thing
         $rewriteModule->setRequestContext($mockRequestContext);
@@ -123,6 +149,7 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
         $request = new HttpRequest();
         $response = new HttpResponse();
         $mockRequestContext = new MockRequestContext();
+        $mockRequestContext->setServerVar(ServerVars::DOCUMENT_ROOT, $this->documentRoot);
 
         // Do the thing
         $this->assertSame(
@@ -163,6 +190,7 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
         $request = new HttpRequest();
         $response = new HttpResponse();
         $mockRequestContext = new MockRequestContext();
+        $mockRequestContext->setServerVar(ServerVars::DOCUMENT_ROOT, $this->documentRoot);
 
         // Do the thing
         $mockRequestContext->setEnvVar(EnvVars::HTTPS, 'test');

@@ -51,21 +51,21 @@ class AccessModule implements HttpModuleInterface
     const MODULE_NAME = 'access';
 
     /**
-     * Hold's the server context instance
+     * Holds the server context instance
      *
      * @var \AppserverIo\Server\Interfaces\ServerContextInterface
      */
     protected $serverContext;
 
     /**
-     * Hold's an array of all accesses
+     * Holds an array of all accesses
      *
      * @var array
      */
     protected $accesses;
 
     /**
-     * Return's the request instance
+     * Returns the request instance
      *
      * @return \AppserverIo\Psr\HttpMessage\RequestInterface The request instance
      */
@@ -85,7 +85,7 @@ class AccessModule implements HttpModuleInterface
     }
 
     /**
-     * Return's the server context instance
+     * Returns the server context instance
      *
      * @return \AppserverIo\Server\Interfaces\ServerContextInterface
      */
@@ -99,7 +99,7 @@ class AccessModule implements HttpModuleInterface
      *
      * @param \AppserverIo\Server\Interfaces\ServerContextInterface $serverContext The server's context instance
      *
-     * @return bool
+     * @return boolean
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
     public function init(ServerContextInterface $serverContext)
@@ -109,14 +109,14 @@ class AccessModule implements HttpModuleInterface
     }
 
     /**
-     * Implement's module logic for given hook
+     * Implements module logic for given hook
      *
      * @param \AppserverIo\Psr\HttpMessage\RequestInterface          $request        A request object
      * @param \AppserverIo\Psr\HttpMessage\ResponseInterface         $response       A response object
      * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
-     * @param int                                                    $hook           The current hook to process logic for
+     * @param integer                                                $hook           The current hook to process logic for
      *
-     * @return bool
+     * @return boolean
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
     public function process(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext, $hook)
@@ -151,8 +151,8 @@ class AccessModule implements HttpModuleInterface
         // generally everything is not allowed
         $allowed = false;
 
-        if ($accesses['allow']) {
-            // check allow accesses informations if something matches
+        if (isset($accesses['allow'])) {
+            // check allow accesses information if something matches
             foreach ($accesses['allow'] as $accessData) {
                 // we are optimistic an initial say data will match
                 $matchAllow = true;
@@ -180,7 +180,7 @@ class AccessModule implements HttpModuleInterface
         }
 
         if (isset($accesses['deny'])) {
-            // check deny accesses informations if something matches
+            // check deny accesses information if something matches
             foreach ($accesses['deny'] as $accessData) {
                 // initial nothing denies the request
                 $matchDeny = false;
@@ -214,7 +214,7 @@ class AccessModule implements HttpModuleInterface
     }
 
     /**
-     * Return's an array of module names which should be executed first
+     * Returns an array of module names which should be executed first
      *
      * @return array The array of module names
      */
@@ -236,7 +236,7 @@ class AccessModule implements HttpModuleInterface
     /**
      * Prepares the module for upcoming request in specific context
      *
-     * @return bool
+     * @return boolean
      * @throws \AppserverIo\Server\Exceptions\ModuleException
      */
     public function prepare()

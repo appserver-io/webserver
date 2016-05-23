@@ -48,13 +48,7 @@ class MockRequestContext extends RequestContext
 
         // Presetting the server vars with some default values
         $this->serverVars = array (
-            'DOCUMENT_ROOT' => realpath(
-                __DIR__ .
-                DIRECTORY_SEPARATOR . '..' .
-                DIRECTORY_SEPARATOR . '_files' .
-                DIRECTORY_SEPARATOR . 'modules' .
-                DIRECTORY_SEPARATOR . RewriteModule::MODULE_NAME . DIRECTORY_SEPARATOR
-            ),
+            'DOCUMENT_ROOT' => '',
             'SERVER_ADMIN' => 'admin@appserver.io',
             'SERVER_NAME' => 'unittest.local',
             'SERVER_ADDR' => '0.0.0.0',

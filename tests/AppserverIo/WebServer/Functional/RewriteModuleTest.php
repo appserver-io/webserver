@@ -115,6 +115,13 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
 
         // We need a MockRequestContext to work on
         $this->mockRequestContext = new MockRequestContext();
+        $this->mockRequestContext->setServerVar(ServerVars::DOCUMENT_ROOT, realpath(
+            __DIR__ .
+            DIRECTORY_SEPARATOR . '..' .
+            DIRECTORY_SEPARATOR . '_files' .
+            DIRECTORY_SEPARATOR . 'modules' .
+            DIRECTORY_SEPARATOR . RewriteModule::MODULE_NAME . DIRECTORY_SEPARATOR
+        ));
 
         // The module has to be inited
         $this->rewriteModule->init($this->mockServerContext);

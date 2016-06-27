@@ -64,7 +64,8 @@ class DeflateModule implements HttpModuleInterface
         "text/xml",
         "application/xml",
         "application/xml+rss",
-        "text/javascript"
+        "text/javascript",
+        "image/svg+xml"
     );
 
     /**

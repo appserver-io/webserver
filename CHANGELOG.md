@@ -1,3 +1,13 @@
+# Version 4.0.9
+
+## Bugfixes
+
+* Fixed error in FastCgiModule when splitting response header and body
+
+## Features
+
+* None
+
 # Version 4.0.8
 
 ## Bugfixes

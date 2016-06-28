@@ -1,3 +1,15 @@
+# Version 5.0.0
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Remove deprecated PhpModule and related classes
+* Remove dependency to appserver-io-php/appserver PECL extension 
+* Make webserver ready for PHP 7 by switching to appserver-io/server version 9.0.0
+
 # Version 4.0.9
 
 ## Bugfixes

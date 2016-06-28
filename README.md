@@ -47,6 +47,19 @@ It will startup on insecure http port 9080 and secure https port 9443.
 
 To test a php script just goto http://127.0.0.1:9080/info.php and see what happens... ;)
 
+Additionally you can pass two arguments to the startup script. The first one is the path to a
+custom configuration file, the second one to a custom autoloader file. For example, if you
+want to use your own configuration and autoloader files start the webserver with
+
+```bash
+bin/webserver path/to/your/configuration.xml path/to/your/autoloader.php
+```
+
+Both files can be absolute or relative to the webserver's root directory.
+
+> Please be aware, that the autoloader *MUST* be able to load the webserver classes too, as
+it is not complementary but a replacement for the default composer autoloader.
+
 # Semantic versioning
 
 This library follows semantic versioning and its public API defines as follows:

@@ -4,20 +4,19 @@
 
     <loggers>
         <!-- <logger name="System" type="\AppserverIo\Server\Loggers\DummyLogger"/> -->
-        <logger name="System" type="\Monolog\Logger">
+        <logger name="System" type="\AppserverIo\Logger\Logger">
             <!-- Example for using processors -->
             <!--
             <processors>
-                <processor type="\Monolog\Processor\IntrospectionProcessor" />
+                <processor type="\AppserverIo\Logger\Processors\SysloadProcessor" />
             </processors>
             -->
             <handlers>
                 <!-- Default stream handler to log file -->
-                <handler type="\Monolog\Handler\StreamHandler">
+                <handler type="\AppserverIo\Logger\Handlers\CustomFileHandler">
                     <params>
                         <param name="stream" type="string">var/log/webserver-system.log</param>
-                        <param name="level" type="integer">100</param>
-                        <param name="bubble" type="boolean">1</param>
+                        <param name="level" type="integer">info</param>
                     </params>
                 </handler>
                 <!-- Example for using a hipchat handler -->
@@ -42,26 +41,23 @@
                 -->
             </handlers>
         </logger>
-        <logger name="Access" type="\Monolog\Logger">
+        <logger name="Access" type="\AppserverIo\Logger\Logger">
             <handlers>
-                <handler type="\Monolog\Handler\StreamHandler">
-                    <formatter type="\Monolog\Formatter\LineFormatter">
+                <handler type="\AppserverIo\Logger\Handlers\CustomFileHandler">
+                    <formatter type="\AppserverIo\Logger\Formatters\StandardFormatter">
                         <params>
-                            <param name="format" type="string">%message%</param>
-                            <param name="dateFormat" type="string">Y-m-d H:i:s</param>
-                            <param name="allowInlineLineBreaks" type="boolean">1</param>
+                            <param name="format" type="string">%4$s</param>
                         </params>
                     </formatter>
                     <params>
                         <param name="stream" type="string">var/log/webserver-access.log</param>
-                        <param name="level" type="integer">100</param>
-                        <param name="bubble" type="boolean">1</param>
+                        <param name="level" type="integer">info</param>
                     </params>
                 </handler>
             </handlers>
         </logger>
     </loggers>
-    
+
     <upstreams>
         <upstream name="backend" type="\AppserverIo\WebServer\Upstreams\DefaultUpstream">
             <servers>
@@ -309,7 +305,6 @@
                 <module type="\AppserverIo\WebServer\Modules\LocationModule" />
                 <module type="\AppserverIo\WebServer\Modules\AutoIndexModule" />
                 <module type="\AppserverIo\WebServer\Modules\CoreModule" />
-                <module type="\AppserverIo\WebServer\Modules\PhpModule" />
                 <module type="\AppserverIo\WebServer\Modules\FastCgiModule" />
                 <module type="\AppserverIo\WebServer\Modules\ProxyModule" />
                 <!-- RESPONSE_PRE hook -->
@@ -317,8 +312,8 @@
                 <module type="\AppserverIo\WebServer\Modules\DeflateModule" />
             </modules>
             <handlers>
-                <handler name="php" extension=".php"/>
-                <handler name="php" extension=".phtml"/>
+                <handler name="fastcgi" extension=".php"/>
+                <handler name="fastcgi" extension=".phtml"/>
                 <handler name="servlet" extension=".do"/>
             </handlers>
         </server>
@@ -511,15 +506,14 @@
                 <module type="\AppserverIo\WebServer\Modules\LocationModule" />
                 <module type="\AppserverIo\WebServer\Modules\AutoIndexModule" />
                 <module type="\AppserverIo\WebServer\Modules\CoreModule" />
-                <module type="\AppserverIo\WebServer\Modules\PhpModule" />
                 <module type="\AppserverIo\WebServer\Modules\FastCgiModule"/>
                 <!-- RESPONSE_PRE hook -->
                 <module type="\AppserverIo\WebServer\Modules\HeaderModule" />
                 <module type="\AppserverIo\WebServer\Modules\DeflateModule"/>
             </modules>
             <handlers>
-                <handler name="php" extension=".php"/>
-                <handler name="php" extension=".phtml"/>
+                <handler name="fastcgi" extension=".php"/>
+                <handler name="fastcgi" extension=".phtml"/>
                 <handler name="servlet" extension=".do"/>
             </handlers>
         </server>

@@ -4,6 +4,7 @@ composer.phar
 .idea
 .c9
 /var/log/*.log
+/var/www/magento
 /target
 /reports
 /instance-src

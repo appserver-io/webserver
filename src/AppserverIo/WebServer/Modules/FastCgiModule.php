@@ -31,7 +31,6 @@ use AppserverIo\Server\Dictionaries\ModuleHooks;
 use AppserverIo\Server\Exceptions\ModuleException;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
-use Crunch\FastCGI\ConnectionException;
 use Crunch\FastCGI\Client as FastCgiClient;
 
 /**
@@ -271,9 +270,10 @@ class FastCgiModule implements HttpModuleInterface
     {
 
         // split the header from the body. Split on \n\n.
-        $doubleCr = strpos($stdout, "\r\n\r\n");
+        $splitter = "\r\n\r\n";
+        $doubleCr = strpos($stdout, $splitter);
         $rawHeader = substr($stdout, 0, $doubleCr);
-        $rawBody = substr($stdout, $doubleCr, strlen($stdout));
+        $rawBody = substr($stdout, $doubleCr + strlen($splitter), strlen($stdout));
 
         // format the header.
         $header = array();
@@ -335,7 +335,7 @@ class FastCgiModule implements HttpModuleInterface
         return array(
             'statusCode' => (int) $code,
             'headers' => $header,
-            'body' => trim($rawBody)
+            'body' => $rawBody
         );
     }
 

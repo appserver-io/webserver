@@ -1,3 +1,13 @@
+# Version 5.0.1
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Remove monolog as it has been replaced with appserver-io/logger
+
 # Version 5.0.0
 
 ## Bugfixes

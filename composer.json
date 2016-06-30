@@ -29,7 +29,6 @@
 	],
 	"require" : {
 		"php" : ">=5.4.0",
-		"monolog/monolog" : "1.10.*",
 		"rhumsaa/uuid" : "~2.8",
 		"psr/log" : "*",
 		"appserver-io/server" : "~9.0",

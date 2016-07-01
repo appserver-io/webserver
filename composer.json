@@ -31,7 +31,7 @@
 		"php" : ">=5.4.0",
 		"rhumsaa/uuid" : "~2.8",
 		"psr/log" : "*",
-		"appserver-io/server" : "~9.0",
+		"appserver-io/server" : "~10.0",
 		"appserver-io/http" : "~2.0",
 		"appserver-io/fastcgi" : "~1.0",
 		"appserver-io/logger" : "~1.0",
@@ -43,6 +43,9 @@
 		"appserver-io/build" : "~1.0",
 		"codeclimate/php-test-reporter" : "dev-master"
 	},
+	"bin" : [
+		"bin/webserver"
+	],
 	"autoload" : {
 		"psr-0" : {
 			"AppserverIo\\WebServer" : [

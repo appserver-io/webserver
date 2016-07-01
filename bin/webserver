@@ -1,28 +1,56 @@
-#!/bin/bash
-#
-# webserver
-#
-# NOTICE OF LICENSE
-#
-# This source file is subject to the Open Software License (OSL 3.0)
-# that is available through the world-wide-web at this URL:
-# http://opensource.org/licenses/osl-3.0.php
-#
-# PHP version 5
-#
-# @category  Server
-# @package   WebServer
-# @author    Johann Zelger <jz@appserver.io>
-# @copyright 2014 TechDivision GmbH <info@appserver.io>
-# @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
-# @link      https://github.com/appserver-io/webserver
-##
+#!/usr/bin/env php
+<?php
 
-# get base dir from bash source location
-BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
+/**
+ * bin/webserver
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * PHP version 5
+ *
+ * @author    Tim Wagner <tw@appserver.io>
+ * @copyright 2016 TechDivision GmbH <info@appserver.io>
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @link      https://github.com/appserver-io/webserver
+ * @link      http://www.appserver.io
+ */
 
-# check if PHP_BIN was set. If not set appserver php as default.
-[ -z "$PHP_BIN" ] && PHP_BIN="/opt/appserver/bin/php";
+date_default_timezone_set('UTC');
 
-# call webserver script
-$PHP_BIN -ddisplay_errors=1 -dappserver.php_sapi=webserver -ddate.timezone=Europe/Berlin -dauto_globals_jit=0 $BASE_DIR/../src/server.php $@
+if (PHP_SAPI !== 'cli') {
+    die('The webserver should be invoked via the CLI version of PHP, not the ' . PHP_SAPI . ' SAPI' . PHP_EOL);
+}
+
+define('STARTUP_BASE', getcwd());
+
+require (STARTUP_BASE . '/vendor/appserver-io/server/src/AppserverIo/Server/Standalone.php');
+
+$files = array(STARTUP_BASE . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
+
+foreach ($files as $file) {
+    if (file_exists($file)) {
+        require $file;
+        define('APPSERVER_AUTOLOADER', $file);
+        break;
+    }
+}
+
+// check if first argument is given for configuration
+if (isset($argv[1])) {
+    $config = $argv[1];
+} else {
+    $config = STARTUP_BASE . DIRECTORY_SEPARATOR . 'etc' . DIRECTORY_SEPARATOR . 'webserver.xml';
+}
+
+if (isset($argv[2])) {
+    $autoloaderFile = $argv[2];
+} else {
+    $autoloaderFile = APPSERVER_AUTOLOADER;
+}
+
+$server = new \AppserverIo\Server\Standalone(STARTUP_BASE, $config, $autoloaderFile);
+$server->start();

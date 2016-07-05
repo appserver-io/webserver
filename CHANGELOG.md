@@ -1,3 +1,13 @@
+# Version 5.0.3
+
+## Bugfixes
+
+* Make MagentoRewriteMapper more generic and make it work with Magento 2
+
+## Features
+
+* None
+
 # Version 5.0.2
 
 ## Bugfixes

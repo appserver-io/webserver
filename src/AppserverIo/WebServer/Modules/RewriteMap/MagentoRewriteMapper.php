@@ -61,7 +61,7 @@ class MagentoRewriteMapper implements RewriteMapperInterface
         // check if request path matches to base. if not we don't need to do anything.
         // find store code from magento.
         // important: be sure that magento is configured to add store codes to url!
-        if (preg_match('/^\/' . preg_quote($base, '/') . '\/([a-z0-9_]+)/', $requestUrl, $matches)) {
+        if (preg_match('/^' . preg_quote($base, '/') . '\/([a-z0-9_]+)/', $requestUrl, $matches)) {
             // get store code
             $storeCode = $matches[1];
 
@@ -80,29 +80,30 @@ class MagentoRewriteMapper implements RewriteMapperInterface
 
             // get magento store entry by given store code string
             $query = $db->query("select * from $storeTableName where code = '$storeCode'");
-            $magentoStore = $query->fetch(\PDO::FETCH_OBJ);
+            if ($magentoStore = $query->fetch(\PDO::FETCH_OBJ)) {
+                // build up base url
+                $baseUrl = $base . '/' . $storeCode . '/';
 
-            // build up base url
-            $baseUrl = '/' . $base . '/' . $storeCode . '/';
+                // build magento request path for comparison in core_url_rewrite table
+                $magentoRequestPath = str_replace($baseUrl, '', $requestUrl);
 
-            // build magento request path for comparison in core_url_rewrite table
-            $magentoRequestPath = str_replace($baseUrl, '', $requestUrl);
+                // get magento url rewrite
+                $query = $db->query(
+                    "select * from $rewriteTableName
+                    where request_path = '$magentoRequestPath'
+                    and store_id = '$magentoStore->store_id'
+                    and redirect_type=301"
+                );
 
-            // get magento url rewrite
-            $query = $db->query(
-                "select * from $rewriteTableName
-                where request_path = '$magentoRequestPath'
-                and store_id = '$magentoStore->store_id'
-                and options = 'RP'"
-            );
+                // Check if we got something useful
+                if (is_a($query, '\PDOStatement')) {
+                    // try to fetch the rewrite URL
+                    $magentoUrlRewrite = $query->fetch(\PDO::FETCH_OBJ);
 
-            // Check if we got something useful
-            if (is_a($query, '\PDOStatement')) {
-                $magentoUrlRewrite = $query->fetch(\PDO::FETCH_OBJ);
-
-                // check if target_path was found and set target url for return
-                if (isset($magentoUrlRewrite->target_path)) {
-                    $targetUrl .= $this->params['protocol'] . $this->params['headerHost'] . $baseUrl . $magentoUrlRewrite->target_path;
+                    // check if target_path was found and set target url for return
+                    if (isset($magentoUrlRewrite->target_path)) {
+                        $targetUrl .= $this->params['protocol'] . $this->params['headerHost'] . $baseUrl . $magentoUrlRewrite->target_path;
+                    }
                 }
             }
 

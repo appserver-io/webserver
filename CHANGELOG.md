@@ -1,3 +1,13 @@
+# Version 5.0.4
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Add Dockerfile configuration
+
 # Version 5.0.3
 
 ## Bugfixes

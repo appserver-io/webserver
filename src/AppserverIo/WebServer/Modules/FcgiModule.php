@@ -20,27 +20,23 @@
 
 namespace AppserverIo\WebServer\Modules;
 
-use Crunch\FastCGI\Client\Factory as FastCGIClientFactory;
-use React\Dns\Resolver\Factory as DnsResolverFactory;
-use React\EventLoop\Factory as EventLoopFactory;
-use React\SocketClient\Connector as SocketConnector;
-use Crunch\FastCGI\Protocol\RequestParameters;
-use Crunch\FastCGI\Client\ClientException;
 use React\Promise as promise;
 use Crunch\FastCGI\Client\Client;
-
+use Crunch\FastCGI\Protocol\RequestParameters;
+use React\EventLoop\Factory as EventLoopFactory;
+use React\Dns\Resolver\Factory as DnsResolverFactory;
+use React\SocketClient\Connector as SocketConnector;
+use Crunch\FastCGI\Client\Factory as FcgiClientFactory;
 use AppserverIo\Psr\HttpMessage\Protocol;
 use AppserverIo\Psr\HttpMessage\RequestInterface;
 use AppserverIo\Psr\HttpMessage\ResponseInterface;
 use AppserverIo\WebServer\Interfaces\HttpModuleInterface;
 use AppserverIo\Http\HttpResponseStates;
 use AppserverIo\Server\Dictionaries\ServerVars;
-use AppserverIo\Server\Dictionaries\ModuleVars;
 use AppserverIo\Server\Dictionaries\ModuleHooks;
 use AppserverIo\Server\Exceptions\ModuleException;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
-
 
 /**
  * Class FastCgiModule
@@ -112,57 +108,56 @@ class FcgiModule implements HttpModuleInterface
             }
 
             // check if file does not exist
-            if (! $requestContext->hasServerVar(ServerVars::SCRIPT_FILENAME)) {
+            if ($requestContext->hasServerVar(ServerVars::SCRIPT_FILENAME) === false) {
                 $response->setStatusCode(404);
                 throw new ModuleException(null, 404);
             }
 
+            // initialize the event loop
             $loop = EventLoopFactory::create();
 
+            // initialize the socket connector with the DNS resolver
             $dnsResolverFactory = new DnsResolverFactory();
             $dns = $dnsResolverFactory->createCached('0.0.0.0', $loop);
 
+            // initialize the FastCGI factory with the connector
             $connector = new SocketConnector($loop, $dns);
+            $factory = new FcgiClientFactory($loop, $connector);
 
-            $factory = new FastCGIClientFactory($loop, $connector);
+            // initialize the FastCGI client with the FastCGI server IP and port
+            $cl = $factory->createClient(FcgiModule::DEFAULT_FAST_CGI_IP, FcgiModule::DEFAULT_FAST_CGI_PORT);
 
-            // rewind the body stream
-            // $bodyStream = $request->getBodyStream();
-            // rewind($bodyStream);
-
-            $factory->createClient(FcgiModule::DEFAULT_FAST_CGI_IP, FcgiModule::DEFAULT_FAST_CGI_PORT)
-                    ->then(function (Client $client) use ($request, $requestContext, $response) {
-
-                $bodyStream = $request->getBodyContent();
-
+            // invoke the FastCGI request
+            $cl->done(function (Client $client) use ($request, $requestContext, $response) {
+                // initialize the environment
                 $env = $this->prepareEnvironment($request, $requestContext);
 
+                // initialize the request
                 $req = $client->newRequest(
                     new RequestParameters($env),
-                    new \Crunch\FastCGI\ReaderWriter\StringReader($bodyStream)
+                    new \Crunch\FastCGI\ReaderWriter\StringReader($request->getBodyContent())
                 );
 
+                // initialize the response handler
                 $responseHandler = function ($res) use ($response) {
-
+                    // explode status code, headers and body from the FastCGI response
                     list ($statusCode, $headers, $body) = $this->formatResponse($res->getContent()->read());
-
+                    // initialize the HTTP response with the values
                     $response->setHeaders($headers);
                     $response->appendBodyStream($body);
                     $response->setStatusCode($statusCode);
                 };
 
-                $failHandler = function (ClientException $fail) {
-                    error_log("Request failed: {$fail->getMessage()}");
-                    return $fail;
-                };
+                // finally send the FastCGI request
+                $x = $client->sendRequest($req)->then($responseHandler);
 
-                $x = $client->sendRequest($req)->then($responseHandler, $failHandler);
-
+                // close the FastCGI connection
                 promise\all([$x])->then(function () use ($client) {
                     $client->close();
                 });
             });
 
+            // start the event loop
             $loop->run();
 
             // add the X-Powered-By header
@@ -170,6 +165,7 @@ class FcgiModule implements HttpModuleInterface
 
             // set response state to be dispatched after this without calling other modules process
             $response->setState(HttpResponseStates::DISPATCH);
+
         } catch (\Exception $e) {
             // catch all exceptions
             throw new ModuleException($e->getMessage(), $e->getCode());

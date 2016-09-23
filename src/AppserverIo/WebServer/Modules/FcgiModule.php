@@ -21,12 +21,13 @@
 namespace AppserverIo\WebServer\Modules;
 
 use React\Promise as promise;
+use React\EventLoop\LoopInterface;
 use Crunch\FastCGI\Client\Client;
 use Crunch\FastCGI\Protocol\RequestParameters;
+use Crunch\FastCGI\Client\Factory as FcgiClientFactory;
 use React\EventLoop\Factory as EventLoopFactory;
 use React\Dns\Resolver\Factory as DnsResolverFactory;
 use React\SocketClient\Connector as SocketConnector;
-use Crunch\FastCGI\Client\Factory as FcgiClientFactory;
 use AppserverIo\Psr\HttpMessage\Protocol;
 use AppserverIo\Psr\HttpMessage\RequestInterface;
 use AppserverIo\Psr\HttpMessage\ResponseInterface;
@@ -34,9 +35,10 @@ use AppserverIo\WebServer\Interfaces\HttpModuleInterface;
 use AppserverIo\Http\HttpResponseStates;
 use AppserverIo\Server\Dictionaries\ServerVars;
 use AppserverIo\Server\Dictionaries\ModuleHooks;
-use AppserverIo\Server\Exceptions\ModuleException;
 use AppserverIo\Server\Interfaces\RequestContextInterface;
 use AppserverIo\Server\Interfaces\ServerContextInterface;
+use AppserverIo\Server\Dictionaries\ModuleVars;
+use AppserverIo\Server\Exceptions\ModuleException;
 
 /**
  * Class FastCgiModule
@@ -61,11 +63,39 @@ class FcgiModule implements HttpModuleInterface
     const DEFAULT_FAST_CGI_IP = '127.0.0.1';
 
     /**
+     * The default DNS server for DNS resolution.
+     *
+     * @var string
+     */
+    const DEFAULT_DNS_SERVER = '0.0.0.0';
+
+    /**
      * The default port for the Fast-CGI connection.
      *
      * @var integer
      */
     const DEFAULT_FAST_CGI_PORT = 9010;
+
+    /**
+     * The param key for the FastCGI server host name.
+     *
+     * @var string
+     */
+    const PARAM_HOST = 'host';
+
+    /**
+     * The param key for the FastCGI server port.
+     *
+     * @var string
+     */
+    const PARAM_PORT = 'port';
+
+    /**
+     * The param key for the DNS server used to resolve the DNS server name.
+     *
+     * @var string
+     */
+    const PARAM_DNS_SERVER = 'dnsServer';
 
     /**
      * Defines the module name.
@@ -116,19 +146,8 @@ class FcgiModule implements HttpModuleInterface
             // initialize the event loop
             $loop = EventLoopFactory::create();
 
-            // initialize the socket connector with the DNS resolver
-            $dnsResolverFactory = new DnsResolverFactory();
-            $dns = $dnsResolverFactory->createCached('0.0.0.0', $loop);
-
-            // initialize the FastCGI factory with the connector
-            $connector = new SocketConnector($loop, $dns);
-            $factory = new FcgiClientFactory($loop, $connector);
-
-            // initialize the FastCGI client with the FastCGI server IP and port
-            $cl = $factory->createClient(FcgiModule::DEFAULT_FAST_CGI_IP, FcgiModule::DEFAULT_FAST_CGI_PORT);
-
             // invoke the FastCGI request
-            $cl->done(function (Client $client) use ($request, $requestContext, $response) {
+            $this->getFastCgiClient($requestContext, $loop)->done(function (Client $client) use ($request, $requestContext, $response) {
                 // initialize the environment
                 $env = $this->prepareEnvironment($request, $requestContext);
 
@@ -320,6 +339,52 @@ class FcgiModule implements HttpModuleInterface
             $header,
             $rawBody
         );
+    }
+
+    /**
+     * Creates and returns a new FastCGI client instance.
+     *
+     * @param \AppserverIo\Server\Interfaces\RequestContextInterface $requestContext A requests context instance
+     * @param \React\EventLoop\LoopInterface                         $loop           The event loop instance
+     *
+     * @return \Crunch\FastCGI\Connection The FastCGI connection instance
+     */
+    protected function getFastCgiClient(RequestContextInterface $requestContext, LoopInterface $loop)
+    {
+
+        // initialize default host/port/DNS server
+        $host = FcgiModule::DEFAULT_FAST_CGI_IP;
+        $port = FcgiModule::DEFAULT_FAST_CGI_PORT;
+        $dnsServer = FcgiModule::DEFAULT_DNS_SERVER;
+
+        // set the connection data to be used for the Fast-CGI connection
+        $fileHandlerVariables = array();
+
+        // check if we've configured module variables
+        if ($requestContext->hasModuleVar(ModuleVars::VOLATILE_FILE_HANDLER_VARIABLES)) {
+            // load the volatile file handler variables and set connection data
+            $fileHandlerVariables = $requestContext->getModuleVar(ModuleVars::VOLATILE_FILE_HANDLER_VARIABLES);
+            if (isset($fileHandlerVariables[FcgiModule::PARAM_HOST])) {
+                $host = $fileHandlerVariables[FcgiModule::PARAM_HOST];
+            }
+            if (isset($fileHandlerVariables[FcgiModule::PARAM_PORT])) {
+                $port = $fileHandlerVariables[FcgiModule::PARAM_PORT];
+            }
+            if (isset($fileHandlerVariables[FcgiModule::PARAM_DNS_SERVER])) {
+                $dnsServer = $fileHandlerVariables[FcgiModule::PARAM_DNS_SERVER];
+            }
+        }
+
+        // initialize the socket connector with the DNS resolver
+        $dnsResolverFactory = new DnsResolverFactory();
+        $dns = $dnsResolverFactory->createCached($dnsServer, $loop);
+
+        // initialize the FastCGI factory with the connector
+        $connector = new SocketConnector($loop, $dns);
+        $factory = new FcgiClientFactory($loop, $connector);
+
+        // initialize the FastCGI client with the FastCGI server IP and port
+        return $factory->createClient($host, $port);
     }
 
     /**

@@ -3,6 +3,7 @@ composer.lock
 composer.phar
 .idea
 .c9
+/etc/webserver-lb.xml
 /var/log/*.log
 /var/www/magento
 /target

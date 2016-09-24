@@ -31,6 +31,7 @@
 		"php" : ">=5.4.0",
 		"rhumsaa/uuid" : "~2.8",
 		"psr/log" : "*",
+		"crunch/fastcgi" : "2.x-dev",
 		"appserver-io/server" : "~10.0",
 		"appserver-io/http" : "~2.0",
 		"appserver-io/fastcgi" : "~1.0",

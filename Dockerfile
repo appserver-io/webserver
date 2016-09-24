@@ -11,7 +11,7 @@ MAINTAINER Tim Wagner <tw@appserver.io>
 ################################################################################
 
 # define versions
-ARG APPSERVER_RUNTIME_BUILD_VERSION=1.1.5-43
+ARG APPSERVER_RUNTIME_BUILD_VERSION=1.1.6-44
 
 ################################################################################
 

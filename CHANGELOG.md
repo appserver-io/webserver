@@ -1,3 +1,13 @@
+# Version 5.1.0
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Add new FcgiModule using original CrunchPHP/fastcgi library
+
 # Version 5.0.4
 
 ## Bugfixes

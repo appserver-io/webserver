@@ -161,8 +161,20 @@ class FcgiModule implements HttpModuleInterface
                 $responseHandler = function ($res) use ($response) {
                     // explode status code, headers and body from the FastCGI response
                     list ($statusCode, $headers, $body) = $this->formatResponse($res->getContent()->read());
+
+                    // set the headers found in the Fast-CGI response
+                    foreach ($headers as $headerName => $headerValue) {
+                        // if found an array, e. g. for the Set-Cookie header, we add each value
+                        if (is_array($headerValue)) {
+                            foreach ($headerValue as $value) {
+                                $response->addHeader($headerName, $value, true);
+                            }
+                        } else {
+                            $response->addHeader($headerName, $headerValue);
+                        }
+                    }
+
                     // initialize the HTTP response with the values
-                    $response->setHeaders($headers);
                     $response->appendBodyStream($body);
                     $response->setStatusCode($statusCode);
                 };
@@ -179,8 +191,8 @@ class FcgiModule implements HttpModuleInterface
             // start the event loop
             $loop->run();
 
-            // add the X-Powered-By header
-            $response->addHeader(Protocol::HEADER_X_POWERED_BY, __CLASS__);
+            // append the X-Powered-By header
+            $response->addHeader(Protocol::HEADER_X_POWERED_BY, __CLASS__, true);
 
             // set response state to be dispatched after this without calling other modules process
             $response->setState(HttpResponseStates::DISPATCH);

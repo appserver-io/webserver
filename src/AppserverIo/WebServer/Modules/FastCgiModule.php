@@ -146,7 +146,7 @@ class FastCgiModule implements HttpModuleInterface
             }
 
             // add the X-Powered-By header
-            $response->addHeader(Protocol::HEADER_X_POWERED_BY, __CLASS__);
+            $response->addHeader(Protocol::HEADER_X_POWERED_BY, __CLASS__, true);
 
             // set response state to be dispatched after this without calling other modules process
             $response->setState(HttpResponseStates::DISPATCH);

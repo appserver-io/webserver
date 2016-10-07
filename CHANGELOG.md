@@ -1,3 +1,14 @@
+# Version 5.1.1
+
+## Bugfixes
+
+* Fix that headers are hardcoded overwritten in FcgiModule
+* Append X-Powered-By header in FcgiModule/FastCgiModule instead of override existing one
+
+## Features
+
+* None
+
 # Version 5.1.0
 
 ## Bugfixes

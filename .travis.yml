@@ -12,7 +12,7 @@ matrix:
 
 before_install:
   - pecl install pthreads-2.0.10
-  - pecl install xdebug
+  - pecl install xdebug-2.4.1
   - phpenv rehash
 
 before_script:

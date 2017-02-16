@@ -70,4 +70,4 @@ This library follows semantic versioning and its public API defines as follows:
 
 # External Links
 
-* Documentation at [appserver.io](http://docs.appserver.io)
+* Documentation at [appserver.io](http://appserver.io/get-started/documentation/1.1/webserver.html)

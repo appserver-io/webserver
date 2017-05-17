@@ -857,43 +857,4 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
 
         $this->assertDesiredRewrite($uri, $result);
     }
-
-    /**
-     * Data provider
-     *
-     * @return array
-     */
-    public function stackedRulesTestDataProvider()
-    {
-        return array(
-            array('/firstIteration/test.txt', '/finalIteration/test.txt'),
-            array('/wontfit/test.txt', '/wontfit/test.txt'),
-            array('/toSecondIteration/test.txt', '/finalIteration/test.txt'),
-        );
-    }
-
-    /**
-     * Tests if several rules will handover their result to the next one
-     *
-     * @return void
-     *
-     * @dataProvider stackedRulesTestDataProvider
-     */
-    public function testStackedRules($uri, $result)
-    {
-        $this->prepareRuleset(array(
-            array(
-                'condition' => '/firstIteration/(.+)',
-                'target' => '/toSecondIteration/$1',
-                'flag' => ''
-            ),
-            array(
-                'condition' => '/toSecondIteration/(.+)',
-                'target' => '/finalIteration/$1',
-                'flag' => ''
-            )
-        ));
-
-        $this->assertDesiredRewrite($uri, $result);
-    }
 }

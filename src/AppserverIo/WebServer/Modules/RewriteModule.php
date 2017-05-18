@@ -196,15 +196,6 @@ class RewriteModule implements HttpModuleInterface
      */
     public function process(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext, $hook)
     {
-        // In php an interface is, by definition, a fixed contract. It is immutable.
-        // So we have to declare the right ones afterwards...
-        /**
-         * @var $request \AppserverIo\Psr\HttpMessage\RequestInterface
-         */
-        /**
-         * @var $request \AppserverIo\Psr\HttpMessage\ResponseInterface
-         */
-
         // if false hook is coming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
             return;
@@ -253,8 +244,12 @@ class RewriteModule implements HttpModuleInterface
                 }
             }
 
+            $this->fillHeaderBackreferences($request);
+
             // Iterate over all rules, resolve vars and apply the rule (if needed)
+            /** @var Rule $rule */
             foreach ($this->rules[$requestUrl] as $rule) {
+                $rule->resolve($this->serverBackreferences);
                 // Check if the rule matches, and if, apply the rule
                 if ($rule->matches()) {
                     // Apply the rule. If apply() returns false this means this was the last rule to process

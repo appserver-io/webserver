@@ -12,7 +12,7 @@
  * PHP version 5
  *
  * @author    Bernhard Wick <bw@appserver.io>
- * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @copyright 2017 TechDivision GmbH <info@appserver.io>
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link      https://github.com/appserver-io/webserver
  * @link      http://www.appserver.io/
@@ -30,7 +30,7 @@ use AppserverIo\WebServer\Modules\Rewrite\Dictionaries\RuleFlags;
  * This class provides an object based representation of a rewrite rules condition including logic for checking itself.
  *
  * @author    Bernhard Wick <bw@appserver.io>
- * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @copyright 2017 TechDivision GmbH <info@appserver.io>
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link      https://github.com/appserver-io/webserver
  * @link      http://www.appserver.io/
@@ -73,6 +73,13 @@ class Condition
      * @var string $operand
      */
     protected $operand;
+
+    /**
+     * The original operand as given on instantiation, kept for better re-iteration
+     *
+     * @var string $originalOperand
+     */
+    protected $originalOperand;
 
     /**
      * In some cases, e.g.
@@ -148,7 +155,8 @@ class Condition
         }
 
         // Fill the more important properties
-        $this->operand = $operand;
+        $this->originalOperand = $operand;
+        $this->operand = $this->originalOperand;
         $this->action = $action;
         $this->additionalOperand = '';
 
@@ -255,7 +263,7 @@ class Condition
         $backreferenceValues = array_values($backreferences);
 
         // Substitute the backreferences in our operand and additionalOperand
-        $this->operand = str_replace($backreferenceHolders, $backreferenceValues, $this->operand);
+        $this->operand = str_replace($backreferenceHolders, $backreferenceValues, $this->originalOperand);
 
         // prepare our operand to be usable for filesystem checks
         $this->prepareFilesystemOperand();

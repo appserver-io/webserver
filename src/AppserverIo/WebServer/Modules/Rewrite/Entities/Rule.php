@@ -12,7 +12,7 @@
  * PHP version 5
  *
  * @author    Bernhard Wick <bw@appserver.io>
- * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @copyright 2017 TechDivision GmbH <info@appserver.io>
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link      https://github.com/appserver-io/webserver
  * @link      http://www.appserver.io/
@@ -34,7 +34,7 @@ use AppserverIo\Server\Interfaces\RequestContextInterface;
  * and handeling conditions.
  *
  * @author    Bernhard Wick <bw@appserver.io>
- * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @copyright 2017 TechDivision GmbH <info@appserver.io>
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link      https://github.com/appserver-io/webserver
  * @link      http://www.appserver.io/
@@ -255,7 +255,7 @@ class Rule
         $this->resolveConditions($backreferences);
 
         // Second we have to produce the regex based backreferences from the now semi-resolved conditions
-        $conditionBackreferences = $this->getBackreferences();
+        $conditionBackreferences = array_merge($this->getBackreferences(), $backreferences);
 
         // Last but not least we have to resolve the conditions against the regex backreferences
         $this->resolveConditions($conditionBackreferences);

@@ -12,7 +12,7 @@
  * PHP version 5
  *
  * @author    Bernhard Wick <bw@appserver.io>
- * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @copyright 2017 TechDivision GmbH <info@appserver.io>
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link      https://github.com/appserver-io/webserver
  * @link      http://www.appserver.io/
@@ -37,7 +37,7 @@ use AppserverIo\Server\Dictionaries\ServerVars;
  * Basic test class for the RewriteModule class.
  *
  * @author    Bernhard Wick <bw@appserver.io>
- * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @copyright 2017 TechDivision GmbH <info@appserver.io>
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link      https://github.com/appserver-io/webserver
  * @link      http://www.appserver.io/
@@ -122,52 +122,35 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
             DIRECTORY_SEPARATOR . 'modules' .
             DIRECTORY_SEPARATOR . RewriteModule::MODULE_NAME . DIRECTORY_SEPARATOR
         ));
+        // we are a MacOS Firefox by default
+        $this->mockRequestContext->setServerVar(ServerVars::HTTP_USER_AGENT, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36');
 
         // The module has to be inited
         $this->rewriteModule->init($this->mockServerContext);
 
-        // We will collect all data files
-        $dataPath = __DIR__ .
-            DIRECTORY_SEPARATOR . '..' .
-            DIRECTORY_SEPARATOR . '_files' .
-            DIRECTORY_SEPARATOR . 'modules' .
-            DIRECTORY_SEPARATOR . RewriteModule::MODULE_NAME . DIRECTORY_SEPARATOR;
-
-        $dataFiles = scandir($dataPath);
-
-        // Iterate over all data files and collect the sets of test data
-        foreach ($dataFiles as $dataFile) {
-
-            // Skip the files we do not want
-            foreach ($this->excludedDataFiles as $excludedDataFile) {
-
-                if (strpos($dataFile, $excludedDataFile) === 0) {
-
-                    continue 2;
-                }
-            }
-
-            // Require the different files and collect the data
-            $ruleSets = array();
-            require $dataPath . $dataFile;
-
-            // Iterate over all rulesets and collect the rules and maps
-            foreach ($ruleSets as $setName => $ruleSet) {
-
-                // Per convention we got the variables $rules, and $map within a file
-                $this->rewriteDataSets[$setName] = array(
-                    'redirect' => @$ruleSet['redirect'],
-                    'redirectAs' => @$ruleSet['redirectAs'],
-                    'rules' => $ruleSet['rules'],
-                    'map' => $ruleSet['map']
-                );
-            }
-        }
-
         // Create a request and response object we can use for our processing
         $this->request = new HttpRequest();
+        $this->fillRequestHeaders();
         $this->response = new HttpResponse();
         $this->response->init();
+    }
+
+    /**
+     * Will fill the request object with some default headers
+     *
+     * @return void
+     */
+    public function fillRequestHeaders()
+    {
+        $this->request->setHeaders(array (
+            Protocol::HEADER_HOST => $this->mockRequestContext->getServerVar(ServerVars::HTTP_HOST),
+            Protocol::HEADER_CONNECTION => 'keep-alive',
+            Protocol::HEADER_USER_AGENT => $this->mockRequestContext->getServerVar(ServerVars::HTTP_USER_AGENT),
+            Protocol::HEADER_ACCEPT => '*/*',
+            Protocol::HEADER_REFERER => 'from.testland.com',
+            Protocol::HEADER_ACCEPT_ENCODING => 'gzip, deflate, sdch, br',
+            Protocol::HEADER_ACCEPT_LANGUAGE => 'de-DE,de;q=0.8,en-US;q=0.6,en;q=0.4,it;q=0.2',
+        ));
     }
 
     /**
@@ -835,6 +818,8 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
             array('/html/index.html', '/html'),
             array('/ppp/test.gif', '/ppp'),
             array('/html/test.gif', '/html'),
+            array('/ppp/html/test.gif', '/ppp'),
+            array('/html/ppp/test.gif', '/ppp'),
         );
     }
 
@@ -856,5 +841,33 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertDesiredRewrite($uri, $result);
+    }
+
+    /**
+     * Test wrapper for the urlencode dataset
+     *
+     * @return void
+     */
+    public function testChangingUserAgentBackreference()
+    {
+        $this->prepareRuleset(array(
+            array(
+                'condition' => 'phone@$HTTP_USER_AGENT',
+                'target' => '/phone.html',
+                'flag' => 'NC,L'
+            ),
+            array(
+                'condition' => 'macintosh@$HTTP_USER_AGENT',
+                'target' => '/desktop.html',
+                'flag' => 'NC,L'
+            )
+        ));
+
+        // test with a dektop browser
+        $this->request->addHeader(Protocol::HEADER_USER_AGENT, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36');
+        $this->assertDesiredRewrite('/testuri', '/desktop.html');
+        // test with a mobile browser
+        $this->request->addHeader(Protocol::HEADER_USER_AGENT, 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1');
+        $this->assertDesiredRewrite('/testuri', '/phone.html');
     }
 }

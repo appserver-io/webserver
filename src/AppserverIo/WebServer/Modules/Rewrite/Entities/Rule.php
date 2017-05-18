@@ -79,6 +79,13 @@ class Rule
     protected $matchingBackreferences = array();
 
     /**
+     * Will hold the backreferences of the applied targets
+     *
+     * @var array $targetBackreferences
+     */
+    protected $targetBackreferences = array();
+
+    /**
      * The target to rewrite the REDIRECT_URL to
      *
      * @var string $target
@@ -377,8 +384,10 @@ class Rule
 
                 // Set the "redirect" query string as a backup as we might change the original
                 $requestContext->setServerVar('REDIRECT_QUERY_STRING', $requestContext->getServerVar(ServerVars::QUERY_STRING));
+                $this->targetBackreferences['$REDIRECT_QUERY_STRING'] = $requestContext->getServerVar(ServerVars::QUERY_STRING);
             }
             $requestContext->setServerVar('REDIRECT_URL', $queryFreeRequestUri);
+            $this->targetBackreferences['$REDIRECT_URL'] = $queryFreeRequestUri;
 
             // Substitute the backreferences in our operation
             $this->target = str_replace($backreferenceHolders, $backreferenceValues, $this->target);
@@ -390,6 +399,7 @@ class Rule
 
                 // Set the REQUEST_FILENAME path
                 $requestContext->setServerVar(ServerVars::REQUEST_FILENAME, $this->target);
+                $this->targetBackreferences['$' .  ServerVars::REQUEST_FILENAME] = $this->target;
             } elseif (filter_var($this->target, FILTER_VALIDATE_URL) !== false) {
                 // We have a complete URL!
                 $this->type = 'url';
@@ -402,10 +412,13 @@ class Rule
                 // Requested uri always has to begin with a slash
                 $this->target = '/' . ltrim($this->target, '/');
                 $requestContext->setServerVar(ServerVars::X_REQUEST_URI, $this->target);
+                $this->targetBackreferences['$' .  ServerVars::X_REQUEST_URI] = $this->target;
 
                 // Only change the query string if we have one in our target string
                 if (strpos($this->target, '?') !== false) {
-                    $requestContext->setServerVar(ServerVars::QUERY_STRING, substr(strstr($this->target, '?'), 1));
+                    $queryString = substr(strstr($this->target, '?'), 1);
+                    $requestContext->setServerVar(ServerVars::QUERY_STRING, $queryString);
+                    $this->targetBackreferences['$' .  ServerVars::QUERY_STRING] = $queryString;
                 }
             }
 
@@ -417,6 +430,7 @@ class Rule
 
             // Lets tell them that we successfully made a redirect
             $requestContext->setServerVar(ServerVars::REDIRECT_STATUS, '200');
+            $this->targetBackreferences['$' .  ServerVars::REDIRECT_STATUS] = '200';
         }
         // If we got the "LAST"-flag we have to end here, so return false
         if (array_key_exists(RuleFlags::LAST, $this->sortedFlags)) {
@@ -486,6 +500,16 @@ class Rule
         }
 
         return $backreferences;
+    }
+
+    /**
+     * Will collect all backreferences based on this rule instance being applied to current server vars
+     *
+     * @return array
+     */
+    public function getTargetBackreferences()
+    {
+        return $this->targetBackreferences;
     }
 
     /**

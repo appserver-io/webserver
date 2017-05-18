@@ -38,7 +38,7 @@ use AppserverIo\Server\Dictionaries\ModuleHooks;
  * Basic test class for the RewriteModule class.
  *
  * @author    Bernhard Wick <bw@appserver.io>
- * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @copyright 2017 TechDivision GmbH <info@appserver.io>
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link      https://github.com/appserver-io/webserver
  * @link      http://www.appserver.io/
@@ -196,7 +196,7 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
         $mockRequestContext->setEnvVar(EnvVars::HTTPS, 'test');
         $rewriteModule->setRequestContext($mockRequestContext);
         $rewriteModule->fillContextBackreferences();
-        $this->assertEquals('test', $rewriteModule->getServerBackreferences()['$' . EnvVars::HTTPS]);
+        $this->assertEquals('test', $rewriteModule->getBackreferences()['$' . EnvVars::HTTPS]);
     }
 
     /**
@@ -218,8 +218,8 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
         $rewriteModule->fillHeaderBackreferences($request);
 
         // Test what we got
-        $this->assertTrue(isset($rewriteModule->getServerBackreferences()['$Host']));
-        $this->assertTrue(isset($rewriteModule->getServerBackreferences()['$HTTP_HOST']));
-        $this->assertEquals('test-host.com', $rewriteModule->getServerBackreferences()['$HTTP_HOST']);
+        $this->assertTrue(isset($rewriteModule->getBackreferences()['$Host']));
+        $this->assertTrue(isset($rewriteModule->getBackreferences()['$HTTP_HOST']));
+        $this->assertEquals('test-host.com', $rewriteModule->getBackreferences()['$HTTP_HOST']);
     }
 }

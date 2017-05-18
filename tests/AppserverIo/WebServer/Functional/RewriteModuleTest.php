@@ -910,4 +910,27 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
 
         $this->assertDesiredRewrite($uri, $result);
     }
+
+    /**
+     * Test wrapper for the urlencode dataset
+     *
+     * @return void
+     */
+    public function testStackedFileLoad()
+    {
+        $this->prepareRuleset(array(
+            array(
+                'condition' => '/html/version.+?/(.+)$',
+                'target' => '/html/$1',
+                'flag' => ''
+            ),
+            array(
+                'condition' => '-d{OR}-f{OR}-l',
+                'target' => '/itworks',
+                'flag' => 'L'
+            )
+        ));
+
+        $this->assertDesiredRewrite('/html/version1.2.3/test.gif', '/itworks');
+    }
 }

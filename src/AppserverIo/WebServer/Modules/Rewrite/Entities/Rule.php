@@ -346,7 +346,6 @@ class Rule
      */
     public function apply(RequestContextInterface $requestContext, ResponseInterface $response, array $serverBackreferences)
     {
-
         // First of all we have to resolve the target string with the backreferences of the matching condition
         // Separate the keys from the values so we can use them in str_replace
         // And also mix in the server's backreferences for good measure
@@ -432,6 +431,7 @@ class Rule
             $requestContext->setServerVar(ServerVars::REDIRECT_STATUS, '200');
             $this->targetBackreferences['$' .  ServerVars::REDIRECT_STATUS] = '200';
         }
+
         // If we got the "LAST"-flag we have to end here, so return false
         if (array_key_exists(RuleFlags::LAST, $this->sortedFlags)) {
             return false;

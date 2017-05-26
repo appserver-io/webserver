@@ -912,11 +912,26 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Data provider
+     *
+     * @return array
+     */
+    public function stackedFileLoadTestDataProvider()
+    {
+        return array(
+            array('/html/version1.2.3/test.gif', '/itworks'),
+            array('/html/version1.2.3/testNotExisting', '/html/testNotExisting'),
+        );
+    }
+
+    /**
      * Test wrapper for the urlencode dataset
      *
      * @return void
+     *
+     * @dataProvider stackedFileLoadTestDataProvider
      */
-    public function testStackedFileLoad()
+    public function testStackedFileLoad($uri, $result)
     {
         $this->prepareRuleset(array(
             array(
@@ -928,9 +943,14 @@ class RewriteModuleTest extends \PHPUnit_Framework_TestCase
                 'condition' => '-d{OR}-f{OR}-l',
                 'target' => '/itworks',
                 'flag' => 'L'
+            ),
+            array(
+                'condition' => '.*',
+                'target' => '',
+                'flag' => 'L'
             )
         ));
 
-        $this->assertDesiredRewrite('/html/version1.2.3/test.gif', '/itworks');
+        $this->assertDesiredRewrite($uri, $result);
     }
 }

@@ -244,6 +244,7 @@ class RewriteModule implements HttpModuleInterface
                 }
             }
 
+            $this->fillContextBackreferences();
             $this->fillHeaderBackreferences($request);
 
             // Iterate over all rules, resolve vars and apply the rule (if needed)

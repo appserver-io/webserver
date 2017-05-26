@@ -111,7 +111,7 @@ class RewriteModule implements HttpModuleInterface
      *
      * @var array $serverVars
      */
-    protected $serverBackreferences = array();
+    protected $backreferences = array();
 
     /**
      *
@@ -196,15 +196,6 @@ class RewriteModule implements HttpModuleInterface
      */
     public function process(RequestInterface $request, ResponseInterface $response, RequestContextInterface $requestContext, $hook)
     {
-        // In php an interface is, by definition, a fixed contract. It is immutable.
-        // So we have to declare the right ones afterwards...
-        /**
-         * @var $request \AppserverIo\Psr\HttpMessage\RequestInterface
-         */
-        /**
-         * @var $request \AppserverIo\Psr\HttpMessage\ResponseInterface
-         */
-
         // if false hook is coming do nothing
         if (ModuleHooks::REQUEST_POST !== $hook) {
             return;
@@ -218,8 +209,8 @@ class RewriteModule implements HttpModuleInterface
             $requestUrl = $requestContext->getServerVar(ServerVars::HTTP_HOST) . $requestContext->getServerVar(ServerVars::X_REQUEST_URI);
 
             if (! isset($this->rules[$requestUrl])) {
-                // Reset the $serverBackreferences array to avoid mixups of different requests
-                $this->serverBackreferences = array();
+                // Reset the $backreferences array to avoid mixups of different requests
+                $this->backreferences = array();
 
                 // Resolve all used backreferences which are NOT linked to the query string.
                 // We will resolve query string related backreferences separately as we are not able to cache them
@@ -247,20 +238,28 @@ class RewriteModule implements HttpModuleInterface
                     foreach ($rules as $rule) {
                         // Add the rule as a Rule object
                         $rule = new Rule($rule['condition'], $rule['target'], $rule['flag']);
-                        $rule->resolve($this->serverBackreferences);
+                        $rule->resolve($this->backreferences);
                         $this->rules[$requestUrl][] = $rule;
                     }
                 }
             }
 
+            $this->fillContextBackreferences();
+            $this->fillHeaderBackreferences($request);
+
             // Iterate over all rules, resolve vars and apply the rule (if needed)
+            $volatileBackreferences = array();
+            /** @var Rule $rule */
             foreach ($this->rules[$requestUrl] as $rule) {
+                $rule->resolve(array_merge($this->backreferences, $volatileBackreferences));
                 // Check if the rule matches, and if, apply the rule
                 if ($rule->matches()) {
                     // Apply the rule. If apply() returns false this means this was the last rule to process
-                    if ($rule->apply($requestContext, $response, $this->serverBackreferences) === false) {
+                    if ($rule->apply($requestContext, $response, $this->backreferences) === false) {
                         break;
                     }
+                    // rules which are applead and do not end stack execution can influence following rules by means of backreferences
+                    $volatileBackreferences = $rule->getTargetBackreferences();
                 }
             }
         } catch (\Exception $e) {
@@ -280,15 +279,15 @@ class RewriteModule implements HttpModuleInterface
     {
         $headerArray = $request->getHeaders();
 
-        // Iterate over all header vars we know and add them to our serverBackreferences array
+        // Iterate over all header vars we know and add them to our backreferences array
         foreach ($this->supportedServerVars['headers'] as $supportedServerVar) {
             // As we got them with another name, we have to rename them, so we will not have to do this on the fly
             $tmp = strtoupper(str_replace('HTTP', 'HEADER', $supportedServerVar));
             if (@isset($headerArray[constant("AppserverIo\\Psr\\HttpMessage\\Protocol::$tmp")])) {
-                $this->serverBackreferences['$' . $supportedServerVar] = $headerArray[constant("AppserverIo\\Psr\\HttpMessage\\Protocol::$tmp")];
+                $this->backreferences['$' . $supportedServerVar] = $headerArray[constant("AppserverIo\\Psr\\HttpMessage\\Protocol::$tmp")];
 
                 // Also create for the "dynamic" substitution syntax
-                $this->serverBackreferences['$' . constant("AppserverIo\\Psr\\HttpMessage\\Protocol::$tmp")] = $headerArray[constant("AppserverIo\\Psr\\HttpMessage\\Protocol::$tmp")];
+                $this->backreferences['$' . constant("AppserverIo\\Psr\\HttpMessage\\Protocol::$tmp")] = $headerArray[constant("AppserverIo\\Psr\\HttpMessage\\Protocol::$tmp")];
             }
         }
     }
@@ -309,13 +308,13 @@ class RewriteModule implements HttpModuleInterface
         // Iterate over all server variables and add them to the backreference array
         foreach ($requestContext->getServerVars() as $varName => $serverVar) {
             // Prefill the value
-            $this->serverBackreferences['$' . $varName] = $serverVar;
+            $this->backreferences['$' . $varName] = $serverVar;
         }
 
         // Do the same for environment variables
         foreach ($requestContext->getEnvVars() as $varName => $envVar) {
             // Prefill the value
-            $this->serverBackreferences['$' . $varName] = $envVar;
+            $this->backreferences['$' . $varName] = $envVar;
         }
     }
 

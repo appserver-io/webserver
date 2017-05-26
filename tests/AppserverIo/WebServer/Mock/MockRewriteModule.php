@@ -30,7 +30,7 @@ use AppserverIo\Psr\HttpMessage\RequestInterface;
  * Mocks the RewriteModule class to expose additional and hidden functionality
  *
  * @author    Bernhard Wick <bw@appserver.io>
- * @copyright 2015 TechDivision GmbH <info@appserver.io>
+ * @copyright 2017 TechDivision GmbH <info@appserver.io>
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link      https://github.com/appserver-io/webserver
  * @link      http://www.appserver.io/
@@ -55,9 +55,9 @@ class MockRewriteModule extends RewriteModule
      *
      * @return array
      */
-    public function getServerBackreferences()
+    public function getBackreferences()
     {
-        return $this->serverBackreferences;
+        return $this->backreferences;
     }
 
     /**

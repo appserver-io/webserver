@@ -1,63 +1,65 @@
 {
-	"name" : "appserver-io/webserver",
-	"description" : "Multithreaded webserver for php written in php",
-	"homepage" : "https://github.com/appserver-io/webserver",
-	"license" : "OSL-3.0",
-	"keywords" : [
-		"php",
-		"server",
-		"webserver",
-		"httpd",
-		"http-server"
-	],
-	"authors" : [{
-			"name" : "Johann Zelger",
-			"email" : "jz@appserver.io",
-			"homepage" : "http://www.appserver.io",
-			"role" : "Developer"
-		}, {
-			"name" : "Tim Wagner",
-			"email" : "tw@appserver.io",
-			"homepage" : "http://www.appserver.io",
-			"role" : "Developer"
-		}, {
-			"name" : "Bernhard Wick",
-			"email" : "bw@appserver.io",
-			"homepage" : "http://www.appserver.io",
-			"role" : "Developer"
-		}
-	],
-	"require" : {
-		"php" : ">=5.4.0",
-		"rhumsaa/uuid" : "~2.8",
-		"psr/log" : "*",
-		"crunch/fastcgi" : "2.x-dev",
-		"appserver-io/server" : "~10.0",
-		"appserver-io/http" : "~2.0",
-		"appserver-io/fastcgi" : "~1.0",
-		"appserver-io/logger" : "~1.0",
-		"appserver-io-psr/socket" : "~1.0",
-		"appserver-io-psr/http-message" : "~1.0",
-		"appserver-io/concurrency" : "~0.1"
-	},
-	"require-dev" : {
-		"appserver-io/build" : "~1.0",
-		"codeclimate/php-test-reporter" : "dev-master"
-	},
-	"bin" : [
-		"bin/webserver"
-	],
-	"autoload" : {
-		"psr-0" : {
-			"AppserverIo\\WebServer" : [
-				"src/",
-				"tests/"
-			]
-		}
-	},
-	"support" : {
-		"email" : "jz@appserver.io",
-		"issues" : "https://github.com/appserver-io/webserver/issues",
-		"source" : "https://github.com/appserver-io/webserver"
-	}
+    "name": "appserver-io/webserver",
+    "description": "Multithreaded webserver for php written in php",
+    "homepage": "https://github.com/appserver-io/webserver",
+    "license": "OSL-3.0",
+    "keywords": [
+        "php",
+        "server",
+        "webserver",
+        "httpd",
+        "http-server"
+    ],
+    "authors": [
+        {
+            "name": "Johann Zelger",
+            "email": "jz@appserver.io",
+            "homepage": "http://www.appserver.io",
+            "role": "Developer"
+        },
+        {
+            "name": "Tim Wagner",
+            "email": "tw@appserver.io",
+            "homepage": "http://www.appserver.io",
+            "role": "Developer"
+        },
+        {
+            "name": "Bernhard Wick",
+            "email": "bw@appserver.io",
+            "homepage": "http://www.appserver.io",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "rhumsaa/uuid": "~2.8",
+        "psr/log": "*",
+        "appserver-io/fastcgi": "2.x-dev",
+        "appserver-io/http": "~2.0",
+        "appserver-io/logger": "~1.0",
+        "appserver-io/server": "~10.0",
+        "appserver-io/concurrency": "~0.1",
+        "appserver-io-psr/socket": "~1.0",
+        "appserver-io-psr/http-message": "~1.0"
+    },
+    "require-dev": {
+        "appserver-io/build": "~1.0",
+        "codeclimate/php-test-reporter": "dev-master"
+    },
+    "bin": [
+        "bin/webserver"
+    ],
+    "autoload": {
+        "psr-0": {
+            "AppserverIo\\WebServer": [
+                "src/",
+                "tests/"
+            ]
+        }
+    },
+    "support": {
+        "email": "jz@appserver.io",
+        "issues": "https://github.com/appserver-io/webserver/issues",
+        "source": "https://github.com/appserver-io/webserver"
+    }
 }

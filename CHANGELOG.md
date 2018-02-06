@@ -1,3 +1,14 @@
+# Version 5.1.3
+
+## Bugfixes
+
+* Remove old FastCgiModule implementation
+* Switch to appserver-io/fastcgi instead of crunch/fastcgi
+
+## Features
+
+* None
+
 # Version 5.1.2
 
 ## Bugfixes

@@ -223,7 +223,7 @@
                    "type" : "\\AppserverIo\\WebServer\\Modules\\PhpModule"
                 },
                 { 
-                   "type" : "\\AppserverIo\\WebServer\\Modules\\FastCgiModule"
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\FcgiModule"
                 },
                 { 
                    "type" : "\\AppserverIo\\WebServer\\Modules\\DeflateModule"
@@ -442,7 +442,7 @@
                    "type" : "\\AppserverIo\\WebServer\\Modules\\PhpModule"
                 },
                 { 
-                   "type" : "\\AppserverIo\\WebServer\\Modules\\FastCgiModule"
+                   "type" : "\\AppserverIo\\WebServer\\Modules\\FcgiModule"
                 },
                 { 
                    "type" : "\\AppserverIo\\WebServer\\Modules\\DeflateModule"

@@ -34,7 +34,7 @@
         "php": ">=5.4.0",
         "rhumsaa/uuid": "~2.8",
         "psr/log": "*",
-        "appserver-io/fastcgi": "2.x-dev",
+        "appserver-io/fastcgi": "~2.0",
         "appserver-io/http": "~2.0",
         "appserver-io/logger": "~1.0",
         "appserver-io/server": "~10.0",
@@ -43,8 +43,7 @@
         "appserver-io-psr/http-message": "~1.0"
     },
     "require-dev": {
-        "appserver-io/build": "~1.0",
-        "codeclimate/php-test-reporter": "dev-master"
+        "appserver-io/build": "~1.0"
     },
     "bin": [
         "bin/webserver"

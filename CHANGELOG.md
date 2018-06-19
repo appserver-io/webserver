@@ -1,3 +1,13 @@
+# Version 5.1.5
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Switch to appserver-io/logger version ~2.0
+
 # Version 5.1.4
 
 ## Bugfixes
